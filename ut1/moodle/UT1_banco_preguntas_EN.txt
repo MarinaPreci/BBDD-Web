@@ -1,0 +1,326 @@
+// ============================================================
+// UT1 · Data storage systems — Databases
+// 1st year DAM (bilingual) — Marina Preciados Agapito
+// English version of the GIFT question bank, for the bilingual
+// module and the unit's English activity.
+// To import into Moodle: Question bank > Import > GIFT format >
+// select this file.
+// Organized into categories (one per block) so different quizzes
+// can be built by pulling random questions from each category.
+// ============================================================
+
+$CATEGORY: $course$/UT1 (English)/Block 1 · Data, information and information systems
+
+::B1-1 Data vs information::Which of the following sentences is information, rather than a plain piece of data? {
+	~"18" #This is an isolated piece of data, with no context.
+	="18 people enrolled today in the DAM course" #Correct: it has context (what, when, how many) and can be interpreted.
+	~"people" #This is just a unit, with no data attached to it.
+}
+
+::B1-2 Information has context::Information is data that has already been processed and placed in context. {TRUE}
+
+::B1-3 Knowledge requires a decision::Simply gathering large amounts of data is enough for knowledge to appear, without needing to actually use it to decide anything. {FALSE}
+
+::B1-4 What is an information system::An information system is... {
+	=an organized set of elements, whether computerized or not, used to process and manage data in order to meet a specific need #Correct.
+	~always a computer program installed on a computer #It does not have to be computerized.
+	~exactly the same thing as a database #A database is only one possible part of an information system.
+}
+
+::B1-5 The data-information-knowledge chain::Match each example with its level in the chain data → information → knowledge. {
+	=22 °C -> Data
+	="22 °C in Seville on 15 July" -> Information
+	="It's hot, so I'm watering the plants" -> Knowledge
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 2 · The evolution of data storage
+
+::B2-1 Timeline of data storage::Match each milestone with its approximate era. {
+	=Clay tablets -> Around 3000 BC
+	=Magnetic tapes -> 1950
+	="Disks and the hierarchical / network model" -> 1960
+	="Relational model (Codd, IBM)" -> 1970
+	="Big Data and NoSQL" -> From the year 2000 onwards
+}
+
+::B2-2 Access on magnetic tapes::What characterizes access on magnetic tapes? {
+	=They only allow sequential reading: every earlier record must be read first #Correct.
+	~They allow jumping straight to any record #That is direct access, typical of disks.
+	~They organize data into tables related to one another #That corresponds to the relational model, which came much later.
+}
+
+::B2-3 Codd and the relational model::The relational model was proposed by Edgar F. Codd, while working at IBM. {TRUE}
+
+::B2-4 Direct access on tapes::Magnetic tapes allow direct access to any record without having to go through the previous ones. {FALSE}
+
+::B2-5 Origin of NoSQL::What mainly drove the emergence of NoSQL databases? {
+	=The need to handle large volumes of loosely structured data (Big Data) #Correct.
+	~The invention of the hard disk #The hard disk is much older than NoSQL.
+	~The appearance of the SQL language #SQL belongs to the relational model, not to NoSQL.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 3 · Files
+
+::B3-1 Plain text files::Which of these files is a plain text file? {
+	~report.docx #It is binary: it only displays properly in the right application.
+	~photo.jpg #It is binary.
+	=data.csv #Correct: it can be read in any text editor.
+	~program.exe #It is binary, an executable.
+}
+
+::B3-2 Direct access on an SSD::Direct access allows the system to jump straight to the record it needs, as happens on an SSD or NVMe drive. {TRUE}
+
+::B3-3 A JPG file in Notepad::A .jpg file can be opened and read normally in Notepad. {FALSE}
+
+::B3-4 A DBMS's internal files::The internal files a DBMS uses to store its data on disk (such as MariaDB's .ibd files) are usually binary. {TRUE}
+
+::B3-5 A typical file-based problem::A school keeps a student's grades in one teacher's spreadsheet for each subject, and also in a separate spreadsheet in the school office. One day a grade is corrected in the teacher's spreadsheet, but nobody tells the office. {
+	=Inconsistency between files #Correct: the same information no longer matches depending on which file you check.
+	~Isolation of information #Isolation means being unable to relate data from different files, not that the data disagree with each other.
+	~Sequential access #This has nothing to do with the problem described.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 4 · What a database is and its elements
+
+::B4-1 Definition of a database::A database is... {
+	=an organized, interrelated set of data, accessible by several users and applications at the same time, with minimal redundancy #Correct.
+	~a set of text files stored in the same folder #That does not avoid the problems of redundancy and inconsistency.
+	~a program used to create text documents #You are confusing a database with a word processor.
+}
+
+::B4-2 Elements of a database::Match each term with its definition. {
+	=Field -> An identifier for an entire family of data, all of a single data type
+	=Record -> The collection of all the data belonging to one single element
+	="Primary key" -> A unique identifier for each record, which is never repeated
+	=Index -> A structure that orders key fields so searches run faster
+	=View -> A virtual table generated from a query
+	=Schema -> The set of tables, fields and relationships that make up the database
+}
+
+::B4-3 A view takes up no space of its own::A view is a physical table that occupies its own space on disk, just like a regular table. {FALSE}
+
+::B4-4 A real advantage of databases::Which of these is a real advantage of using a database instead of separate files? {
+	=Less redundancy and better data integrity #Correct.
+	~Cheaper and faster to install #It is actually the opposite: installing and maintaining a DBMS is usually more costly.
+	~No qualified staff are needed to administer it #On the contrary, it requires qualified staff (a DBA).
+}
+
+::B4-5 A real drawback of databases::One disadvantage of databases compared with separate files is that they require a more costly installation and qualified staff to administer them. {TRUE}
+
+::B4-6 Choosing the primary key::In a Students table with the fields ID_number, Name, DateOfBirth and Year_group, which field should be the primary key? {
+	=ID_number #Correct: it is unique to each student and never changes.
+	~Name #Two students can share the same name.
+	~Year_group #Many students share the same year group.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 5 · Data types and models
+
+::B5-1 Data models::Match each model with its main feature. {
+	="Hierarchical" -> A tree structure, one-directional, like the Windows registry
+	="Network" -> A graph with many-to-many relationships between nodes
+	=Relational -> Two-dimensional tables related to one another through keys
+	="Object-oriented" -> Compound data types and inheritance
+}
+
+::B5-2 The model behind the Windows registry::Which data model does the Windows configuration registry use? {
+	=Hierarchical #Correct: it is a tree structure of folders and subfolders.
+	~Relational #The relational model uses tables, not a tree of folders.
+	~Document-based #The document model groups all information into a single document, not into a tree.
+}
+
+::B5-3 The most widely used model in business management::Which data model is most widespread today in business management applications? {
+	=Relational #Correct.
+	~Hierarchical #It is an older, less flexible model for this purpose.
+	~Network #It has largely been replaced by the relational model.
+}
+
+::B5-4 A centralized database::A centralized database spreads its data across several servers located in different geographic locations. {FALSE}
+
+::B5-5 MongoDB is document-based::MongoDB is an example of a document-based NoSQL database. {TRUE}
+
+::B5-6 A model for highly connected relationships::A social network wants to store friendships and recommendations among millions of users, with very densely interconnected relationships between them. Which model fits best? {
+	=Graph model (NoSQL) #Correct: graphs are ideal for very densely interconnected relationships.
+	~Hierarchical model #The hierarchical model is one-directional and does not represent such dense many-to-many relationships well.
+	~Key-value model #The key-value model does not represent complex relationships between elements well.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 6 · DBMS, ACID and architecture
+
+::B6-1 Database vs DBMS::Which of these statements about a DBMS is correct? {
+	~MySQL is a database #MySQL is a DBMS, not a database itself.
+	=A DBMS is the software that creates, manipulates and administers databases, acting as the interface between the user and the data #Correct.
+	~A DBMS can only manage one database at a time #A single DBMS can administer several databases at the same time.
+}
+
+::B6-2 The four ACID properties::Match each ACID letter with its meaning. {
+	=A -> Atomicity: every operation runs, or none of them do
+	=C -> Consistency: the system moves from one valid state to another valid state
+	=I -> Isolation: no transaction sees the result of another one that has not finished yet
+	=D -> Durability: once an operation is confirmed, it is never lost
+}
+
+::B6-3 ACID: stock control::Two employees of an online shop sell the last unit of a product at the same time, in two different orders. The system must prevent both sales from being confirmed based on the same available stock, before the other transaction has finished. Which ACID property is at stake here? {
+	=Isolation #Correct: no transaction should see the intermediate state of another transaction that is still in progress.
+	~Atomicity #Atomicity is about a transaction running entirely or not at all, not about what other transactions can see.
+	~Durability #Durability protects data that has already been confirmed; it does not prevent this conflict.
+}
+
+::B6-4 ANSI/SPARC architecture::Match each level of the three-level architecture with what it describes. {
+	=External -> How the user sees the data: forms, listings, reports
+	=Conceptual -> The complete design: all the data and relationships, organized in tables
+	=Internal -> How the data is physically stored on disk
+}
+
+::B6-5 The internal level::The internal level of the ANSI/SPARC architecture describes how the end user sees and uses the data, through forms and reports. {FALSE}
+
+::B6-6 The DBA::Which user profile is mainly responsible for administering and maintaining the DBMS (backups, permissions, performance)? {
+	=The DBA (database administrator) #Correct.
+	~The end user #The end user only queries or enters data; they do not administer the DBMS.
+	~The data analyst #The analyst exploits the data; they do not administer the system.
+}
+
+::B6-7 Office vs corporate DBMSs::A DBMS such as Access is aimed more at home or office use, while one such as Oracle is designed for large corporate data volumes. {TRUE}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 7 · SQL and its sublanguages
+
+::B7-1 Classifying SQL statements::Classify each SQL statement under its sublanguage. {
+	="ALTER TABLE customers ADD phone VARCHAR(9)" -> DDL
+	="SELECT * FROM orders WHERE total > 100" -> DML
+	="REVOKE SELECT ON employees FROM ana" -> DCL
+	=COMMIT -> TCL
+	="INSERT INTO products VALUES (1, 'Keyboard', 19.99)" -> DML
+	="DROP TABLE temp_data" -> DDL
+}
+
+::B7-2 The role of DDL::Which SQL sublanguage is responsible for defining the structure of tables (creating, altering or dropping them)? {
+	=DDL #Correct (Data Definition Language).
+	~DML #DML manipulates the data, not the structure.
+	~DCL #DCL controls access permissions.
+}
+
+::B7-3 A DCL statement::Which of these statements belongs to DCL? {
+	=GRANT SELECT ON employees TO ana #Correct: DCL controls permissions.
+	~SELECT * FROM employees #This is DML.
+	~COMMIT #This is TCL.
+}
+
+::B7-4 ROLLBACK::The ROLLBACK statement undoes the changes made by a transaction that has not yet been committed. {TRUE}
+
+::B7-5 DML creates tables::DML allows you to create and delete tables in the database. {FALSE}
+
+::B7-6 Reading an SQL query::Given the query SELECT Make, Model FROM Cars WHERE Consumption &lt; 5, what do you get as a result? {
+	=The make and model of the cars with fuel consumption lower than 5 #Correct.
+	~All the data for every car in the table #That would be the result without WHERE and with SELECT *.
+	~Only the number of cars that meet the condition #That would require a COUNT function, not this SELECT.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Block 8 · Where a database lives
+
+::B8-1 Where a database lives::Match each field with an example of database use in it. {
+	=Administrative -> A company's customers, orders and invoices
+	=Scientific -> Climate and genomic data
+	="Search engines" -> Google indexing almost the entire internet
+	=Configuration -> The Windows registry
+}
+
+::B8-2 A non-typical use of a database::Which of these is NOT a typical example of database use? {
+	~Antivirus software storing its catalogue of known malware #It is: antivirus programs do use databases.
+	~A library managing its catalogue of books and loans #It is a typical example too.
+	=A single voice note recorded on a phone, with no structure or relation to any other data #Correct: it is an isolated piece of data, not an organized database.
+}
+
+::B8-3 Antivirus software and databases::Antivirus programs also use databases, for example to store catalogues of known malware. {TRUE}
+
+::B8-4 Fields of use beyond business::Besides companies, which of these are real fields where databases are used? {
+	=Libraries and population censuses #Correct.
+	~Handwritten letters and paper shopping lists #These are examples with no structure or DBMS behind them.
+	~Casual conversations with no record kept at all #No data is stored there at all.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/General review
+
+::REP-1 Meaning of DML::What does DML stand for? {
+	=Data Manipulation Language #Correct.
+	~Data Modeling Language #This does not exist as a standard SQL sublanguage.
+	~Database Management Language #That would describe the DBMS itself, not an SQL sublanguage.
+}
+
+::REP-2 What a DBMS is for::What is a database management system (DBMS) mainly used for? {
+	=To create, manipulate and administer databases, acting as the interface between the user and the data #Correct.
+	~Only to design an application's graphical interface #That is not the role of a DBMS.
+	~Only to make backup copies, with no other function #That is one of its functions, but not the only one.
+}
+
+::REP-3 Data redundancy::What does data redundancy consist of? {
+	=Storing the same piece of data duplicated in more than one place without any real need #Correct.
+	~Encrypting data to protect it #That is security, not redundancy.
+	~Deleting data that is no longer used #That would be cleanup or data purging.
+}
+
+::REP-4 The benefit of integrity::What benefit does data integrity provide in a database? {
+	=It guarantees that the data stays correct and consistent at all times #Correct.
+	~It makes the database take up less disk space #That is more closely related to minimal redundancy.
+	~It lets any user modify any data without restrictions #That would be the opposite of good integrity control.
+}
+
+::REP-5 The level that describes the whole structure::What is the name of the ANSI/SPARC architecture level that describes the database's entire structure (tables, fields, relationships)? {
+	=Conceptual #Correct.
+	~External #The external level is each user's own view, not the whole structure.
+	~Internal #The internal level is how the data is physically stored on disk.
+}
+
+::REP-6 A real-life example of a primary key::Which of these is a good real-life example of a primary key? {
+	=A person's national ID number #Correct: it is unique and never repeated.
+	~A person's first name #It can be shared by different people.
+	~A person's age #It changes over time and is shared by many people.
+}
+
+::REP-7 The main goal of a database::What is the main goal of a database? {
+	=To organize data in an interrelated way, with minimal redundancy, accessible to several users and applications #Correct.
+	~To keep as many copies of each piece of data as possible #That is exactly the opposite: minimizing redundancy.
+	~To completely replace any spreadsheet #Both tools can coexist depending on the case.
+}
+
+::REP-8 What a database is used for::In practice, what is a database used for in a company? {
+	=To reliably store and manage the information that several people and applications need to consult and update #Correct.
+	~Only to make the company website look nicer #It has no direct relation to visual design.
+	~Only to fulfil a mandatory legal requirement #That is not its main function.
+}
+
+::REP-9 Types of databases::Which of these lists correctly names types of databases? {
+	=Relational, hierarchical, document-based and key-value #Correct.
+	~Word, Excel and PowerPoint #These are office applications, not types of databases.
+	~HTML, CSS and JavaScript #These are web technologies, not types of databases.
+}
+
+::REP-10 Types of files by content::According to their content, what two main types are files classified into? {
+	=Plain text and binary #Correct.
+	~Large and small #That refers to size, not content type.
+	~Old and modern #That is not a real classification of files.
+}
+
+
+$CATEGORY: $course$/UT1 (English)/Technical vocabulary
+
+// English-medium vocabulary check (companion to the "Anna's problem"
+// listening and short-writing activity in the support document).
+::VOC-1 Technical vocabulary::Match each term with the definition that best fits it. {
+	=data -> A single, isolated fact, with no context of its own
+	=information -> Data that has already been processed and put into context
+	=file -> A set of data stored as a single named unit
+	=record -> All the data referring to one single element
+	=field -> An identifier for a family of data, all of a single type
+	="primary key" -> The field that uniquely identifies each record
+	=database -> An organized, interrelated set of data with minimal redundancy
+	=DBMS -> The software that creates, manages and administers databases
+	=query -> A request for information sent to a database
+	=backup -> A copy of data kept so it can be restored after a loss
+}

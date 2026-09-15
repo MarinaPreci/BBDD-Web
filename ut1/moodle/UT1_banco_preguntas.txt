@@ -1,0 +1,324 @@
+// ============================================================
+// UT1 · Sistemas de almacenamiento de la información — Base de datos
+// 1º DAM bilingüe — Marina Preciados Agapito
+// Banco de preguntas en formato GIFT para importar en Moodle:
+// Banco de preguntas > Importar > formato GIFT > seleccionar este fichero.
+// Organizado en categorías (una por bloque) para poder generar
+// cuestionarios distintos tomando preguntas aleatorias de cada categoría.
+// ============================================================
+
+$CATEGORY: $course$/UT1/Bloque 1 · Dato, información y sistema de información
+
+::B1-1 Dato vs información::¿Cuál de las siguientes frases es información, y no un simple dato? {
+	~"18" #Es un dato aislado, sin contexto.
+	="18 personas se han matriculado hoy en el curso de DAM" #Correcto: tiene contexto (qué, cuándo, cuánto) y puede interpretarse.
+	~"personas" #Es solo una unidad, sin ningún dato asociado.
+}
+
+::B1-2 La información tiene contexto::La información es un dato ya procesado y puesto en contexto. {TRUE}
+
+::B1-3 El conocimiento requiere decisión::Basta con acumular muchos datos para que aparezca conocimiento, sin necesidad de usarlos para decidir nada. {FALSE}
+
+::B1-4 Qué es un sistema de información::Un sistema de información es... {
+	=un conjunto organizado de elementos, informatizados o no, para tratar y administrar datos y cubrir una necesidad concreta #Correcto.
+	~siempre un programa informático instalado en un ordenador #No tiene por qué estar informatizado.
+	~exactamente lo mismo que una base de datos #La base de datos es solo una posible parte de un sistema de información.
+}
+
+::B1-5 La cadena dato-información-conocimiento::Relaciona cada ejemplo con su nivel en la cadena dato → información → conocimiento. {
+	=22 ºC -> Dato
+	="22 ºC en Sevilla el 15 de julio" -> Información
+	="Hace calor, así que riego las plantas" -> Conocimiento
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 2 · La evolución del almacenamiento
+
+::B2-1 Cronología del almacenamiento::Relaciona cada hito con su época aproximada. {
+	=Tablillas de arcilla -> Alrededor del 3000 a.C.
+	=Cintas magnéticas -> 1950
+	="Discos y modelo jerárquico / en red" -> 1960
+	="Modelo relacional (Codd, IBM)" -> 1970
+	="Big Data y NoSQL" -> A partir del año 2000
+}
+
+::B2-2 Acceso en cintas magnéticas::¿Qué caracteriza al acceso mediante cintas magnéticas? {
+	=Solo permiten lectura secuencial: hay que recorrer todos los registros anteriores #Correcto.
+	~Permiten saltar directamente a cualquier registro #Eso es acceso directo, propio de los discos.
+	~Organizan los datos en tablas relacionadas entre sí #Eso corresponde al modelo relacional, muy posterior.
+}
+
+::B2-3 Codd y el modelo relacional::El modelo relacional fue propuesto por Edgar F. Codd, trabajando en IBM. {TRUE}
+
+::B2-4 Acceso directo en cintas::Las cintas magnéticas permiten acceso directo a cualquier registro sin recorrer los anteriores. {FALSE}
+
+::B2-5 Origen del NoSQL::¿Qué impulsó principalmente la aparición de las bases de datos NoSQL? {
+	=La necesidad de manejar grandes volúmenes de datos poco estructurados (Big Data) #Correcto.
+	~La invención del disco duro #El disco duro es muy anterior al NoSQL.
+	~La aparición del lenguaje SQL #SQL pertenece al modelo relacional, no al NoSQL.
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 3 · Ficheros
+
+::B3-1 Ficheros de texto plano::¿Cuál de estos ficheros es un fichero de texto plano? {
+	~informe.docx #Es binario: solo se lee bien con la aplicación adecuada.
+	~foto.jpg #Es binario.
+	=datos.csv #Correcto: es legible en cualquier editor de texto.
+	~programa.exe #Es binario, un ejecutable.
+}
+
+::B3-2 Acceso directo en SSD::El acceso directo permite saltar directamente al registro que interesa, como ocurre en un SSD o NVMe. {TRUE}
+
+::B3-3 Fichero JPG en el Bloc de notas::Un fichero .jpg se puede leer con normalidad en el Bloc de notas. {FALSE}
+
+::B3-4 Ficheros internos de un SGBD::Los ficheros internos que usa un SGBD para guardar sus datos en disco (como los .ibd de MariaDB) suelen ser binarios. {TRUE}
+
+::B3-5 Un problema típico de los ficheros::Un instituto guarda las notas de un alumno en el Excel del profesor de cada asignatura y, además, en otro Excel distinto en Secretaría. Un día se corrige una nota en el Excel del profesor, pero nadie avisa a Secretaría. {
+	=Inconsistencia entre ficheros #Correcto: la misma información no coincide según qué fichero se consulte.
+	~Aislamiento de la información #El aislamiento es no poder relacionar datos de ficheros distintos, no que no coincidan entre sí.
+	~Acceso secuencial #No tiene relación con este problema.
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 4 · Qué es una base de datos y sus elementos
+
+::B4-1 Definición de base de datos::Una base de datos es... {
+	=un conjunto de datos organizados e interrelacionados, accesibles por varios usuarios y aplicaciones a la vez, con redundancia mínima #Correcto.
+	~un conjunto de ficheros de texto guardados en la misma carpeta #Eso no evita los problemas de redundancia e inconsistencia.
+	~un programa que sirve para crear documentos de texto #Confundes base de datos con procesador de texto.
+}
+
+::B4-2 Elementos de una base de datos::Relaciona cada término con su definición. {
+	=Campo -> Identificador de toda una familia de datos, con un único tipo de dato
+	=Registro -> Recolección de todos los datos de un mismo elemento
+	="Clave primaria" -> Identificador único de cada registro, que no se repite
+	=Índice -> Estructura que ordena campos clave para buscar más rápido
+	=Vista -> Tabla virtual generada a partir de una consulta
+	=Esquema -> Conjunto de tablas, campos y relaciones de la base de datos
+}
+
+::B4-3 La vista no ocupa espacio propio::Una vista es una tabla física que ocupa espacio propio en el disco, igual que una tabla normal. {FALSE}
+
+::B4-4 Ventaja real de las bases de datos::¿Cuál de estas es una ventaja real de usar una base de datos frente a ficheros sueltos? {
+	=Menor redundancia e integridad de los datos #Correcto.
+	~Instalación más barata y rápida #Es justo lo contrario: instalar y mantener un SGBD suele ser más costoso.
+	~No hace falta personal cualificado para administrarla #Al contrario, requiere personal cualificado (DBA).
+}
+
+::B4-5 Inconveniente real de las BD::Una de las desventajas de las bases de datos frente a los ficheros sueltos es que requieren una instalación más costosa y personal cualificado para administrarlas. {TRUE}
+
+::B4-6 Elegir la clave primaria::En una tabla de Alumnos con los campos DNI, Nombre, FechaNacimiento y Curso, ¿qué campo debería ser la clave primaria? {
+	=DNI #Correcto: es único para cada alumno y no cambia.
+	~Nombre #Dos alumnos pueden llamarse igual.
+	~Curso #Muchos alumnos comparten el mismo curso.
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 5 · Tipos y modelos de datos
+
+::B5-1 Modelos de datos::Relaciona cada modelo con su característica principal. {
+	="Jerárquico" -> Estructura en árbol, unidireccional, como el registro de Windows
+	="En red" -> Grafo con relaciones muchos a muchos entre nodos
+	=Relacional -> Tablas bidimensionales relacionadas mediante claves
+	="Orientado a objetos" -> Tipos de datos compuestos y herencia
+}
+
+::B5-2 Modelo del registro de Windows::¿Qué modelo de datos usa el registro de configuración de Windows? {
+	=Jerárquico #Correcto: es una estructura en árbol de carpetas y subcarpetas.
+	~Relacional #El relacional usa tablas, no árboles de carpetas.
+	~Documental #El documental agrupa toda la información en un documento, no en un árbol.
+}
+
+::B5-3 Modelo más usado en gestión empresarial::¿Cuál es el modelo de datos más extendido hoy en día en aplicaciones de gestión empresarial? {
+	=Relacional #Correcto.
+	~Jerárquico #Es un modelo más antiguo y menos flexible para este uso.
+	~En red #Ha sido en gran parte sustituido por el relacional.
+}
+
+::B5-4 BD centralizada::Una base de datos centralizada reparte sus datos entre varios servidores situados en distintas ubicaciones geográficas. {FALSE}
+
+::B5-5 MongoDB es documental::MongoDB es un ejemplo de base de datos NoSQL de tipo documental. {TRUE}
+
+::B5-6 Modelo para relaciones muy conectadas::Una red social quiere guardar las amistades y recomendaciones entre millones de usuarios, con relaciones muy interconectadas entre ellos. ¿Qué modelo encaja mejor? {
+	=Modelo en grafos (NoSQL) #Correcto: los grafos son ideales para relaciones muy interconectadas.
+	~Modelo jerárquico #El jerárquico es unidireccional y no representa bien relaciones muchos a muchos tan densas.
+	~Modelo clave-valor #El clave-valor no representa bien relaciones complejas entre elementos.
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 6 · SGBD, ACID y arquitectura
+
+::B6-1 BD vs SGBD::¿Cuál de estas afirmaciones sobre un SGBD es correcta? {
+	~MySQL es una base de datos #MySQL es un SGBD, no una base de datos en sí.
+	=Un SGBD es el software que crea, manipula y administra bases de datos, y sirve de interfaz entre el usuario y los datos #Correcto.
+	~Un SGBD solo puede gestionar una base de datos a la vez #Un mismo SGBD puede administrar varias bases de datos a la vez.
+}
+
+::B6-2 Las cuatro propiedades ACID::Relaciona cada letra de ACID con su significado. {
+	=A -> Atomicidad: todas las operaciones se ejecutan, o ninguna
+	=C -> Consistencia: se pasa de un estado válido a otro estado válido
+	=I -> Aislamiento: ninguna transacción ve el resultado de otra que aún no ha terminado
+	=D -> Durabilidad: una vez confirmada la operación, no se pierde
+}
+
+::B6-3 ACID: control de stock::Dos empleados de una tienda online venden a la vez la última unidad de un producto, en dos pedidos distintos. El sistema debe evitar que ambas ventas se confirmen viendo el mismo stock disponible antes de que la otra transacción termine. ¿Qué propiedad ACID entra en juego? {
+	=Aislamiento #Correcto: ninguna transacción debe ver el estado intermedio de otra transacción en curso.
+	~Atomicidad #La atomicidad trata de que una transacción se ejecute entera o nada, no de qué ven otras transacciones.
+	~Durabilidad #La durabilidad protege los datos ya confirmados, no evita este conflicto.
+}
+
+::B6-4 Arquitectura ANSI/SPARC::Relaciona cada nivel de la arquitectura en 3 niveles con lo que describe. {
+	=Externo -> Cómo ve los datos el usuario: formularios, listados, informes
+	=Conceptual -> El diseño completo: todos los datos y relaciones, en tablas
+	=Interno -> Cómo se almacenan físicamente los datos en el disco
+}
+
+::B6-5 Nivel interno::El nivel interno de la arquitectura ANSI/SPARC describe cómo ve y usa los datos el usuario final, mediante formularios e informes. {FALSE}
+
+::B6-6 El DBA::¿Qué perfil de usuario se encarga principalmente de administrar y mantener el SGBD (copias de seguridad, permisos, rendimiento)? {
+	=El DBA (administrador de la base de datos) #Correcto.
+	~El usuario final #El usuario final solo consulta o introduce datos, no administra el SGBD.
+	~El analista de datos #El analista explota los datos, no administra el sistema.
+}
+
+::B6-7 SGBD ofimáticos vs corporativos::Un SGBD como Access está pensado más para un uso doméstico u ofimático, mientras que uno como Oracle está pensado para grandes volúmenes de datos corporativos. {TRUE}
+
+
+$CATEGORY: $course$/UT1/Bloque 7 · SQL y sus sublenguajes
+
+::B7-1 Clasificar sentencias SQL::Clasifica cada sentencia SQL en su sublenguaje. {
+	="ALTER TABLE clientes ADD telefono VARCHAR(9)" -> DDL
+	="SELECT * FROM pedidos WHERE total > 100" -> DML
+	="REVOKE SELECT ON empleados FROM ana" -> DCL
+	=COMMIT -> TCL
+	="INSERT INTO productos VALUES (1, 'Teclado', 19.99)" -> DML
+	="DROP TABLE temporal" -> DDL
+}
+
+::B7-2 Función del DDL::¿Qué sublenguaje de SQL se encarga de definir la estructura de las tablas (crearlas, modificarlas o eliminarlas)? {
+	=DDL #Correcto (Data Definition Language).
+	~DML #El DML manipula los datos, no la estructura.
+	~DCL #El DCL controla los permisos de acceso.
+}
+
+::B7-3 Instrucción DCL::¿Cuál de estas instrucciones pertenece al DCL? {
+	=GRANT SELECT ON empleados TO ana #Correcto: el DCL controla permisos.
+	~SELECT * FROM empleados #Es DML.
+	~COMMIT #Es TCL.
+}
+
+::B7-4 ROLLBACK::La instrucción ROLLBACK deshace los cambios de una transacción que todavía no se ha confirmado. {TRUE}
+
+::B7-5 El DML crea tablas::El DML permite crear y eliminar tablas de la base de datos. {FALSE}
+
+::B7-6 Leer una consulta SQL::Dada la consulta SELECT Marca, Modelo FROM Automoviles WHERE Consumo &lt; 5, ¿qué obtienes como resultado? {
+	=La marca y el modelo de los coches con un consumo menor que 5 #Correcto.
+	~Todos los datos de todos los coches de la tabla #Eso sería sin WHERE y con SELECT *.
+	~Solo el número de coches que cumplen la condición #Eso sería con una función COUNT, no con este SELECT.
+}
+
+
+$CATEGORY: $course$/UT1/Bloque 8 · Dónde vive una base de datos
+
+::B8-1 Dónde vive una base de datos::Relaciona cada ámbito con un ejemplo de uso de bases de datos. {
+	=Administrativas -> Clientes, pedidos y facturas de una empresa
+	=Científicas -> Datos climáticos y genómicos
+	="Motores de búsqueda" -> Google indexando casi todo internet
+	=Configuración -> El registro de Windows
+}
+
+::B8-2 Uso no típico de una BD::¿Cuál de estas opciones NO es un ejemplo típico de uso de bases de datos? {
+	~Un antivirus guardando su catálogo de malware conocido #Sí lo es: los antivirus usan bases de datos.
+	~Una biblioteca gestionando su catálogo de libros y préstamos #Sí lo es.
+	=Una nota de voz suelta grabada en el móvil, sin ninguna estructura ni relación con otros datos #Correcto: es un dato aislado, no una base de datos organizada.
+}
+
+::B8-3 Antivirus y bases de datos::Los antivirus también usan bases de datos, por ejemplo para guardar catálogos de malware conocido. {TRUE}
+
+::B8-4 Ámbitos de uso más allá de la empresa::Además de las empresas, ¿cuáles de estos son ámbitos reales de uso de bases de datos? {
+	=Bibliotecas y censos de población #Correcto.
+	~Cartas escritas a mano y listas de la compra en papel #Son ejemplos sin estructura ni SGBD detrás.
+	~Conversaciones improvisadas sin ningún registro #No hay ningún dato almacenado ahí.
+}
+
+
+$CATEGORY: $course$/UT1/Repaso general
+
+::REP-1 Significado de DML::¿Qué significa DML? {
+	=Data Manipulation Language (Lenguaje de Manipulación de Datos) #Correcto.
+	~Data Modeling Language #No existe como sublenguaje SQL estándar.
+	~Database Management Language #Ese sería más bien el propio SGBD, no un sublenguaje SQL.
+}
+
+::REP-2 Para qué sirve un SGBD::¿Para qué sirve principalmente un gestor de base de datos (SGBD)? {
+	=Para crear, manipular y administrar bases de datos, sirviendo de interfaz entre el usuario y los datos #Correcto.
+	~Solo para diseñar la interfaz gráfica de una aplicación #Esa no es la función de un SGBD.
+	~Solo para hacer copias de seguridad, sin más funciones #Es una de sus funciones, pero no la única.
+}
+
+::REP-3 Redundancia de datos::¿En qué consiste la redundancia de datos? {
+	=En guardar el mismo dato duplicado en más de un sitio sin necesidad #Correcto.
+	~En cifrar los datos para protegerlos #Eso es seguridad, no redundancia.
+	~En borrar datos que ya no se usan #Eso sería depuración o limpieza de datos.
+}
+
+::REP-4 Ventaja de la integridad::¿Qué ventaja aporta la integridad de los datos en una base de datos? {
+	=Garantiza que los datos sean correctos y consistentes en todo momento #Correcto.
+	~Hace que la base de datos ocupe menos espacio en disco #Eso tiene más que ver con la redundancia mínima.
+	~Permite que cualquier usuario modifique cualquier dato sin restricciones #Eso sería lo contrario de un buen control de integridad.
+}
+
+::REP-5 Nivel que describe toda la estructura::¿Cómo se llama el nivel de la arquitectura ANSI/SPARC que describe toda la estructura de la base de datos (tablas, campos, relaciones)? {
+	=Conceptual #Correcto.
+	~Externo #El externo es la vista de cada usuario, no toda la estructura.
+	~Interno #El interno es cómo se almacena físicamente en disco.
+}
+
+::REP-6 Ejemplo real de clave primaria::¿Cuál de estos es un buen ejemplo de clave primaria en la vida real? {
+	=El DNI de una persona #Correcto: es único y no se repite.
+	~El nombre de pila de una persona #Se puede repetir entre personas distintas.
+	~La edad de una persona #Cambia con el tiempo y se repite entre muchas personas.
+}
+
+::REP-7 Objetivo de una base de datos::¿Cuál es el objetivo principal de una base de datos? {
+	=Organizar los datos de forma interrelacionada, con redundancia mínima y accesible para varios usuarios y aplicaciones #Correcto.
+	~Guardar el máximo número de copias posibles de cada dato #Es justo lo contrario: minimizar la redundancia.
+	~Sustituir por completo a cualquier hoja de cálculo #Ambas herramientas pueden coexistir según el caso.
+}
+
+::REP-8 Para qué sirve una base de datos::¿Para qué sirve, en la práctica, una base de datos en una empresa? {
+	=Para almacenar y gestionar de forma fiable la información que varias personas y aplicaciones necesitan consultar y actualizar #Correcto.
+	~Únicamente para hacer más bonita la página web de la empresa #No tiene relación directa con el diseño visual.
+	~Solo para cumplir un trámite legal obligatorio #No es su función principal.
+}
+
+::REP-9 Tipos de bases de datos::¿Cuál de estas listas menciona correctamente tipos de bases de datos? {
+	=Relacionales, jerárquicas, documentales y clave-valor #Correcto.
+	~Word, Excel y PowerPoint #Son aplicaciones ofimáticas, no tipos de bases de datos.
+	~HTML, CSS y JavaScript #Son tecnologías web, no tipos de bases de datos.
+}
+
+::REP-10 Tipos de ficheros según su contenido::Según su contenido, ¿en qué dos grandes tipos se clasifican los ficheros? {
+	=Texto plano y binarios #Correcto.
+	~Grandes y pequeños #Eso es tamaño, no tipo de contenido.
+	~Antiguos y modernos #Eso no es una clasificación real de ficheros.
+}
+
+
+$CATEGORY: $course$/UT1/Inglés · Vocabulario técnico
+
+// Actividad específica de inglés (parte 1 de 3: ver también, en el documento
+// de apoyo, el listening "Anna's problem" y la redacción corta en inglés).
+::ING-1 Vocabulario técnico EN-ES::Match each English term with its Spanish equivalent. {
+	=data -> dato
+	=information -> información
+	=file -> fichero
+	=record -> registro
+	=field -> campo
+	="primary key" -> clave primaria
+	=database -> base de datos
+	="DBMS (database management system)" -> SGBD
+	=query -> consulta
+	=backup -> copia de seguridad
+}
