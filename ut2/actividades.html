@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividades UT2 · Activities Unit 2 — El modelo entidad-relación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #262626;
+    --bg-alt: #2e2e2e;
+    --panel: #333333;
+    --line: #4a4a4a;
+    --ink: #ece9e0;
+    --ink-soft: #a6acc4;
+    --ink-dim: #8a90ac;
+    --clay: #3acfba;
+    --clay-soft: #a9ecdf;
+    --teal: #49a89c;
+    --teal-soft: #bfe3dd;
+    --ok: #6fbf8b;
+    --link: var(--teal-soft);
+    --accent-text: var(--clay-soft);
+    --nav-bg: rgba(18,20,28,.9);
+    --max: min(90vw, 1400px);
+    --maxw: min(96vw, 1800px);
+    --radius: 3px;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f4ec; --bg-alt:#efe9d8; --panel:#ffffff; --line:#ded5bd;
+    --ink:#221f18; --ink-soft:#55503f; --ink-dim:#837c65;
+    --link:#166f64; --accent-text:#0e8a76; --nav-bg: rgba(247,244,236,.9);
+    --ok:#1f8a5c;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; font-size:18px;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;font-size:1.25rem;}
+  ::selection{background:var(--clay);color:#12211e;}
+  h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:700;line-height:1.15;margin:0 0 .5em;letter-spacing:-0.01em;}
+  p{margin:0 0 1em;}
+  a{color:var(--link);}
+  a:hover{color:var(--accent-text);}
+  code{font-family:'Spline Sans Mono',monospace;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:3px;font-size:1em;}
+
+  [data-i18n]{display:none;}
+  #ut2-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+  #ut2-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+
+  .langbar{position:fixed;top:0;right:0;z-index:60;display:flex;gap:0;margin:16px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:0 6px 20px rgba(0,0,0,.35);}
+  .langbar button{font-family:'Spline Sans Mono',monospace;font-size:16px;letter-spacing:.03em;background:none;border:none;color:var(--ink-dim);padding:7px 14px;border-radius:999px;cursor:pointer;transition:background .2s ease,color .2s ease;}
+  .langbar button.active{background:var(--clay);color:#0d211c;}
+
+  nav.toc{position:sticky;top:0;z-index:50;background:var(--nav-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  nav.toc .inner{max-width:var(--maxw);margin:0 auto;padding:16px 150px 16px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+  nav.toc .brand{font-family:'Fraunces',serif;font-weight:700;color:var(--ink);font-size:16px;}
+  nav.toc .back{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--ink-soft);text-decoration:none;}
+
+  header.hero{padding:110px 24px 70px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse 900px 500px at 10% -10%, rgba(207,139,58,.16), transparent 60%),radial-gradient(ellipse 700px 500px at 100% 0%, rgba(73,168,156,.13), transparent 55%);}
+  .hero-inner{max-width:var(--maxw);margin:0 auto;}
+  .kicker{font-family:'Spline Sans Mono',monospace;font-size:19px;color:var(--accent-text);letter-spacing:.04em;margin-bottom:14px;display:block;}
+  .hero h1{font-size:clamp(2rem,5vw,3.4rem);max-width:100%;}
+  .hero .lede{font-size:1.25rem;color:var(--ink-soft);max-width:100%;margin-top:16px;}
+
+  .instructions{max-width:var(--maxw);margin:40px auto 0;padding:0 24px;}
+  .instructions .box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:var(--radius);padding:20px 24px;color:var(--ink-soft);font-size:1rem;}
+  .instructions .box strong{color:var(--ink);}
+
+  main{max-width:var(--maxw);margin:0 auto;padding:60px 24px 100px;}
+
+  .q-block{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:26px;background:var(--panel);overflow:hidden;}
+  .q-head{display:flex;align-items:flex-start;gap:16px;padding:24px 26px 18px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:700;font-size:1.5rem;color:var(--accent-text);flex-shrink:0;line-height:1;}
+  .q-body{flex:1;min-width:0;}
+  .q-tag{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--link);letter-spacing:.04em;display:block;margin-bottom:8px;}
+  .q-body h3{font-size:1.08rem;margin-bottom:10px;color:var(--ink);font-family:'Inter',sans-serif;font-weight:600;}
+  .q-body p{color:var(--ink-soft);font-size:1rem;}
+  .q-body ul,.q-body ol{color:var(--ink-soft);font-size:1rem;padding-left:22px;margin:0 0 10px;}
+  .q-body ul li, .q-body ol li{margin-bottom:5px;}
+
+  details.answer{border-top:1px solid var(--line);}
+  details.answer summary{cursor:pointer;list-style:none;padding:14px 26px;font-family:'Spline Sans Mono',monospace;font-size:16px;letter-spacing:.03em;color:var(--ok);display:flex;align-items:center;gap:8px;user-select:none;}
+  details.answer summary::-webkit-details-marker{display:none;}
+  details.answer summary::before{content:"▸";display:inline-block;transition:transform .18s ease;color:var(--ok);}
+  details.answer[open] summary::before{transform:rotate(90deg);}
+  details.answer .answer-body{padding:0 26px 24px;color:var(--ink-soft);font-size:1rem;background:rgba(111,191,139,.05);}
+  details.answer .answer-body strong{color:var(--ink);}
+  details.answer .answer-body table{width:100%;border-collapse:collapse;margin-top:10px;font-size:1rem;}
+  details.answer .answer-body td,details.answer .answer-body th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;}
+  details.answer .answer-body code{background:rgba(255,255,255,.08);}
+
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px;}
+  .pillrow .pill{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:4px 12px;}
+
+  .section-title{display:flex;align-items:center;gap:14px;margin:64px 0 26px;}
+  .section-title:first-of-type{margin-top:0;}
+  .section-title .n{font-family:'Spline Sans Mono',monospace;color:var(--ink-dim);font-size:16px;}
+  .section-title h2{font-size:1.5rem;margin:0;}
+  .section-title .line{flex:1;height:1px;background:var(--line);}
+
+  .er-scenario{background:rgba(58,207,186,.06);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:var(--radius);padding:16px 20px;margin:10px 0 14px;font-size:1rem;color:var(--ink-soft);}
+  .er-scenario strong{color:var(--ink);}
+
+  footer{padding:50px 24px 80px;border-top:1px solid var(--line);}
+  footer .inner{max-width:var(--maxw);margin:0 auto;}
+  footer p{color:var(--ink-dim);font-size:1.25rem;max-width:100%;}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+  .theme-toggle{
+    display:flex; align-items:center; gap:8px; width:100%; margin-top:18px;
+    background:#292929; border:1px solid #3d3d3d; border-radius:6px;
+    color:#a6acc4; font-family:'Spline Sans Mono',monospace; font-size:13px;
+    padding:9px 12px; cursor:pointer; text-align:left;
+  }
+  .theme-toggle:hover{background:#333; color:#ece9e0;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="teoria.html">📖 Teoría</a>
+        <a href="actividades.html" class="active">📝 Actividades</a>
+        <a href="resumen.html">🎛️ Resumen</a>
+       
+      </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+  <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
+</aside>
+
+<div id="ut2-app" data-lang="es">
+<div class="langbar" role="group" aria-label="language selector">
+  <button id="btn-es" class="active" onclick="setLang('es')">ES</button>
+  <button id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+
+<nav class="toc">
+  <div class="inner">
+    <span class="brand">UT2 · <span data-i18n="es">Actividades</span><span data-i18n="en">Activities</span></span>
+    <a class="back" href="teoria.html">
+      <span data-i18n="es">← Volver al tema</span><span data-i18n="en">← Back to the unit</span>
+    </a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="kicker">
+      <span data-i18n="es">UT2 · Base de datos · 1º DAM — Marina Preciados Agapito — con soluciones</span>
+      <span data-i18n="en">Unit 2 · Databases · 1st year DAM — Marina Preciados Agapito — with solutions</span>
+    </span>
+    <h1>
+      <span data-i18n="es">Actividades: el modelo entidad-relación</span>
+      <span data-i18n="en">Activities: the entity-relationship model</span>
+    </h1>
+    <p class="lede">
+      <span data-i18n="es">13 ejercicios que recorren entidades, atributos, relaciones, cardinalidad, el modelo E/R extendido y las restricciones adicionales (claves candidatas, dependencias, agregación). Cada pregunta tiene su solución oculta — haz clic en "Ver solución" para comprobar tu respuesta. En varias actividades tendrás que dibujar tú mismo/a el diagrama en papel o pizarra: describimos qué debe contener, no lo dibujamos por ti.</span>
+      <span data-i18n="en">13 exercises covering entities, attributes, relationships, cardinality, the extended E/R model and additional constraints (candidate keys, dependencies, aggregation). Each question has a hidden solution — click "Show solution" to check your answer. In several activities you'll need to sketch the diagram yourself on paper or the whiteboard: we describe what it must contain, not draw it for you.</span>
+    </p>
+  </div>
+</header>
+
+<div class="instructions">
+  <div class="box">
+    <strong><span data-i18n="es">Cómo usar esta hoja de actividades: </span><span data-i18n="en">How to use this activity sheet: </span></strong>
+    <span data-i18n="es">intenta responder cada pregunta antes de desplegar la solución. Las actividades combinan tipo test, verdadero/falso, relacionar conceptos, diseño de diagramas E/R y preguntas cortas de desarrollo.</span>
+    <span data-i18n="en">try to answer each question before expanding the solution. The activities mix multiple choice, true/false, matching, E/R diagram design, and short open-ended questions.</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ BLOQUE 1: ENTIDADES ============ -->
+  <div class="section-title">
+    <span class="n">01</span>
+    <h2><span data-i18n="es">Entidades fuertes y débiles</span><span data-i18n="en">Strong and weak entities</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">1</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">TIPO TEST</span><span data-i18n="en">MULTIPLE CHOICE</span></span>
+        <h3><span data-i18n="es">¿Cuál de las siguientes NO es una buena candidata a nombre de entidad?</span><span data-i18n="en">Which of the following is NOT a good candidate for an entity name?</span></h3>
+        <ul>
+          <li data-i18n="es">A) LIBRO</li><li data-i18n="en">A) BOOK</li>
+          <li data-i18n="es">B) rápidamente</li><li data-i18n="en">B) quickly</li>
+          <li data-i18n="es">C) PROVEEDOR</li><li data-i18n="en">C) SUPPLIER</li>
+        </ul>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><strong>B.</strong>
+        <span data-i18n="es">Las entidades salen de los <strong>nombres comunes</strong> del enunciado (en singular): LIBRO y PROVEEDOR son objetos sobre los que se puede almacenar información. "Rápidamente" es un adverbio, no un sustantivo — no representa ningún objeto ni concepto sobre el que guardar datos.</span>
+        <span data-i18n="en">Entities come from the <strong>common nouns</strong> in the statement (singular): BOOK and SUPPLIER are objects we can store information about. "Quickly" is an adverb, not a noun — it doesn't represent any object or concept we could store data about.</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">2</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO</span><span data-i18n="en">CASE STUDY</span></span>
+        <h3><span data-i18n="es">Un hotel guarda información de sus reservas. Cada reserva tiene una o varias habitaciones asociadas, y cada habitación reservada tiene sus propias fechas de entrada y salida. Una "habitación reservada" se identifica por el número de reserva más el número de habitación — no tiene sentido fuera de una reserva concreta.</span><span data-i18n="en">A hotel stores information about its bookings. Each booking has one or more rooms attached to it, and each booked room has its own check-in and check-out dates. A "booked room" is identified by the booking number plus the room number — it makes no sense outside of a specific booking.</span></h3>
+        <p><span data-i18n="es">¿Cuál es la entidad fuerte y cuál la entidad débil? ¿Qué pista textual del enunciado te lo confirma?</span><span data-i18n="en">Which is the strong entity and which is the weak one? What textual clue in the statement confirms it?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es"><strong>RESERVA</strong> es la entidad fuerte y <strong>HABITACIÓN_RESERVADA</strong> la entidad débil. La pista es la <strong>dependencia de identificación</strong>: el enunciado dice explícitamente que la habitación reservada "se identifica por el número de reserva más el número de habitación" — necesita el identificador de su entidad fuerte para poder identificarse a sí misma, y "no tiene sentido fuera de una reserva concreta".</span>
+        <span data-i18n="en"><strong>BOOKING</strong> is the strong entity and <strong>BOOKED_ROOM</strong> the weak one. The clue is the <strong>identifying dependency</strong>: the statement explicitly says the booked room "is identified by the booking number plus the room number" — it needs its strong entity's identifier to identify itself, and "makes no sense outside of a specific booking".</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ BLOQUE 2: ATRIBUTOS ============ -->
+  <div class="section-title">
+    <span class="n">02</span>
+    <h2><span data-i18n="es">Atributos</span><span data-i18n="en">Attributes</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">3</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">RELACIONAR</span><span data-i18n="en">MATCHING</span></span>
+        <h3><span data-i18n="es">Relaciona cada tipo de atributo (columna A) con su ejemplo (columna B).</span><span data-i18n="en">Match each attribute type (column A) with its example (column B).</span></h3>
+        <p><span data-i18n="es"><strong>A:</strong> 1. Clave · 2. Compuesto · 3. Multivaluado · 4. Opcional · 5. Derivado</span><span data-i18n="en"><strong>A:</strong> 1. Key · 2. Composite · 3. Multi-valued · 4. Optional · 5. Derived</span></p>
+        <p><span data-i18n="es"><strong>B:</strong> a. La antigüedad de un empleado, calculada desde su fecha de contratación · b. El DNI de una persona · c. Los varios idiomas que habla un traductor · d. Una dirección postal, descomponible en calle, número y código postal · e. Un segundo teléfono de contacto que el cliente puede no facilitar</span><span data-i18n="en"><strong>B:</strong> a. An employee's seniority, calculated from their hire date · b. A person's national ID number · c. The several languages a translator speaks · d. A postal address, breakable into street, number and postcode · e. A second contact phone the customer may not provide</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><span data-i18n="es">1-b · 2-d · 3-c · 4-e · 5-a</span><span data-i18n="en">1-b · 2-d · 3-c · 4-e · 5-a</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">4</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">DISEÑO</span><span data-i18n="en">DESIGN</span></span>
+        <h3><span data-i18n="es">Queremos guardar datos de la entidad COCHE: matrícula, marca, modelo, año de fabricación y antigüedad en años. Ninguno de esos atributos es un identificador natural fiable salvo uno.</span><span data-i18n="en">We want to store data for the CAR entity: plate number, make, model, year of manufacture and age in years. None of those attributes is a reliable natural identifier except one.</span></h3>
+        <p><span data-i18n="es">¿Cuál debería ser la clave? ¿Cuál de los cinco atributos es derivado, y de cuál se calcula?</span><span data-i18n="en">Which one should be the key? Which of the five attributes is derived, and from which one is it calculated?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">La <strong>matrícula</strong> debe ser la clave: es única para cada coche y nunca se repite (a diferencia de marca, modelo o año, que muchos coches comparten). La <strong>antigüedad en años</strong> es un atributo <strong>derivado</strong>: se calcula a partir del <strong>año de fabricación</strong> y el año actual, igual que la edad se calcula a partir de la fecha de nacimiento.</span>
+        <span data-i18n="en">The <strong>plate number</strong> should be the key: it's unique to each car and never repeats (unlike make, model or year, which many cars share). <strong>Age in years</strong> is a <strong>derived</strong> attribute: it's calculated from the <strong>year of manufacture</strong> and the current year, just like age is calculated from a date of birth.</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ BLOQUE 3: RELACIONES / CARDINALIDAD ============ -->
+  <div class="section-title">
+    <span class="n">03</span>
+    <h2><span data-i18n="es">Relaciones, grado y cardinalidad</span><span data-i18n="en">Relationships, degree and cardinality</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">5</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">IDENTIFICAR EL GRADO</span><span data-i18n="en">IDENTIFY THE DEGREE</span></span>
+        <h3><span data-i18n="es">Indica el grado de cada relación: binaria, ternaria o reflexiva.</span><span data-i18n="en">State the degree of each relationship: binary, ternary or reflexive.</span></h3>
+        <ol>
+          <li data-i18n="es">a) ACTOR interpreta PERSONAJE.</li>
+          <li data-i18n="en">a) ACTOR plays CHARACTER.</li>
+          <li data-i18n="es">b) Un PAÍS es fronterizo con otro PAÍS.</li>
+          <li data-i18n="en">b) A COUNTRY borders another COUNTRY.</li>
+          <li data-i18n="es">c) Un MÉDICO atiende a un PACIENTE en una CONSULTA, en una fecha y hora concretas.</li>
+          <li data-i18n="en">c) A DOCTOR sees a PATIENT in a CONSULTING ROOM, at a specific date and time.</li>
+        </ol>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><span data-i18n="es">
+        a) <strong>Binaria</strong> — dos entidades distintas (ACTOR, PERSONAJE). ·
+        b) <strong>Reflexiva</strong> — dos ejemplares de la misma entidad (PAÍS con PAÍS); necesitaría roles ("fronterizo con" en ambos sentidos) para no ser ambigua. ·
+        c) <strong>Ternaria</strong> — tres entidades distintas intervienen a la vez (MÉDICO, PACIENTE, CONSULTA).
+        </span>
+        <span data-i18n="en">
+        a) <strong>Binary</strong> — two different entities (ACTOR, CHARACTER). ·
+        b) <strong>Reflexive</strong> — two instances of the same entity (COUNTRY with COUNTRY); it would need roles ("borders" in both directions) to avoid ambiguity. ·
+        c) <strong>Ternary</strong> — three different entities are involved at once (DOCTOR, PATIENT, CONSULTING ROOM).
+        </span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">6</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CARDINALIDAD Y CORRESPONDENCIA</span><span data-i18n="en">CARDINALITY & CORRESPONDENCE</span></span>
+        <h3><span data-i18n="es">Una biblioteca gestiona el préstamo de libros. Un socio puede tener varios libros prestados a la vez, o ninguno. Un libro concreto (un ejemplar físico) sólo puede estar prestado a un socio en cada momento, o estar disponible.</span><span data-i18n="en">A library manages book loans. A member can have several books on loan at once, or none. A specific book (one physical copy) can only be on loan to one member at a time, or be available.</span></h3>
+        <p><span data-i18n="es">Escribe la cardinalidad de SOCIO y de LIBRO en la relación "presta", y el tipo de correspondencia resultante.</span><span data-i18n="en">Write the cardinality of MEMBER and BOOK in the "borrows" relationship, and the resulting correspondence type.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">SOCIO: <code>(0,N)</code> — puede tener cero o varios libros prestados. LIBRO: <code>(0,1)</code> — en cada momento está prestado a cero o un socio, nunca a dos a la vez. Tomando los máximos de cada lado, el tipo de correspondencia es <strong>1:N</strong> (un socio, muchos libros prestados; cada libro, un único socio).</span>
+        <span data-i18n="en">MEMBER: <code>(0,N)</code> — can have zero or several books on loan. BOOK: <code>(0,1)</code> — at any moment it's on loan to zero or one member, never two at once. Taking the maximum on each side, the correspondence type is <strong>1:N</strong> (one member, many borrowed books; each book, a single member).</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">7</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">DISEÑA EL DIAGRAMA</span><span data-i18n="en">DESIGN THE DIAGRAM</span></span>
+        <h3><span data-i18n="es">Un gimnasio ofrece clases dirigidas (yoga, spinning…). De cada clase se quiere saber el nombre, el horario y el aforo máximo. Los socios se apuntan a las clases que quieran; de cada socio se necesita el DNI, nombre y fecha de alta. Un socio puede apuntarse a varias clases, y una clase puede tener varios socios apuntados.</span><span data-i18n="en">A gym offers group classes (yoga, spinning…). For each class we want its name, schedule and maximum capacity. Members sign up for whichever classes they like; for each member we need their ID number, name and join date. A member can sign up for several classes, and a class can have several members signed up.</span></h3>
+        <p><span data-i18n="es">Dibuja el diagrama E/R completo en papel: entidades con sus atributos (marcando la clave), la relación, y su cardinalidad y tipo de correspondencia.</span><span data-i18n="en">Draw the full E/R diagram on paper: entities with their attributes (marking the key), the relationship, and its cardinality and correspondence type.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es"><strong>Entidades:</strong> CLASE (nombre, horario, aforo — sin clave natural obvia, se podría usar un <code>id_clase</code> artificial) y SOCIO (<u>DNI</u>, nombre, fecha de alta). <strong>Relación:</strong> "se apunta a", binaria, tipo de correspondencia <strong>N:M</strong> — cardinalidad <code>(0,N)</code> en ambos lados, ya que un socio puede no estar apuntado a ninguna clase todavía, y una clase puede no tener socios apuntados aún.</span>
+        <span data-i18n="en"><strong>Entities:</strong> CLASS (name, schedule, capacity — no obvious natural key, so an artificial <code>id_class</code> could be used) and MEMBER (<u>ID number</u>, name, join date). <strong>Relationship:</strong> "signs up for", binary, correspondence type <strong>N:M</strong> — cardinality <code>(0,N)</code> on both sides, since a member might not be signed up for any class yet, and a class might not have any members signed up yet.</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ BLOQUE 4: MODELO EXTENDIDO ============ -->
+  <div class="section-title">
+    <span class="n">04</span>
+    <h2><span data-i18n="es">El modelo E/R extendido</span><span data-i18n="en">The extended E/R model</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">8</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">VERDADERO / FALSO</span><span data-i18n="en">TRUE / FALSE</span></span>
+        <h3><span data-i18n="es">Indica si cada afirmación sobre relaciones ISA (herencia) es verdadera o falsa.</span><span data-i18n="en">Say whether each statement about ISA (inheritance) relationships is true or false.</span></h3>
+        <ol>
+          <li data-i18n="es">1. Una superentidad y sus subentidades repiten en el diagrama todos los atributos comunes.</li>
+          <li data-i18n="en">1. A super-entity and its sub-entities repeat every shared attribute in the diagram.</li>
+          <li data-i18n="es">2. Una jerarquía "total" significa que todo ejemplar de la superentidad pertenece a alguna subentidad.</li>
+          <li data-i18n="en">2. A "total" hierarchy means every instance of the super-entity belongs to some sub-entity.</li>
+          <li data-i18n="es">3. Una jerarquía "solapada" permite que un mismo ejemplar pertenezca a varias subentidades a la vez.</li>
+          <li data-i18n="en">3. An "overlapping" hierarchy allows the same instance to belong to several sub-entities at once.</li>
+          <li data-i18n="es">4. Se recomienda usar relaciones ISA siempre que sea posible, cuantas más mejor.</li>
+          <li data-i18n="en">4. ISA relationships are recommended whenever possible — the more, the better.</li>
+        </ol>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <span data-i18n="es">
+        <p><strong>1. Falso.</strong> Los atributos comunes se indican una única vez en la superentidad; las subentidades los heredan sin repetirlos.</p>
+        <p><strong>2. Verdadero.</strong> Total = sin excepciones, todo ejemplar pertenece a alguna subentidad (sin círculo sobre el triángulo).</p>
+        <p><strong>3. Verdadero.</strong> Solapada = sin arco de exclusividad, un ejemplar puede pertenecer a varias subentidades a la vez.</p>
+        <p><strong>4. Falso.</strong> Se recomienda <em>no</em> abusar de ellas: úsalas sólo si las subentidades tienen atributos o relaciones distintas; si no, basta un atributo "tipo".</p>
+        </span>
+        <span data-i18n="en">
+        <p><strong>1. False.</strong> Shared attributes are stated once, on the super-entity; sub-entities inherit them without repeating them.</p>
+        <p><strong>2. True.</strong> Total = no exceptions, every instance belongs to some sub-entity (no circle on the triangle).</p>
+        <p><strong>3. True.</strong> Overlapping = no exclusivity arc, an instance can belong to several sub-entities at once.</p>
+        <p><strong>4. False.</strong> They're recommended <em>against</em> overuse: use them only when sub-entities have different attributes or relationships; otherwise a "type" attribute is enough.</p>
+        </span>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">9</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CLASIFICAR LA JERARQUÍA</span><span data-i18n="en">CLASSIFY THE HIERARCHY</span></span>
+        <div class="er-scenario">
+          <span data-i18n="es">Un concesionario clasifica sus VEHÍCULOS en COCHE, MOTO y FURGONETA. Todo vehículo del concesionario pertenece obligatoriamente a una de esas tres categorías, y nunca a más de una a la vez (no existe un vehículo que sea coche y moto al mismo tiempo).</span>
+          <span data-i18n="en">A dealership classifies its VEHICLES as CAR, MOTORBIKE and VAN. Every vehicle at the dealership must belong to one of those three categories, and never to more than one at a time (there's no vehicle that's both a car and a motorbike).</span>
+        </div>
+        <p><span data-i18n="es">¿Qué combinación de obligatoriedad y número de relaciones describe esta jerarquía: exclusiva/solapada y total/parcial?</span><span data-i18n="en">Which combination of mandatoriness and number of relationships describes this hierarchy: exclusive/overlapping and total/partial?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es"><strong>Exclusiva y total.</strong> Es <em>total</em> porque "todo vehículo... pertenece obligatoriamente" a una categoría (sin excepciones, sin círculo sobre el triángulo). Es <em>exclusiva</em> porque "nunca a más de una a la vez" (con arco de exclusividad bajo el triángulo).</span>
+        <span data-i18n="en"><strong>Exclusive and total.</strong> It's <em>total</em> because "every vehicle... must belong" to a category (no exceptions, no circle over the triangle). It's <em>exclusive</em> because "never... more than one at a time" (with an exclusivity arc under the triangle).</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">10</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO FINAL</span><span data-i18n="en">FINAL CASE STUDY</span></span>
+        <h3><span data-i18n="es">Un centro deportivo tiene EMPLEADOS. Algunos empleados son MONITORES (imparten clases; se necesita saber qué especialidad tienen) y otros son RECEPCIONISTAS (atienden al público; se necesita saber su turno). Un mismo empleado puede ser monitor y recepcionista a la vez si el centro lo necesita, pero también puede haber empleados de mantenimiento que no sean ni una cosa ni la otra.</span><span data-i18n="en">A sports centre has EMPLOYEES. Some employees are INSTRUCTORS (they teach classes; we need their specialty) and others are RECEPTIONISTS (they handle the front desk; we need their shift). The same employee can be both an instructor and a receptionist if the centre needs it, but there can also be maintenance staff who are neither.</span></h3>
+        <p><span data-i18n="es">¿Se justifica aquí una relación ISA, o bastaría con un atributo "tipo"? Si usas ISA: ¿qué combinación de obligatoriedad/número de relaciones le corresponde?</span><span data-i18n="en">Is an ISA relationship justified here, or would a "type" attribute be enough? If you use ISA: which mandatoriness/number-of-relationships combination applies?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">Sí se justifica una <strong>relación ISA</strong>, porque MONITOR y RECEPCIONISTA tienen <strong>atributos distintos</strong> (especialidad vs. turno) — un simple atributo "tipo" no podría guardar esos datos adicionales. La jerarquía es <strong>solapada</strong> (un empleado puede ser monitor y recepcionista a la vez → sin arco de exclusividad) y <strong>parcial</strong> (puede haber empleados de mantenimiento que no sean ninguna de las dos subentidades → con círculo sobre el triángulo).</span>
+        <span data-i18n="en">Yes, an <strong>ISA relationship</strong> is justified, because INSTRUCTOR and RECEPTIONIST have <strong>different attributes</strong> (specialty vs. shift) — a simple "type" attribute couldn't hold that extra data. The hierarchy is <strong>overlapping</strong> (an employee can be both instructor and receptionist → no exclusivity arc) and <strong>partial</strong> (there can be maintenance staff who are neither sub-entity → circle over the triangle).</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ BLOQUE 5: CLAVES, RESTRICCIONES Y AGREGACIÓN ============ -->
+  <div class="section-title">
+    <span class="n">05</span>
+    <h2><span data-i18n="es">Claves, restricciones y agregación</span><span data-i18n="en">Keys, constraints and aggregation</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">11</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CLAVES CANDIDATAS</span><span data-i18n="en">CANDIDATE KEYS</span></span>
+        <h3><span data-i18n="es">La entidad PRODUCTO de un almacén tiene estos atributos: <code>código_barras</code> (único, siempre presente, estable, 13 dígitos), <code>referencia_interna</code> (única, siempre presente, pero cambia si el proveedor cambia el producto de familia), <code>nombre</code> (no único — dos productos distintos pueden llamarse igual) y <code>id_producto</code> (numérico, generado por el sistema, único, siempre presente y nunca cambia).</span><span data-i18n="en">The PRODUCT entity in a warehouse has these attributes: <code>barcode</code> (unique, always present, stable, 13 digits), <code>internal_reference</code> (unique, always present, but changes if the supplier moves the product to another family), <code>name</code> (not unique — two different products can share a name) and <code>product_id</code> (numeric, system-generated, unique, always present and never changes).</span></h3>
+        <p><span data-i18n="es">a) ¿Cuáles de estos cuatro atributos son claves candidatas? b) De ellas, ¿cuál elegirías como clave primaria y por qué? c) ¿Es <code>id_producto</code> una clave natural o artificial?</span><span data-i18n="en">a) Which of these four attributes are candidate keys? b) Of those, which would you pick as the primary key, and why? c) Is <code>product_id</code> a natural or an artificial key?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">a) Son claves candidatas <code>código_barras</code>, <code>referencia_interna</code> e <code>id_producto</code>: las tres son únicas y siempre tienen valor. <code>nombre</code> queda descartado porque no es único. b) La mejor clave primaria es <code>id_producto</code>: cumple las cuatro propiedades (único, siempre con valor, <strong>estable</strong> y simple), mientras que <code>referencia_interna</code> falla en estabilidad (puede cambiar) — aunque sigue siendo válida como <strong>clave alternativa</strong>. <code>código_barras</code> también sería una alternativa aceptable. c) <code>id_producto</code> es una clave <strong>artificial</strong>: no proviene del mundo real del negocio, la genera el propio sistema sólo para identificar de forma estable.</span>
+        <span data-i18n="en">a) The candidate keys are <code>barcode</code>, <code>internal_reference</code> and <code>product_id</code>: all three are unique and always have a value. <code>name</code> is ruled out because it isn't unique. b) The best primary key is <code>product_id</code>: it meets all four properties (unique, always valued, <strong>stable</strong> and simple), while <code>internal_reference</code> fails on stability (it can change) — though it's still valid as an <strong>alternate key</strong>. <code>barcode</code> would also be an acceptable alternative. c) <code>product_id</code> is an <strong>artificial</strong> key: it doesn't come from the real-world business, the system itself generates it purely to identify records stably.</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">12</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">RESTRICCIONES</span><span data-i18n="en">CONSTRAINTS</span></span>
+        <div class="er-scenario">
+          <span data-i18n="es">Una academia organiza CONVOCATORIAS de examen para cada CURSO. Cada convocatoria se identifica por su número de orden dentro del curso (1ª, 2ª, 3ª...) — ese número se repite en cursos distintos y no tiene sentido si no sabemos de qué curso hablamos. Además, el reglamento dice que un aula de examen debe tener entre 8 y 20 alumnos matriculados, ni uno menos ni uno más. Por último, un profesor no puede ser el que corrija el examen de un curso en el que él mismo imparte clase — pero el diagrama E/R no tiene forma de expresar esa condición.</span>
+          <span data-i18n="en">An academy organizes exam SITTINGS for each COURSE. Each sitting is identified by its sequence number within the course (1st, 2nd, 3rd...) — that number repeats across different courses and means nothing without knowing which course it belongs to. The rules also state that an exam room must have between 8 and 20 enrolled students, no fewer and no more. Finally, a teacher cannot be the one grading the exam for a course they themselves teach — but the E/R diagram has no way to express that condition.</span>
+        </div>
+        <p><span data-i18n="es">a) ¿Qué tipo de dependencia tiene CONVOCATORIA respecto a CURSO: existencial o de identificación? Justifícalo. b) ¿Cómo escribirías la cardinalidad del aula de examen en vez de usar <code>(0,N)</code>? c) ¿Cómo se documenta la restricción del profesor examinador en el diagrama?</span><span data-i18n="en">a) What kind of dependency does SITTING have on COURSE: existential or identifying? Justify it. b) How would you write the exam room's cardinality instead of using <code>(0,N)</code>? c) How is the examiner restriction documented on the diagram?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">a) Es <strong>dependencia de identificación</strong>: el enunciado dice explícitamente que el número de convocatoria "se repite en cursos distintos y no tiene sentido si no sabemos de qué curso hablamos" — CONVOCATORIA necesita el identificador de CURSO para formar su propia clave (número de convocatoria + código de curso). b) Al conocer los límites exactos del negocio, se escribe la <strong>cardinalidad exacta</strong>: <code>(8,20)</code> en vez del genérico <code>(0,N)</code>. c) Es <strong>pérdida expresiva</strong>: se anota como una nota <strong>PE</strong> al pie del diagrama ("PE: un profesor no puede corregir el examen de un curso en el que imparte clase"), porque ninguna cardinalidad ni símbolo del modelo E/R básico puede representar esa regla de negocio.</span>
+        <span data-i18n="en">a) It's an <strong>identifying dependency</strong>: the statement explicitly says the sitting number "repeats across different courses and means nothing without knowing which course it belongs to" — SITTING needs COURSE's identifier to form its own key (sitting number + course code). b) Since the exact business limits are known, you write the <strong>exact cardinality</strong>: <code>(8,20)</code> instead of the generic <code>(0,N)</code>. c) It's <strong>semantic loss (pérdida expresiva)</strong>: it's recorded as a <strong>PE</strong> note at the foot of the diagram ("PE: a teacher cannot grade the exam for a course they teach"), because no cardinality or symbol in the basic E/R model can express that business rule.</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">13</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">AGREGACIÓN</span><span data-i18n="en">AGGREGATION</span></span>
+        <div class="er-scenario">
+          <span data-i18n="es">Una autoescuela asigna PROFESORES a VEHÍCULOS para dar clases prácticas (relación "imparte_en"). Ahora quieren registrar además qué ALUMNO evalúa cada combinación profesor-vehículo concreta al final del curso, guardando la nota de esa evaluación. Un mismo alumno puede evaluar varias combinaciones profesor-vehículo distintas a lo largo del curso.</span>
+          <span data-i18n="en">A driving school assigns TEACHERS to VEHICLES to give practical lessons (the "teaches_in" relationship). Now they also want to record which STUDENT evaluates each specific teacher-vehicle combination at the end of the course, storing that evaluation's grade. The same student can evaluate several different teacher-vehicle combinations over the course.</span>
+        </div>
+        <p><span data-i18n="es">a) ¿Por qué no basta con una relación ternaria directa entre PROFESOR, VEHÍCULO y ALUMNO? b) Describe (sin dibujarlo) cómo se resolvería con <strong>agregación</strong>: qué se agrega, qué nueva relación aparece y con qué cardinalidades.</span><span data-i18n="en">a) Why isn't a direct ternary relationship between TEACHER, VEHICLE and STUDENT enough? b) Describe (without drawing it) how this would be solved with <strong>aggregation</strong>: what gets aggregated, what new relationship appears, and with what cardinalities.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p>
+        <span data-i18n="es">a) Una relación ternaria uniría PROFESOR-VEHÍCULO-ALUMNO como si los tres participasen simultáneamente en un único hecho, pero aquí hay dos hechos distintos en el tiempo: primero se forma la pareja profesor-vehículo ("imparte_en"), y <em>después</em> un alumno evalúa esa pareja ya existente. La ternaria no puede expresar que lo que se evalúa es la combinación ya formada, no una nueva coincidencia de los tres a la vez. b) Se <strong>agrega</strong> la relación "imparte_en" junto con sus dos entidades (PROFESOR y VEHÍCULO), tratando ese conjunto como si fuera una entidad de orden superior. Sobre esa agregación se crea una nueva relación binaria, por ejemplo "evalúa", con ALUMNO: cardinalidad <code>(0,N)</code> en la agregación (una combinación profesor-vehículo puede recibir varias evaluaciones, o ninguna) y <code>(0,N)</code> en ALUMNO (un alumno puede evaluar varias combinaciones, o ninguna).</span>
+        <span data-i18n="en">a) A ternary relationship would join TEACHER-VEHICLE-STUDENT as if all three took part in one single fact at once, but here there are two separate facts at different times: first the teacher-vehicle pair is formed ("teaches_in"), and only <em>afterwards</em> does a student evaluate that already-existing pair. A ternary relationship can't express that what's being evaluated is the pair already formed, not a fresh three-way coincidence. b) You <strong>aggregate</strong> the "teaches_in" relationship together with its two entities (TEACHER and VEHICLE), treating that whole set as a higher-level entity. A new binary relationship is then built on top of that aggregation, e.g. "evaluates", with STUDENT: cardinality <code>(0,N)</code> on the aggregation (a teacher-vehicle combination can receive several evaluations, or none) and <code>(0,N)</code> on STUDENT (a student can evaluate several combinations, or none).</span>
+        </p>
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+
+</footer>
+
+</div><!-- /#ut2-app -->
+<script>
+function setLang(lang){
+  var app = document.getElementById('ut2-app');
+  if(app) app.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.getElementById('btn-es').classList.toggle('active', lang==='es');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  try{ localStorage.setItem('ut2-lang', lang); }catch(e){}
+}
+(function(){
+  var saved = null;
+  try{ saved = localStorage.getItem('ut2-lang'); }catch(e){}
+  if(saved === 'en' || saved === 'es'){ setLang(saved); }
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  var THEME_KEY = 'bbdd-theme';
+  var btn = document.getElementById('theme-toggle');
+  var icon = document.getElementById('theme-toggle-icon');
+  var label = document.getElementById('theme-toggle-label');
+  function apply(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    if(icon) icon.textContent = theme === 'light' ? '🌙' : '☀️';
+    if(label) label.textContent = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(e){}
+  apply(saved === 'light' ? 'light' : 'dark');
+  if(btn){
+    btn.addEventListener('click', function(){
+      var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      apply(next);
+      try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    });
+  }
+})();
+</script>
+</body>
+</html>

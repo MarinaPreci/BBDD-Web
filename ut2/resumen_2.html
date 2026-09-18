@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT2 · Resumen — El modelo entidad-relación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15171c;
+  --ink-soft:#4b4f58;
+  --ink-dim:#767c8a;
+  --paper:#ffffff;
+  --stage-bg:#f0ede6;
+  --line:#e7e3da;
+  --blue:#1b39e6;
+  --blue-deep:#0d1a7a;
+  --lilac:#e9c3ef;
+  --mint:#8ed0aa;
+  --mint-deep:#3f9468;
+  --yellow:#ffd23f;
+  --orange:#ff5a2e;
+  --shadow: 0 30px 70px -30px rgba(20,20,30,.35);
+  --tint-blue: color-mix(in srgb, var(--blue) 10%, var(--paper));
+  --tint-mint: color-mix(in srgb, var(--mint-deep) 14%, var(--paper));
+  --tint-ink: color-mix(in srgb, var(--ink) 8%, var(--paper));
+}
+html[data-theme="dark"]{
+  --ink:#f1f0ec;
+  --ink-soft:#c7c8d2;
+  --ink-dim:#9296a8;
+  --paper:#22242c;
+  --stage-bg:#15161b;
+  --line:#3a3d48;
+  --blue-deep:#93a8ff;
+  --mint-deep:#7fd9a8;
+  --shadow: 0 30px 70px -30px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--stage-bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:28px 16px;
+}
+h1,h2,h3,h4{font-family:'Baloo 2','Poppins',system-ui,sans-serif;margin:0;letter-spacing:-0.01em;text-wrap:balance;}
+p{margin:0;}
+a{color:inherit;}
+
+#deck-app{width:100%;max-width:1200px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+/* ============ toolbar ============ */
+.toolbar{
+  width:100%;
+  max-width:1160px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-family:'Inter',sans-serif;
+}
+.toolbar-group{display:flex;align-items:center;gap:8px;}
+.toolbar-title{
+  font-family:'Baloo 2',sans-serif;
+  font-weight:700;
+  font-size:16px;
+  color:var(--ink-soft);
+}
+.tb-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;
+  padding:8px 14px;border-radius:999px;cursor:pointer;line-height:1;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.tb-btn:hover{transform:translateY(-2px);}
+.tb-btn.active{background:var(--ink);color:var(--paper);}
+.tb-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.lang-group{display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;}
+.lang-group .tb-btn{border:none;border-radius:0;padding:8px 16px;}
+.lang-group .tb-btn+.tb-btn{border-left:2px solid var(--ink);}
+
+/* ============ stage ============ */
+.stage-wrap{
+  width:100%;
+  max-width:1160px;
+  aspect-ratio:16/9;
+  position:relative;
+}
+.stage{
+  position:absolute;inset:0;
+  background:var(--paper);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.stage:fullscreen{border-radius:0;max-width:none;}
+.stage:fullscreen .slide{padding:5vw 6vw;}
+
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  padding:56px 64px;
+  overflow:hidden;
+}
+.slide.is-active{display:block;}
+.slide-inner{
+  position:relative;z-index:2;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+  max-width:980px;
+}
+.eyebrow{
+  font-family:'Baloo 2',sans-serif;font-weight:700;
+  font-size:clamp(14px,1.6vw,18px);
+  color:var(--blue-deep);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.slide h2{font-size:clamp(26px,3.6vw,44px);line-height:1.08;font-weight:800;max-width:16ch;}
+.slide .mega{font-size:clamp(34px,6vw,72px);line-height:1.02;font-weight:800;}
+.lede-lg{font-size:clamp(16px,1.9vw,22px);color:var(--ink-soft);max-width:62ch;line-height:1.5;}
+.note{font-size:clamp(15px,1.6vw,18px);color:var(--ink-soft);max-width:66ch;line-height:1.55;}
+.byline{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(16px,1.8vw,20px);color:var(--ink-soft);}
+
+/* ============ deco shapes ============ */
+.deco-corner{position:absolute;z-index:1;pointer-events:none;}
+.deco-a{width:230px;height:230px;top:-70px;right:-70px;border-radius:50%;background:var(--blue);}
+.deco-b{width:160px;height:160px;bottom:-50px;left:-50px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+
+.slide[data-deco="2"] .deco-a{background:var(--yellow);top:-90px;left:-90px;right:auto;border-radius:50%;}
+.slide[data-deco="2"] .deco-b{display:none;}
+
+.slide[data-deco="3"] .deco-a{width:210px;height:210px;top:-60px;right:-60px;border-radius:50%;border:38px solid var(--blue);background:transparent;}
+.slide[data-deco="3"] .deco-b{width:130px;height:130px;bottom:-40px;left:-40px;background:var(--mint);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="4"] .deco-a{width:200px;height:200px;bottom:-70px;right:-70px;top:auto;border-radius:50%;background:var(--orange);}
+.slide[data-deco="4"] .deco-b{width:150px;height:150px;top:-50px;left:-50px;bottom:auto;background:var(--lilac);clip-path:polygon(100% 0,0 0,100% 100%);}
+
+.slide[data-deco="5"] .deco-a{width:220px;height:220px;top:-80px;left:-80px;right:auto;border-radius:50%;background:var(--mint);}
+.slide[data-deco="5"] .deco-b{width:120px;height:120px;bottom:-40px;right:-40px;left:auto;background:var(--yellow);clip-path:polygon(0 0,100% 0,100% 100%);}
+
+.slide[data-deco="6"] .deco-a{width:200px;height:200px;top:-70px;right:-70px;border-radius:50%;background:var(--lilac);}
+.slide[data-deco="6"] .deco-b{width:170px;height:170px;bottom:-60px;left:-60px;background:var(--blue);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="title"] .deco-a{width:340px;height:340px;top:-110px;right:-110px;border-radius:50%;background:var(--blue);}
+.slide[data-deco="title"] .deco-b{width:230px;height:230px;bottom:-70px;left:-70px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+.slide.slide-title .slide-inner{gap:22px;}
+
+.slide[data-deco="activity"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--orange);opacity:.16;}
+.activity-inner{align-items:flex-start;gap:12px;}
+.activity-inner .lede-lg{max-width:70ch;}
+.slide[data-deco="activity"],.slide[data-deco="solucion"]{overflow-y:auto;}
+.activity-badge.team{background:var(--blue);box-shadow:0 14px 30px -10px rgba(27,57,230,.55);}
+.quiz-cards .card{display:flex;flex-direction:column;gap:8px;}
+.quiz-cards .card p{font-size:14.5px;font-weight:600;line-height:1.4;}
+.scenario-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:18px 22px;margin-top:4px;}
+.scenario-card p{font-size:16px;font-weight:600;line-height:1.5;}
+.activity-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--orange);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(255,90,46,.55);
+  flex:none;
+}
+
+.activity-prompts{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;}
+.activity-prompt{
+  display:flex;align-items:center;gap:10px;border:2px solid var(--ink);border-radius:999px;
+  padding:9px 18px 9px 9px;background:var(--paper);font-size:14.5px;font-weight:600;
+}
+.activity-prompt .num{
+  width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:13px;
+}
+.activity-prompt.p-campo .num{background:var(--blue);}
+.activity-prompt.p-registro .num{background:var(--mint-deep);}
+.activity-prompt.p-clave .num{background:var(--orange);}
+
+.solution-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--mint-deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(63,148,104,.55);
+  flex:none;
+}
+.slide[data-deco="solucion"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--mint);opacity:.22;}
+
+/* ============ content components ============ */
+.index-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 34px;}
+.index-list li{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);}
+.ix-num{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--blue);}
+.ix-txt{font-size:16px;color:var(--ink-soft);}
+
+.chain{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
+.chain-step{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 14px;min-width:135px;flex:1;}
+.chain-tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--blue-deep);margin-bottom:6px;}
+.chain-step p{font-size:14.5px;font-weight:600;}
+.chain-arrow{align-self:center;font-size:22px;color:var(--ink-dim);}
+
+.pillbox{display:flex;flex-wrap:wrap;gap:10px;}
+.pill,.pill-lg{
+  display:inline-flex;align-items:center;
+  border:2px solid var(--ink);border-radius:999px;
+  font-family:'Baloo 2',sans-serif;font-weight:600;
+  background:var(--paper);
+}
+.pill{padding:8px 16px;font-size:14px;}
+.pill-lg{padding:12px 20px;font-size:16px;}
+
+.tl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tl-row-4{grid-template-columns:repeat(4,1fr);}
+.tl-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.tl-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--tint-blue);margin-bottom:12px;}
+.tl-icon svg{display:block;}
+.tl-year{display:inline-block;font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:13px;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.tl-card h4{font-size:17px;margin-bottom:6px;line-height:1.2;}
+.tl-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.4;}
+
+.cards{display:grid;gap:14px;}
+.cards-2{grid-template-columns:repeat(2,1fr);}
+.cards-3{grid-template-columns:repeat(3,1fr);}
+.cards-4{grid-template-columns:repeat(4,1fr);}
+.cards-5{grid-template-columns:repeat(5,1fr);}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.card.small{padding:14px 16px;}
+.card .tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.card h4{font-size:16px;margin-bottom:6px;line-height:1.2;}
+.card p{font-size:13.5px;color:var(--ink-soft);line-height:1.42;}
+
+.gloss-grid .card, .gloss-grid .gloss-item{background:var(--paper);}
+.gloss-item{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.gloss-item h4{font-size:15.5px;margin-bottom:6px;}
+.gloss-item p{font-size:13px;color:var(--ink-soft);line-height:1.4;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:34px;}
+.col-h{display:block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);margin-bottom:10px;}
+.col-h-good{color:var(--mint-deep);}
+.col-h-bad{color:var(--orange);}
+.check-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.check-list li{display:flex;align-items:flex-start;gap:8px;font-size:14.5px;color:var(--ink-soft);}
+.check-icon{color:var(--mint-deep);font-weight:800;}
+.x-icon{color:var(--orange);font-weight:800;}
+.problem-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;}
+.problem-list li{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;}
+
+.diagram-box{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 16px;}
+.diagram-box svg{display:block;width:100%;height:auto;}
+
+.arch{display:flex;flex-direction:column;gap:10px;}
+.arch-layer{border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;color:#fff;}
+.arch-layer .lbl{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;}
+.arch-layer span:last-child{font-size:14px;opacity:.92;}
+.arch-layer.ext{background:var(--blue);}
+.arch-layer.con{background:var(--blue-deep);}
+.arch-layer.int{background:var(--ink);color:var(--paper);}
+
+.code{
+  font-family:'Spline Sans Mono',monospace;font-size:13.5px;line-height:1.7;
+  background:#15171c;color:#e9ecf7;border-radius:14px;padding:16px 20px;
+  white-space:pre-wrap;margin-top:10px;
+}
+.code .kw{color:#8fd0aa;font-weight:600;}
+.code .cm{color:#9aa1b8;}
+
+.final-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;counter-reset:fin;}
+.final-list li{counter-increment:fin;position:relative;padding-left:30px;font-size:15.5px;color:var(--ink-soft);line-height:1.4;}
+.final-list li::before{content:counter(fin);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.credits{margin-top:8px;font-size:11.5px;color:var(--ink-dim);max-width:70ch;line-height:1.5;}
+
+/* ============ bilingual toggle (self-contained wrapper, not <html>) ============ */
+[data-i18n]{display:none;}
+#deck-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+#deck-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+#deck-app[data-lang="es"] span[data-i18n="es"],
+#deck-app[data-lang="en"] span[data-i18n="en"]{display:inline;}
+
+/* ============ nav row ============ */
+.nav-row{
+  width:100%;max-width:1160px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.nav-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.nav-btn:hover{background:var(--ink);color:#fff;transform:translateY(-2px);}
+.nav-btn:disabled{opacity:.3;cursor:default;transform:none;background:var(--paper);color:var(--ink);}
+.nav-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.progress-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.progress-track{width:100%;height:6px;border-radius:999px;background:var(--line);overflow:hidden;}
+.progress-fill{height:100%;background:var(--blue);border-radius:999px;transition:width .25s ease;}
+.slide-counter{font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--ink-dim);}
+.hint{font-size:12px;color:var(--ink-dim);text-align:center;}
+
+@media (max-width:760px){
+  .slide{padding:34px 26px;}
+  .cards-3,.cards-4,.cards-5{grid-template-columns:repeat(2,1fr);}
+  .tl-row,.tl-row-4{grid-template-columns:1fr;}
+  .index-list{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .problem-list{grid-template-columns:1fr;}
+}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="teoria.html">📖 Teoría</a>
+        <a href="actividades.html">📝 Actividades</a>
+        <a href="resumen.html" class="active">🎛️ Resumen</a>
+        <a href="diapositivas.html">🖥️ Diapositivas</a>
+      </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+</aside>
+
+<div id="deck-app" data-lang="es">
+
+  <div class="toolbar">
+    <span class="toolbar-title">UT2 · <span data-i18n="es">Resumen de apoyo</span><span data-i18n="en">Teaching support summary</span></span>
+    <div class="toolbar-group">
+      <div class="lang-group" role="group" aria-label="Idioma / Language">
+        <button type="button" class="tb-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button type="button" class="tb-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="tb-btn" id="btn-theme" onclick="toggleTheme()"><span id="theme-icon">🌙</span> <span id="theme-label"><span data-i18n="es">Modo oscuro</span><span data-i18n="en">Dark mode</span></span></button>
+      <button type="button" class="tb-btn" id="btn-fs" onclick="toggleFullscreen()">⛶ <span data-i18n="es">Pantalla completa</span><span data-i18n="en">Fullscreen</span></button>
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+
+<section class="slide slide-title" data-deco="title">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner title-slide">
+    <span class="eyebrow"><span data-i18n="es">UT2 · Base de datos · 1º DAM bilingüe</span><span data-i18n="en">Unit 2 · Databases · 1st year DAM bilingual programme</span></span>
+    <h1 class="mega"><span data-i18n="es">El modelo<br>entidad-relación</span><span data-i18n="en">The entity-<br>relationship model</span></h1>
+    <p class="byline">Marina Preciados Agapito</p>
+  </div>
+</section>
+
+<section class="slide " data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">Índice</span><span data-i18n="en">Contents</span></span>
+    <h2><span data-i18n="es">Lo que vamos a ver</span><span data-i18n="en">What we'll cover</span></h2>
+    <ol class="index-list">
+      <li><span class="ix-num">01</span><span class="ix-txt"><span data-i18n="es">Por qué diseñar antes de crear tablas</span><span data-i18n="en">Why design before building tables</span></span></li>
+      <li><span class="ix-num">02</span><span class="ix-txt"><span data-i18n="es">El modelo entidad-relación</span><span data-i18n="en">The entity-relationship model</span></span></li>
+      <li><span class="ix-num">03</span><span class="ix-txt"><span data-i18n="es">Entidades fuertes y débiles</span><span data-i18n="en">Strong and weak entities</span></span></li>
+      <li><span class="ix-num">04</span><span class="ix-txt"><span data-i18n="es">Atributos y sus tipos</span><span data-i18n="en">Attributes and their types</span></span></li>
+      <li><span class="ix-num">05</span><span class="ix-txt"><span data-i18n="es">Relaciones: grado, cardinalidad, correspondencia</span><span data-i18n="en">Relationships: degree, cardinality, correspondence</span></span></li>
+      <li><span class="ix-num">06</span><span class="ix-txt"><span data-i18n="es">Claves candidatas y restricciones</span><span data-i18n="en">Candidate keys and constraints</span></span></li>
+      <li><span class="ix-num">07</span><span class="ix-txt"><span data-i18n="es">El modelo E/R extendido: herencia y agregación</span><span data-i18n="en">The extended E/R model: inheritance and aggregation</span></span></li>
+      <li><span class="ix-num">08</span><span class="ix-txt"><span data-i18n="es">Guía para construir un diagrama E/R</span><span data-i18n="en">Guide to building an E/R diagram</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide " data-deco="3">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">01 — <span data-i18n="es">Por qué diseñar antes de crear tablas</span><span data-i18n="en">Why design before building tables</span></span>
+    <h2><span data-i18n="es">Del problema real a la máquina</span><span data-i18n="en">From the real problem to the machine</span></h2>
+    <div class="chain">
+      <div class="chain-step"><span class="chain-tag">1</span><p><span data-i18n="es">Recopilar información</span><span data-i18n="en">Gather information</span></p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-step"><span class="chain-tag">2 · <span data-i18n="es">conceptual</span><span data-i18n="en">conceptual</span></span><p><span data-i18n="es">Modelo E/R</span><span data-i18n="en">E/R model</span></p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-step"><span class="chain-tag">3 · <span data-i18n="es">lógico</span><span data-i18n="en">logical</span></span><p><span data-i18n="es">Modelo relacional</span><span data-i18n="en">Relational model</span></p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-step"><span class="chain-tag">4</span><p><span data-i18n="es">Normalización</span><span data-i18n="en">Normalisation</span></p></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-step"><span class="chain-tag">5 · <span data-i18n="es">físico</span><span data-i18n="en">physical</span></span><p><span data-i18n="es">Codificación (SQL)</span><span data-i18n="en">Coding (SQL)</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Saltarse el modelo conceptual hace perder de vista el problema real y provoca incoherencia en los datos, a la larga. En codificación elegimos hardware, software y SGBD, y trasladamos el modelo lógico a una máquina física real.</span><span data-i18n="en">Skipping the conceptual model means losing sight of the real problem, and eventually causes incoherent data. In coding we choose the hardware, software and DBMS, and take the logical model to a real physical machine.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="4">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">01 — <span data-i18n="es">Tres niveles de representación</span><span data-i18n="en">Three levels of representation</span></span>
+    <h2><span data-i18n="es">Conceptual, lógico y físico</span><span data-i18n="en">Conceptual, logical and physical</span></h2>
+    <div class="cards cards-3">
+      <div class="card"><span class="tag"><span data-i18n="es">CONCEPTUAL</span><span data-i18n="en">CONCEPTUAL</span></span><h4><span data-i18n="es">Independiente del SGBD</span><span data-i18n="en">Independent of the DBMS</span></h4><p><span data-i18n="es">Describe cómo se organiza el problema en el mundo real, sin pensar todavía en cómo se va a guardar. Ejemplo: el modelo entidad-relación, protagonista de esta unidad.</span><span data-i18n="en">Describes how the problem is organised in the real world, without yet thinking about how it will be stored. Example: the entity-relationship model, the star of this unit.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">LÓGICO</span><span data-i18n="en">LOGICAL</span></span><h4><span data-i18n="es">Depende del tipo de BD</span><span data-i18n="en">Depends on the type of database</span></h4><p><span data-i18n="es">Más técnico: establece la estructura de los datos y sus relaciones para un tipo de base de datos concreto. Ejemplo: el modelo relacional, que veremos en la próxima unidad.</span><span data-i18n="en">More technical: it establishes the structure of the data and its relationships for one specific type of database. Example: the relational model, covered in the next unit.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">FÍSICO</span><span data-i18n="en">PHYSICAL</span></span><h4><span data-i18n="es">Cómo se almacena de verdad</span><span data-i18n="en">How it's actually stored</span></h4><p><span data-i18n="es">Especifica los datos a nivel de ficheros, registros y estructuras físicas dentro de un SGBD concreto ya elegido.</span><span data-i18n="en">Specifies the data at the level of files, records and physical structures inside a specific, already-chosen DBMS.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">La metodología recomendada no salta directamente del problema real a las tablas: pasa primero por estos esquemas intermedios, más cercanos al mundo real que a la máquina.</span><span data-i18n="en">The recommended methodology doesn't jump straight from the real problem to database tables: it first passes through these intermediate schemas, closer to the real world than to the machine.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">01 — <span data-i18n="es">Interacción entre modelos</span><span data-i18n="en">Interaction between models</span></span>
+    <h2><span data-i18n="es">Quién trabaja con cada modelo</span><span data-i18n="en">Who works with each model</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 680 190">
+        <rect x="20" y="14" width="180" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="110" y="38" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">USUARIO EXPERTO</text>
+        <rect x="20" y="76" width="180" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="110" y="100" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">DOMINIO DEL PROBLEMA</text>
+        <rect x="20" y="138" width="180" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="110" y="162" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">BASE DE DATOS</text>
+        <line x1="110" y1="52" x2="110" y2="76" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="110" y1="114" x2="110" y2="138" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+
+        <rect x="430" y="14" width="230" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="545" y="37" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">INFORMÁTICO</text>
+        <text x="545" y="49" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">DISEÑADOR BBDD</text>
+        <rect x="430" y="76" width="230" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="545" y="100" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">PROGRAMADOR BBDD</text>
+        <rect x="430" y="138" width="230" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="545" y="162" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ADMINISTRADOR BBDD</text>
+        <line x1="545" y1="52" x2="545" y2="76" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="545" y1="114" x2="545" y2="138" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+
+        <line x1="200" y1="33" x2="430" y2="33" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+        <text x="315" y="25" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--blue-deep);">MODELO CONCEPTUAL</text>
+        <line x1="200" y1="95" x2="430" y2="95" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+        <text x="315" y="87" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--mint-deep);">MODELO LÓGICO</text>
+        <line x1="200" y1="157" x2="430" y2="157" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+        <text x="315" y="149" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--blue-deep);">MODELO FÍSICO</text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">El usuario experto y el diseñador construyen juntos el modelo conceptual; el programador lo traduce al modelo lógico; el administrador lo lleva al modelo físico. Los tres parten del mismo dominio del problema.</span><span data-i18n="en">The expert user and the designer build the conceptual model together; the programmer translates it into the logical model; the administrator takes it to the physical model. All three start from the same problem domain.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="4">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">01 — <span data-i18n="es">Notación de Chen</span><span data-i18n="en">Chen's notation</span></span>
+    <h2><span data-i18n="es">Tres formas, tres significados</span><span data-i18n="en">Three shapes, three meanings</span></h2>
+    <div class="cards cards-3">
+      <div class="card"><span class="tag"><span data-i18n="es">RECTÁNGULO</span><span data-i18n="en">RECTANGLE</span></span><h4><span data-i18n="es">Entidad</span><span data-i18n="en">Entity</span></h4><p><span data-i18n="es">Un objeto sobre el que guardamos información. ALUMNO, PRODUCTO…</span><span data-i18n="en">An object we store information about. STUDENT, PRODUCT…</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">ROMBO</span><span data-i18n="en">DIAMOND</span></span><h4><span data-i18n="es">Relación</span><span data-i18n="en">Relationship</span></h4><p><span data-i18n="es">Un vínculo real entre entidades. Casi siempre un verbo: estudia, factura…</span><span data-i18n="en">A real link between entities. Almost always a verb: studies, invoices…</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">ELIPSE</span><span data-i18n="en">ELLIPSE</span></span><h4><span data-i18n="es">Atributo</span><span data-i18n="en">Attribute</span></h4><p><span data-i18n="es">Una propiedad concreta. Subrayada si es la clave que identifica cada ejemplar.</span><span data-i18n="en">A specific property. Underlined if it's the key that identifies each instance.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Peter P. Chen (1976). Existen otras notaciones (UML, Barker, Crow's Foot…), pero usaremos ésta todo el curso.</span><span data-i18n="en">Peter P. Chen (1976). Other notations exist (UML, Barker, Crow's Foot…), but we'll use this one all course long.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Encuentra la entidad</span><span data-i18n="en">Find the entity</span></h2>
+    <p class="lede-lg"><span data-i18n="es">En cada frase hay un nombre común que podría ser una entidad. Encuéntralo tú solo/a antes de comentarlo en voz alta.</span><span data-i18n="en">Each sentence hides a common noun that could be an entity. Find it on your own before we discuss it out loud.</span></p>
+    <div class="cards cards-3 quiz-cards">
+      <div class="card"><span class="tag">1</span><p><span data-i18n="es">«Cada cliente tiene un nombre y una dirección»</span><span data-i18n="en">«Each customer has a name and an address»</span></p></div>
+      <div class="card"><span class="tag">2</span><p><span data-i18n="es">«Rápidamente, el empleado factura el pedido»</span><span data-i18n="en">«Quickly, the employee invoices the order»</span></p></div>
+      <div class="card"><span class="tag">3</span><p><span data-i18n="es">«El precio es de 19,90 euros»</span><span data-i18n="en">«The price is 19.90 euros»</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Pista: busca sustantivos en singular que representen objetos, no adverbios ni valores sueltos.</span><span data-i18n="en">Hint: look for singular nouns representing objects, not adverbs or bare values.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">CLIENTE, EMPLEADO... y ningún tercero</span><span data-i18n="en">CUSTOMER, EMPLOYEE... and no third one</span></h2>
+    <div class="cards cards-3 quiz-cards">
+      <div class="card" style="border-color:var(--mint-deep)"><span class="tag" style="color:var(--mint-deep);background:var(--tint-mint)">CLIENTE</span><p><span data-i18n="es">Nombre común, objeto con propiedades (nombre, dirección).</span><span data-i18n="en">Common noun, an object with properties (name, address).</span></p></div>
+      <div class="card" style="border-color:var(--mint-deep)"><span class="tag" style="color:var(--mint-deep);background:var(--tint-mint)">EMPLEADO</span><p><span data-i18n="es">"Rápidamente" es un adverbio — no es una entidad.</span><span data-i18n="en">"Quickly" is an adverb — not an entity.</span></p></div>
+      <div class="card" style="border-color:var(--ink-dim)"><span class="tag" style="color:var(--ink-dim);background:var(--tint-ink)">—</span><p><span data-i18n="es">"19,90 euros" es sólo un valor de un atributo (precio), no una entidad.</span><span data-i18n="en">"19.90 euros" is just an attribute value (price), not an entity.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">03 — <span data-i18n="es">Entidades fuertes y débiles</span><span data-i18n="en">Strong and weak entities</span></span>
+    <h2><span data-i18n="es">Cuando una depende de la otra</span><span data-i18n="en">When one depends on the other</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 640 190">
+        <rect x="30" y="70" width="140" height="48" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="100" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EMPLEADO</text>
+        <polygon points="290,52 342,95 290,138 238,95" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="290" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">tiene</tspan></text>
+        <rect x="440" y="66" width="150" height="58" rx="4" style="fill:none;stroke:var(--blue);stroke-width:2"/>
+        <rect x="448" y="74" width="134" height="42" rx="3" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="515" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">FAMILIAR</text>
+        <line x1="170" y1="95" x2="238" y2="95" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="342" y1="95" x2="440" y2="95" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <text x="204" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(0,N)</text>
+        <text x="391" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(1,1)</text>
+        <text x="100" y="152" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:12px;fill:var(--ink-dim);"><tspan data-i18n="es">fuerte</tspan></text>
+        <text x="515" y="152" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:12px;fill:var(--ink-dim);"><tspan data-i18n="es">débil (rect. doble)</tspan></text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">FAMILIAR no tiene sentido sin EMPLEADO: si el empleado desaparece, sus familiares registrados desaparecen también. Cada familiar depende de <strong>un único</strong> empleado (1,1); un empleado puede tener 0 o varios familiares (0,N).</span><span data-i18n="en">FAMILY MEMBER makes no sense without EMPLOYEE: if the employee disappears, their registered family members disappear too. Each family member depends on <strong>exactly one</strong> employee (1,1); an employee can have 0 or several family members (0,N).</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="6">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">04 — <span data-i18n="es">Atributos</span><span data-i18n="en">Attributes</span></span>
+    <h2><span data-i18n="es">Cinco tipos a distinguir</span><span data-i18n="en">Five types to tell apart</span></h2>
+    <div class="cards cards-5 gloss-grid">
+      <div class="gloss-item"><h4><span data-i18n="es">Clave</span><span data-i18n="en">Key</span></h4><p><span data-i18n="es">Único, nunca vacío. Se subraya.</span><span data-i18n="en">Unique, never empty. Underlined.</span></p></div>
+      <div class="gloss-item"><h4><span data-i18n="es">Compuesto</span><span data-i18n="en">Composite</span></h4><p><span data-i18n="es">Se descompone en otros más simples.</span><span data-i18n="en">Splits into simpler ones.</span></p></div>
+      <div class="gloss-item"><h4><span data-i18n="es">Multivaluado</span><span data-i18n="en">Multi-valued</span></h4><p><span data-i18n="es">Puede tener varios valores a la vez.</span><span data-i18n="en">Can hold several values at once.</span></p></div>
+      <div class="gloss-item"><h4><span data-i18n="es">Opcional</span><span data-i18n="en">Optional</span></h4><p><span data-i18n="es">Puede quedar vacío (nulo).</span><span data-i18n="en">Can be left empty (null).</span></p></div>
+      <div class="gloss-item"><h4><span data-i18n="es">Derivado</span><span data-i18n="en">Derived</span></h4><p><span data-i18n="es">Se calcula de otro atributo.</span><span data-i18n="en">Calculated from another attribute.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Si ninguna combinación natural sirve como clave, se crea una artificial: <code>id_</code> + nombre de la entidad.</span><span data-i18n="en">If no natural combination works as a key, an artificial one is created: <code>id_</code> + the entity's name.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">Diseñad la entidad ALUMNO</span><span data-i18n="en">Design the STUDENT entity</span></h2>
+    <div class="scenario-card">
+      <p><span data-i18n="es">Queremos guardar de cada alumno: DNI, nombre y apellidos, fecha de nacimiento, un segundo teléfono de contacto (no todos lo dan) y la edad — que nunca se teclea a mano.</span><span data-i18n="en">For each student we want to store: ID number, first and last name, date of birth, a second contact phone (not everyone gives one), and their age — which is never typed in by hand.</span></p>
+    </div>
+    <p class="lede-lg"><span data-i18n="es">En grupo: ¿cuál es la clave? ¿Qué atributo es opcional? ¿Cuál es derivado, y de qué otro atributo sale?</span><span data-i18n="en">As a group: which is the key? Which attribute is optional? Which one is derived, and from which attribute?</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Clave, opcional y derivado</span><span data-i18n="en">Key, optional and derived</span></h2>
+    <div class="cards cards-3 quiz-cards">
+      <div class="card"><span class="tag">DNI</span><p><span data-i18n="es"><strong>Clave</strong> — único por alumno, nunca vacío.</span><span data-i18n="en"><strong>Key</strong> — unique per student, never empty.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">2º teléfono</span><span data-i18n="en">2nd phone</span></span><p><span data-i18n="es"><strong>Opcional</strong> — no todos los alumnos lo facilitan.</span><span data-i18n="en"><strong>Optional</strong> — not every student provides one.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">Edad</span><span data-i18n="en">Age</span></span><p><span data-i18n="es"><strong>Derivado</strong> — se calcula desde la fecha de nacimiento.</span><span data-i18n="en"><strong>Derived</strong> — calculated from the date of birth.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide " data-deco="3">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">05 — <span data-i18n="es">Grado de una relación</span><span data-i18n="en">Degree of a relationship</span></span>
+    <h2><span data-i18n="es">Cuántas entidades intervienen</span><span data-i18n="en">How many entities are involved</span></h2>
+    <div class="tl-row tl-row-4">
+      <div class="tl-card"><span class="tl-year"><span data-i18n="es">LA MÁS COMÚN</span><span data-i18n="en">THE MOST COMMON</span></span><h4><span data-i18n="es">Binaria</span><span data-i18n="en">Binary</span></h4><p><span data-i18n="es">Dos entidades. ALUMNO estudia ASIGNATURA.</span><span data-i18n="en">Two entities. STUDENT studies SUBJECT.</span></p></div>
+      <div class="tl-card"><span class="tl-year"><span data-i18n="es">POCO FRECUENTE</span><span data-i18n="en">LESS COMMON</span></span><h4><span data-i18n="es">Ternaria</span><span data-i18n="en">Ternary</span></h4><p><span data-i18n="es">Tres entidades a la vez. MÉDICO atiende PACIENTE en CONSULTA.</span><span data-i18n="en">Three entities at once. DOCTOR sees PATIENT in a CONSULTING ROOM.</span></p></div>
+      <div class="tl-card"><span class="tl-year"><span data-i18n="es">N ENTIDADES</span><span data-i18n="en">N ENTITIES</span></span><h4><span data-i18n="es">N-aria</span><span data-i18n="en">N-ary</span></h4><p><span data-i18n="es">Se añade una cuarta entidad a la ternaria. MÉDICO atiende PACIENTE en CONSULTA en una FECHA concreta.</span><span data-i18n="en">A fourth entity is added to the ternary one. DOCTOR sees PATIENT in a CONSULTING ROOM on a given DATE.</span></p></div>
+      <div class="tl-card"><span class="tl-year"><span data-i18n="es">CON ROLES</span><span data-i18n="en">WITH ROLES</span></span><h4><span data-i18n="es">Reflexiva</span><span data-i18n="en">Reflexive</span></h4><p><span data-i18n="es">Dos ejemplares de la misma entidad. EMPLEADO es jefe de EMPLEADO.</span><span data-i18n="en">Two instances of the same entity. EMPLOYEE is boss of EMPLOYEE.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide " data-deco="4">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">05 — <span data-i18n="es">Cardinalidad</span><span data-i18n="en">Cardinality</span></span>
+    <h2><span data-i18n="es">Mínimo y máximo por entidad</span><span data-i18n="en">Minimum and maximum per entity</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 560 130">
+        <rect x="15" y="45" width="130" height="40" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="80" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">JUGADOR</tspan></text>
+        <polygon points="270,25 320,65 270,105 220,65" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="270" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">juega en</tspan></text>
+        <rect x="405" y="45" width="130" height="40" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="470" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">EQUIPO</tspan></text>
+        <line x1="145" y1="65" x2="220" y2="65" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="320" y1="65" x2="405" y2="65" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <text x="182" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(0,1)</text>
+        <text x="362" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(1,N)</text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">Un jugador está en 0 o 1 equipo a la vez; un equipo tiene mínimo 1 y muchos jugadores.</span><span data-i18n="en">A player is on 0 or 1 team at a time; a team has a minimum of 1 and many players.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">05 — <span data-i18n="es">Tipo de correspondencia</span><span data-i18n="en">Correspondence type</span></span>
+    <h2><span data-i18n="es">1:1, 1:N o N:M</span><span data-i18n="en">1:1, 1:N or N:M</span></h2>
+    <div class="cards cards-3">
+      <div class="card"><span class="tag">1:1</span><p><span data-i18n="es">PERSONA — DNI. Una persona, un único DNI, y viceversa.</span><span data-i18n="en">PERSON — ID. One person, one ID, and vice versa.</span></p></div>
+      <div class="card"><span class="tag">1:N</span><p><span data-i18n="es">CLIENTE — PEDIDO. Un cliente hace muchos pedidos; cada pedido, un cliente.</span><span data-i18n="en">CUSTOMER — ORDER. A customer places many orders; each order, one customer.</span></p></div>
+      <div class="card"><span class="tag">N:M</span><p><span data-i18n="es">ALUMNO — ASIGNATURA. Muchos alumnos por asignatura y viceversa.</span><span data-i18n="en">STUDENT — SUBJECT. Many students per subject and vice versa.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Se calcula tomando el <strong>valor máximo</strong> de la cardinalidad de cada entidad. ⚠ Aviso: si hiciera falta una segunda N, se transforma en M por convenio (N:M) — el significado no cambia.</span><span data-i18n="en">It's calculated by taking the <strong>maximum value</strong> of each entity's cardinality. ⚠ Note: if a second N were needed, it becomes M by convention (N:M) — the meaning doesn't change.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="6">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">05 — <span data-i18n="es">Atributos de relación</span><span data-i18n="en">Relationship attributes</span></span>
+    <h2><span data-i18n="es">Un dato que no es de ninguna entidad</span><span data-i18n="en">Data that belongs to neither entity</span></h2>
+    <p class="lede-lg"><span data-i18n="es">MECÁNICO <em>repara</em> VEHÍCULO. Queremos guardar la <strong>fecha de reparación</strong> — ¿en cuál de los dos la metemos?</span><span data-i18n="en">MECHANIC <em>repairs</em> VEHICLE. We want to store the <strong>repair date</strong> — which of the two do we put it in?</span></p>
+    <div class="two-col">
+      <div><span class="col-h col-h-bad"><span data-i18n="es">En MECÁNICO</span><span data-i18n="en">In MECHANIC</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">✕ No sabríamos de qué vehículo.</span><span data-i18n="en">✕ We wouldn't know which vehicle.</span></p></div>
+      <div><span class="col-h col-h-bad"><span data-i18n="es">En VEHÍCULO</span><span data-i18n="en">In VEHICLE</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">✕ No sabríamos qué mecánico.</span><span data-i18n="en">✕ We wouldn't know which mechanic.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">✓ Sólo tiene sentido colgado del rombo <em>repara</em>: es un <strong>atributo de relación</strong>.</span><span data-i18n="en">✓ It only makes sense hanging off the <em>repairs</em> diamond: it's a <strong>relationship attribute</strong>.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">!</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Historial clínico</span><span data-i18n="en">Medical record</span></h2>
+    <div class="scenario-card">
+      <p><span data-i18n="es">Un hospital guarda un único historial clínico por paciente. Un paciente recién ingresado puede que todavía no tenga historial abierto. Un historial clínico siempre pertenece a un paciente concreto y sólo a uno.</span><span data-i18n="en">A hospital keeps a single medical record per patient. A newly admitted patient might not have one opened yet. A medical record always belongs to one specific patient, and only one.</span></p>
+    </div>
+    <div class="activity-prompts">
+      <span class="activity-prompt p-campo"><span class="num">A</span><span data-i18n="es">Cardinalidad de PACIENTE</span><span data-i18n="en">PATIENT's cardinality</span></span>
+      <span class="activity-prompt p-registro"><span class="num">B</span><span data-i18n="es">Cardinalidad de HISTORIAL</span><span data-i18n="en">RECORD's cardinality</span></span>
+      <span class="activity-prompt p-clave"><span class="num">C</span><span data-i18n="es">Tipo de correspondencia</span><span data-i18n="en">Correspondence type</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="slide " data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Una relación 1:1</span><span data-i18n="en">A 1:1 relationship</span></h2>
+    <div class="cards cards-3 quiz-cards">
+      <div class="card"><span class="tag"><span data-i18n="es">PACIENTE</span><span data-i18n="en">PATIENT</span></span><p><code>(0,1)</code> — <span data-i18n="es">puede no tener historial todavía, y como mucho uno.</span><span data-i18n="en">might not have a record yet, and at most one.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">HISTORIAL</span><span data-i18n="en">RECORD</span></span><p><code>(1,1)</code> — <span data-i18n="es">siempre pertenece a un único paciente.</span><span data-i18n="en">always belongs to a single patient.</span></p></div>
+      <div class="card"><span class="tag">1:1</span><p><span data-i18n="es">Máximo de cada lado es 1 en ambos casos.</span><span data-i18n="en">The maximum on each side is 1 in both cases.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide " data-deco="4">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">06 — <span data-i18n="es">Claves candidatas</span><span data-i18n="en">Candidate keys</span></span>
+    <h2><span data-i18n="es">Cuando sobran identificadores</span><span data-i18n="en">When there's more than one identifier</span></h2>
+    <div class="cards cards-4">
+      <div class="card"><span class="tag"><span data-i18n="es">IDENTIFICA (CON REDUNDANCIA)</span><span data-i18n="en">IDENTIFIES (WITH REDUNDANCY)</span></span><h4><span data-i18n="es">Superclave</span><span data-i18n="en">Superkey</span></h4><p><span data-i18n="es">Cualquier atributo o conjunto de atributos que identifica cada ejemplar. Puede sobrar redundancia.</span><span data-i18n="en">Any attribute or set of attributes that identifies every instance. May include redundancy.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">ÚNICO + SIEMPRE CON VALOR</span><span data-i18n="en">UNIQUE + ALWAYS VALUED</span></span><h4><span data-i18n="es">Clave candidata</span><span data-i18n="en">Candidate key</span></h4><p><span data-i18n="es">Superclave mínima: ningún atributo se puede quitar sin perder la unicidad.</span><span data-i18n="en">A minimal superkey: no attribute can be dropped without losing uniqueness.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">+ ESTABLE + SIMPLE</span><span data-i18n="en">+ STABLE + SIMPLE</span></span><h4><span data-i18n="es">Clave primaria</span><span data-i18n="en">Primary key</span></h4><p><span data-i18n="es">De todas las candidatas, se elige la más estable y simple.</span><span data-i18n="en">Of all the candidates, the most stable and simplest one is chosen.</span></p></div>
+      <div class="card"><span class="tag"><span data-i18n="es">EL RESTO</span><span data-i18n="en">THE REST</span></span><h4><span data-i18n="es">Clave alternativa</span><span data-i18n="en">Alternate key</span></h4><p><span data-i18n="es">Las demás candidatas quedan como claves alternativas (UNIQUE).</span><span data-i18n="en">The other candidates remain as alternate keys (UNIQUE).</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Ejemplo: en USUARIO, <code>login</code> y <code>email</code> son ambas candidatas — <code>login</code> se elige primaria por ser más estable; <code>email</code> queda como alternativa. Una <strong>clave ajena</strong> (o foránea) es distinta: un atributo que es clave primaria de <em>otra</em> entidad relacionada — así es como una entidad débil incorpora la clave de su entidad fuerte.</span><span data-i18n="en">Example: in USER, <code>login</code> and <code>email</code> are both candidates — <code>login</code> is chosen as primary for being more stable; <code>email</code> stays as an alternate. A <strong>foreign key</strong> is different: an attribute that is the primary key of <em>another</em>, related entity — it's how a weak entity picks up its strong entity's key.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">06 — <span data-i18n="es">Restricciones adicionales</span><span data-i18n="en">Additional constraints</span></span>
+    <h2><span data-i18n="es">Más allá de entidades y relaciones</span><span data-i18n="en">Beyond entities and relationships</span></h2>
+    <div class="two-col">
+      <div><span class="col-h"><span data-i18n="es">Dependencia existencial (E)</span><span data-i18n="en">Existential dependency (E)</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">La entidad débil desaparece si desaparece la fuerte, pero podría identificarse por sí misma.</span><span data-i18n="en">The weak entity disappears if the strong one does, but it could identify itself on its own.</span></p></div>
+      <div><span class="col-h"><span data-i18n="es">Dependencia de identificación (ID)</span><span data-i18n="en">Identifying dependency (ID)</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">Además necesita el identificador de la entidad fuerte para formar su propia clave.</span><span data-i18n="en">It also needs the strong entity's identifier to form its own key.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Cuando el problema da límites exactos (un aula de entre 15 y 30 alumnos), se escribe la <strong>cardinalidad exacta</strong>: <code>(15,30)</code> en vez de <code>(0,N)</code>.</span><span data-i18n="en">When the problem states exact limits (a classroom of between 15 and 30 students), the <strong>exact cardinality</strong> is written: <code>(15,30)</code> instead of <code>(0,N)</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Lo puede expresar el diagrama?</span><span data-i18n="en">Can the diagram express it?</span></h2>
+    <div class="scenario-card">
+      <p><span data-i18n="es">Un empleado no puede dirigir el departamento en el que él mismo trabaja.</span><span data-i18n="en">An employee cannot manage the department they themselves work in.</span></p>
+    </div>
+    <p class="lede-lg"><span data-i18n="es">¿Qué cardinalidad, atributo o símbolo del modelo E/R básico expresa esta regla?</span><span data-i18n="en">Which cardinality, attribute or symbol in the basic E/R model expresses this rule?</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Ninguno — es pérdida expresiva</span><span data-i18n="en">None — it's semantic loss</span></h2>
+    <p class="note"><span data-i18n="es">Se documenta como una nota <strong>PE</strong> al pie del diagrama, porque ninguna cardinalidad puede prohibir que la misma persona ocupe dos papeles distintos en la misma relación.</span><span data-i18n="en">It's documented as a <strong>PE</strong> (semantic loss) note at the foot of the diagram, because no cardinality can forbid the same person from holding two different roles in the same relationship.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="3">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">07 — <span data-i18n="es">Herencia (ISA)</span><span data-i18n="en">Inheritance (ISA)</span></span>
+    <h2><span data-i18n="es">Superentidad y subentidades</span><span data-i18n="en">Super-entity and sub-entities</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 520 190">
+        <rect x="190" y="10" width="120" height="36" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="250" y="33" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">PERSONAL</tspan></text>
+        <line x1="250" y1="46" x2="250" y2="66" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <circle cx="250" cy="73" r="8" style="fill:var(--paper);stroke:var(--ink);stroke-width:2"/>
+        <text x="250" y="77" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">P</text>
+        <polygon points="220,86 280,86 250,116" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <path d="M 175,124 A 78,22 0 0 1 325,124" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+        <line x1="250" y1="116" x2="90" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="250" y1="116" x2="250" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="250" y1="116" x2="410" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="20" y="150" width="140" height="36" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="90" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">PROFESOR</tspan></text>
+        <rect x="180" y="150" width="140" height="36" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="250" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">BEDEL</tspan></text>
+        <rect x="340" y="150" width="140" height="36" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="410" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">TÉCNICO</tspan></text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">El círculo <strong>P</strong> = jerarquía <strong>parcial</strong>; el arco = jerarquía <strong>exclusiva</strong>. Sin círculo sería total; sin arco, solapada.</span><span data-i18n="en">The <strong>P</strong> circle = <strong>partial</strong> hierarchy; the arc = <strong>exclusive</strong> hierarchy. No circle would mean total; no arc, overlapping.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">07 — <span data-i18n="es">Herencia de atributos</span><span data-i18n="en">Attribute inheritance</span></span>
+    <h2><span data-i18n="es">Lo del padre pasa al hijo</span><span data-i18n="en">What the parent has, the child gets</span></h2>
+    <p class="lede-lg"><span data-i18n="es">Los atributos de las entidades de nivel más alto son heredados por las de nivel más bajo, y puede encadenarse en varios niveles.</span><span data-i18n="en">Attributes of higher-level entities are inherited by lower-level ones, and it can chain across several levels.</span></p>
+    <div class="two-col">
+      <div><span class="col-h">PERSONAL <span style="font-weight:400;">(nombre, DNI)</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">Atributos comunes a los tres subtipos: los hereda cualquiera de ellos.</span><span data-i18n="en">Attributes common to all three subtypes: any of them inherits them.</span></p></div>
+      <div><span class="col-h col-h-good">PROFESOR / BEDEL / TÉCNICO →</span><p style="font-size:13.5px;color:var(--ink-soft);">PROFESOR (+<em><span data-i18n="es">asignatura</span><span data-i18n="en">subject</span></em>), BEDEL (+<em><span data-i18n="es">turno</span><span data-i18n="en">shift</span></em>), TÉCNICO (+<em><span data-i18n="es">especialidad</span><span data-i18n="en">specialty</span></em>)</p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Cada subtipo añade sus propios atributos, además de heredar los de PERSONAL.</span><span data-i18n="en">Each subtype adds its own attributes, on top of inheriting those of PERSONAL.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="4">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">07 — <span data-i18n="es">Las cuatro combinaciones</span><span data-i18n="en">The four combinations</span></span>
+    <h2><span data-i18n="es">Total/parcial × exclusiva/solapada</span><span data-i18n="en">Total/partial × exclusive/overlapping</span></h2>
+    <div class="cards cards-4">
+      <div class="card small"><span class="tag"><span data-i18n="es">EXCLUSIVA · TOTAL</span><span data-i18n="en">EXCLUSIVE · TOTAL</span></span><p><span data-i18n="es">Todos, y sólo en una subentidad.</span><span data-i18n="en">Everyone, and only in one sub-entity.</span></p></div>
+      <div class="card small"><span class="tag"><span data-i18n="es">EXCLUSIVA · PARCIAL</span><span data-i18n="en">EXCLUSIVE · PARTIAL</span></span><p><span data-i18n="es">Como mucho una, o ninguna.</span><span data-i18n="en">At most one, or none.</span></p></div>
+      <div class="card small"><span class="tag"><span data-i18n="es">SOLAPADA · TOTAL</span><span data-i18n="en">OVERLAPPING · TOTAL</span></span><p><span data-i18n="es">Todos, y pueden ser varias a la vez.</span><span data-i18n="en">Everyone, and can be several at once.</span></p></div>
+      <div class="card small"><span class="tag"><span data-i18n="es">SOLAPADA · PARCIAL</span><span data-i18n="en">OVERLAPPING · PARTIAL</span></span><p><span data-i18n="es">Varias, una o ninguna.</span><span data-i18n="en">Several, one, or none.</span></p></div>
+    </div>
+    <p class="note"><span data-i18n="es">Ejemplo compartido: EMPLEADO → técnico / científico / astronauta.</span><span data-i18n="en">Shared example: EMPLOYEE → technician / scientist / astronaut.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">Clasifica la jerarquía</span><span data-i18n="en">Classify the hierarchy</span></h2>
+    <div class="scenario-card">
+      <p><span data-i18n="es">Una biblioteca clasifica su MATERIAL en LIBRO, REVISTA y DVD. Todo material del catálogo pertenece obligatoriamente a una de esas tres categorías, y nunca a más de una a la vez.</span><span data-i18n="en">A library classifies its MATERIAL as BOOK, MAGAZINE and DVD. Every item in the catalogue must belong to one of those three categories, and never to more than one at a time.</span></p>
+    </div>
+    <p class="lede-lg"><span data-i18n="es">En grupo: ¿total o parcial? ¿exclusiva o solapada? Justificad con la frase exacta del enunciado.</span><span data-i18n="en">As a group: total or partial? exclusive or overlapping? Justify it with the exact wording of the statement.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Exclusiva y total</span><span data-i18n="en">Exclusive and total</span></h2>
+    <ul class="problem-list">
+      <li><span class="check-icon">✓</span><span data-i18n="es">Total — "pertenece obligatoriamente" a una categoría</span><span data-i18n="en">Total — "must belong" to a category</span></li>
+      <li><span class="check-icon">✓</span><span data-i18n="es">Exclusiva — "nunca a más de una a la vez"</span><span data-i18n="en">Exclusive — "never more than one at a time"</span></li>
+    </ul>
+    <p class="note"><span data-i18n="es">Sin círculo sobre el triángulo (total) y con arco de exclusividad bajo él (exclusiva).</span><span data-i18n="en">No circle over the triangle (total) and an exclusivity arc under it (exclusive).</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="6">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">07 — <span data-i18n="es">Agregación</span><span data-i18n="en">Aggregation</span></span>
+    <h2><span data-i18n="es">Relacionar una relación</span><span data-i18n="en">Relating a relationship</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 170">
+        <rect x="18" y="10" width="330" height="80" rx="10" style="fill:none;stroke:var(--ink-dim);stroke-width:2;stroke-dasharray:6 5"/>
+        <rect x="35" y="34" width="120" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="95" y="56" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">DOCENTE</tspan></text>
+        <polygon points="210,32 244,51 210,70 176,51" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="210" y="54" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">imparte</tspan></text>
+        <rect x="270" y="34" width="110" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="325" y="56" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">AULA</tspan></text>
+        <line x1="155" y1="51" x2="176" y2="51" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="244" y1="51" x2="270" y2="51" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <path d="M 183,90 L 183,125 L 470,125" style="fill:none;stroke:var(--ink-dim);stroke-width:2"/>
+        <polygon points="505,105 548,125 505,145 462,125" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="505" y="129" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">registra</tspan></text>
+        <line x1="548" y1="125" x2="578" y2="125" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="578" y="107" width="105" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="630" y="129" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">INCIDENCIA</tspan></text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">Cuando una relación ya formada (DOCENTE <em>imparte</em> AULA) necesita participar en otra relación, se <strong>agrega</strong>: el conjunto entidad+relación+entidad se trata como una entidad de orden superior. No es lo mismo que una <strong>ternaria</strong>: ésta une tres entidades en un único hecho simultáneo; la agregación conecta un hecho ya existente con una tercera entidad.</span><span data-i18n="en">When an already-formed relationship (TEACHER <em>teaches</em> in ROOM) needs to take part in another relationship, it's <strong>aggregated</strong>: the entity+relationship+entity set is treated as a higher-level entity. Not the same as a <strong>ternary</strong> relationship: that joins three entities in one simultaneous fact; aggregation connects an already-existing fact with a separate third entity.</span></p>
+  </div>
+</section>
+
+<section class="slide " data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">08 — <span data-i18n="es">Guía para construir un diagrama E/R</span><span data-i18n="en">Guide to building an E/R diagram</span></span>
+    <h2><span data-i18n="es">Seis pasos</span><span data-i18n="en">Six steps</span></h2>
+    <ol class="final-list">
+      <li><strong><span data-i18n="es">Leer el problema</span><span data-i18n="en">Read the problem</span></strong> <span data-i18n="es">varias veces hasta entenderlo por completo.</span><span data-i18n="en">several times until you fully understand it.</span></li>
+      <li><strong><span data-i18n="es">Nombres → entidades</span><span data-i18n="en">Nouns → entities</span></strong> <span data-i18n="es">busca los sustantivos comunes del enunciado.</span><span data-i18n="en">look for the common nouns in the statement.</span></li>
+      <li><strong><span data-i18n="es">Adjetivos → atributos</span><span data-i18n="en">Adjectives → attributes</span></strong> <span data-i18n="es">y decide cuál será la clave.</span><span data-i18n="en">and decide which one will be the key.</span></li>
+      <li><strong><span data-i18n="es">Verbos → relaciones</span><span data-i18n="en">Verbs → relationships</span></strong> <span data-i18n="es">calcula cardinalidad y tipo de correspondencia.</span><span data-i18n="en">work out cardinality and correspondence type.</span></li>
+      <li><strong><span data-i18n="es">Refinar</span><span data-i18n="en">Refine</span></strong> <span data-i18n="es">y, si hay dudas, volver a preguntar al cliente.</span><span data-i18n="en">and, if in doubt, go back and ask the client.</span></li>
+      <li><strong><span data-i18n="es">Documentar</span><span data-i18n="en">Document it</span></strong> <span data-i18n="es">añadiendo las listas de atributos y restricciones que el diagrama no puede reflejar.</span><span data-i18n="en">by adding the attribute lists and constraints the diagram can't show.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide " data-deco="6">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow">08 — <span data-i18n="es">Ejemplo resuelto</span><span data-i18n="en">Worked example</span></span>
+    <h2><span data-i18n="es">Clientes, productos y proveedores</span><span data-i18n="en">Customers, products and suppliers</span></h2>
+    <div class="diagram-box">
+      <svg viewBox="0 0 760 150">
+        <rect x="10" y="55" width="120" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="70" y="79" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;fill:var(--ink);"><tspan data-i18n="es">CLIENTE</tspan></text>
+        <polygon points="212,40 250,74 212,108 174,74" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="212" y="78" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);"><tspan data-i18n="es">compra</tspan></text>
+        <rect x="295" y="55" width="120" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="355" y="79" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">PRODUCTO</tspan></text>
+        <polygon points="497,40 535,74 497,108 459,74" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
+        <text x="497" y="78" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8px;fill:var(--ink);"><tspan data-i18n="es">suministra</tspan></text>
+        <rect x="600" y="55" width="150" height="38" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="675" y="79" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">PROVEEDOR</text>
+        <line x1="130" y1="74" x2="174" y2="74" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="250" y1="74" x2="295" y2="74" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <text x="152" y="64" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--blue-deep);">N:M</text>
+        <line x1="415" y1="74" x2="459" y2="74" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="535" y1="74" x2="600" y2="74" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <text x="437" y="64" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--blue-deep);">1:N</text>
+      </svg>
+    </div>
+    <p class="note"><span data-i18n="es">CLIENTE — <em>compra</em> (N:M) — PRODUCTO — <em>suministra</em> (1:N) — PROVEEDOR. Claves: DNI, código y NIF respectivamente.</span><span data-i18n="en">CUSTOMER — <em>buys</em> (N:M) — PRODUCT — <em>supplies</em> (1:N) — SUPPLIER. Keys: ID number, code and tax ID respectively.</span></p>
+  </div>
+</section>
+
+<section class="slide slide-final" data-deco="5">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">En resumen</span><span data-i18n="en">In summary</span></span>
+    <h2><span data-i18n="es">Cinco ideas para llevarse</span><span data-i18n="en">Five ideas to take away</span></h2>
+    <ol class="final-list">
+      <li><strong><span data-i18n="es">El modelo E/R</span><span data-i18n="en">The E/R model</span></strong> <span data-i18n="es">es conceptual e independiente del SGBD: entidades, relaciones y atributos.</span><span data-i18n="en">is conceptual and DBMS-independent: entities, relationships and attributes.</span></li>
+      <li><strong><span data-i18n="es">Rectángulo, rombo, elipse</span><span data-i18n="en">Rectangle, diamond, ellipse</span></strong> <span data-i18n="es">— entidad (doble si es débil), relación con un verbo, atributo (subrayado si es clave).</span><span data-i18n="en">— entity (double if weak), relationship with a verb, attribute (underlined if a key).</span></li>
+      <li><strong><span data-i18n="es">Toda relación</span><span data-i18n="en">Every relationship</span></strong> <span data-i18n="es">tiene grado, cardinalidad (0,1 / 1,1 / 0,N / 1,N) y tipo de correspondencia (1:1, 1:N, N:M).</span><span data-i18n="en">has a degree, cardinality (0,1 / 1,1 / 0,N / 1,N) and correspondence type (1:1, 1:N, N:M).</span></li>
+      <li><strong><span data-i18n="es">Las relaciones ISA</span><span data-i18n="en">ISA relationships</span></strong> <span data-i18n="es">combinan total/parcial y exclusiva/solapada — cuatro combinaciones, úsalas con moderación.</span><span data-i18n="en">combine total/partial and exclusive/overlapping — four combinations, use them sparingly.</span></li>
+      <li><strong><span data-i18n="es">Diseñar bien</span><span data-i18n="en">Designing well</span></strong> <span data-i18n="es">es leer, buscar nombres/adjetivos/verbos, y volver a preguntar si hace falta.</span><span data-i18n="en">means reading, spotting nouns/adjectives/verbs, and asking again if needed.</span></li>
+    </ol>
+    <p class="credits"><span data-i18n="es">Resumen elaborado a partir de UT2 · El modelo entidad-relación — Base de datos, 1º DAM — Marina Preciados Agapito, con materiales de Alicia Cámara Casares.</span><span data-i18n="en">Summary built from Unit 2 · The entity-relationship model — Databases, 1st year DAM — Marina Preciados Agapito, with materials by Alicia Cámara Casares.</span></p>
+  </div>
+</section>
+
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button type="button" class="nav-btn" id="btn-prev" onclick="go(-1)" aria-label="Previous slide">‹</button>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="slide-counter" id="slide-counter">1 / 28</span>
+    </div>
+    <button type="button" class="nav-btn" id="btn-next" onclick="go(1)" aria-label="Next slide">›</button>
+  </div>
+  <p class="hint"><span data-i18n="es">Usa las flechas del teclado, haz clic en ‹ › o pulsa pantalla completa para proyectar en clase.</span><span data-i18n="en">Use the arrow keys, click ‹ ›, or hit fullscreen to project in class.</span></p>
+
+</div><!-- /#deck-app -->
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var idx = 0;
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('is-active', i===idx); });
+    document.getElementById('slide-counter').textContent = (idx+1) + ' / ' + total;
+    document.getElementById('progress-fill').style.width = ((idx+1)/total*100) + '%';
+    document.getElementById('btn-prev').disabled = idx===0;
+    document.getElementById('btn-next').disabled = idx===total-1;
+  }
+
+  window.go = function(delta){
+    idx = Math.max(0, Math.min(total-1, idx+delta));
+    render();
+  };
+
+  document.addEventListener('keydown', function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); go(1); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); go(-1); }
+    else if(e.key==='Home'){ idx=0; render(); }
+    else if(e.key==='End'){ idx=total-1; render(); }
+  });
+
+  window.setLang = function(lang){
+    var app = document.getElementById('deck-app');
+    if(app) app.setAttribute('data-lang', lang);
+    document.getElementById('btn-es').classList.toggle('active', lang==='es');
+    document.getElementById('btn-en').classList.toggle('active', lang==='en');
+    try{ localStorage.setItem('ut2-resumen-lang', lang); }catch(e){}
+  };
+
+  window.toggleFullscreen = function(){
+    var stage = document.getElementById('stage');
+    if(!document.fullscreenElement){
+      if(stage.requestFullscreen) stage.requestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+    }
+  };
+
+  window.setTheme = function(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    var icon = document.getElementById('theme-icon');
+    var labelEs = document.querySelector('#theme-label [data-i18n="es"]');
+    var labelEn = document.querySelector('#theme-label [data-i18n="en"]');
+    if(theme === 'dark'){
+      if(icon) icon.textContent = '☀️';
+      if(labelEs) labelEs.textContent = 'Modo claro';
+      if(labelEn) labelEn.textContent = 'Light mode';
+    } else {
+      if(icon) icon.textContent = '🌙';
+      if(labelEs) labelEs.textContent = 'Modo oscuro';
+      if(labelEn) labelEn.textContent = 'Dark mode';
+    }
+    try{ localStorage.setItem('ut2-resumen-theme', theme); }catch(e){}
+  };
+  window.toggleTheme = function(){
+    var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  try{
+    var savedTheme = localStorage.getItem('ut2-resumen-theme');
+    if(savedTheme) setTheme(savedTheme);
+  }catch(e){}
+
+  try{
+    var saved = localStorage.getItem('ut2-resumen-lang');
+    if(saved) setLang(saved);
+  }catch(e){}
+
+  render();
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

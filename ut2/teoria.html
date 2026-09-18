@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El modelo entidad-relación · The entity-relationship model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #262626;
+    --bg-alt: #2e2e2e;
+    --panel: #333333;
+    --line: #4a4a4a;
+    --ink: #ece9e0;
+    --ink-soft: #a6acc4;
+    --ink-dim: #8a90ac;
+    --clay: #3acfba;
+    --clay-soft: #a9ecdf;
+    --teal: #49a89c;
+    --teal-soft: #bfe3dd;
+    --paper: #e7ddc6;
+    --paper-ink: #2b2416;
+    --link: var(--teal-soft);
+    --accent-text: var(--clay-soft);
+    --nav-bg: rgba(18,20,28,.86);
+    --max: min(90vw, 1400px);
+    --maxw: min(96vw, 1800px);
+    --radius: 3px;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f4ec; --bg-alt:#efe9d8; --panel:#ffffff; --line:#ded5bd;
+    --ink:#221f18; --ink-soft:#55503f; --ink-dim:#837c65;
+    --link:#166f64; --accent-text:#0e8a76; --nav-bg: rgba(247,244,236,.86);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; font-size:18px;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    font-size:1.25rem;
+  }
+  ::selection{background:var(--clay);color:#12211e;}
+
+  h1,h2,h3,h4{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    line-height:1.12;
+    margin:0 0 .5em;
+    letter-spacing:-0.01em;
+  }
+  p{margin:0 0 1em;}
+  a{color:var(--link);}
+  a:hover{color:var(--accent-text);}
+  code{font-family:'Spline Sans Mono',monospace;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:3px;font-size:.9em;}
+
+  /* ---------- language toggle ---------- */
+  [data-i18n]{display:none;}
+  #ut2-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+  #ut2-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+  #ut2-app[data-lang="es"] span[data-i18n="es"],
+  #ut2-app[data-lang="en"] span[data-i18n="en"]{display:inline;}
+  #ut2-app[data-lang="es"] li[data-i18n="es"],
+  #ut2-app[data-lang="en"] li[data-i18n="en"]{display:list-item;}
+  #ut2-app[data-lang="es"] td[data-i18n="es"],
+  #ut2-app[data-lang="en"] td[data-i18n="en"],
+  #ut2-app[data-lang="es"] th[data-i18n="es"],
+  #ut2-app[data-lang="en"] th[data-i18n="en"]{display:table-cell;}
+  #ut2-app[data-lang="es"] tr[data-i18n="es"],
+  #ut2-app[data-lang="en"] tr[data-i18n="en"]{display:table-row;}
+  #ut2-app[data-lang="es"] figcaption[data-i18n="es"],
+  #ut2-app[data-lang="en"] figcaption[data-i18n="en"]{display:block;}
+
+  .langbar{
+    position:fixed; top:0; right:0; z-index:60;
+    display:flex; gap:0; margin:16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px;
+    box-shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  .langbar button{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:16px;
+    letter-spacing:.03em;
+    background:none;
+    border:none;
+    color:var(--ink-dim);
+    padding:7px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .langbar button.active{
+    background:var(--clay);
+    color:#0d211c;
+  }
+
+  /* ---------- top nav ---------- */
+  nav.toc{
+    position:sticky; top:0; z-index:50;
+    background:var(--nav-bg);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  nav.toc .inner{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:12px 64px 12px 24px;
+    display:flex; gap:22px; align-items:center;
+  }
+  nav.toc a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-size:16px;
+    font-family:'Spline Sans Mono',monospace;
+    letter-spacing:.01em;
+    white-space:nowrap;
+  }
+  nav.toc a:hover{color:var(--accent-text);}
+  nav.toc .brand{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    color:var(--ink);
+    font-size:16px;
+    margin-right:4px;
+  }
+
+  section{
+    padding:90px 24px;
+    max-width:var(--maxw);
+    margin:0 auto;
+  }
+  .prose{max-width:var(--max);}
+  .kicker{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:19px;
+    color:var(--accent-text);
+    letter-spacing:.04em;
+    margin-bottom:14px;
+    display:block;
+  }
+  .lede{
+    font-size:1.25rem;
+    color:var(--ink-soft);
+    max-width:100%;
+  }
+
+  /* ---------- hero ---------- */
+  header.hero{
+    position:relative;
+    padding:150px 24px 100px;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(207,139,58,.18), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(73,168,156,.14), transparent 55%);
+  }
+  .hero-inner{max-width:var(--maxw); margin:0 auto; position:relative; z-index:2;}
+  .hero h1{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    max-width:100%;
+    color:var(--ink);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--accent-text);
+  }
+  .hero .lede{margin-top:22px; font-size:1.25rem;}
+
+  .diagram-row{display:flex; gap:14px; margin-top:56px; align-items:center; flex-wrap:wrap;}
+  .mini-ent{
+    font-family:'Spline Sans Mono',monospace; font-size:14px; letter-spacing:.02em;
+    border:2px solid var(--clay); border-radius:4px; padding:10px 16px; color:var(--ink);
+    background:rgba(58,207,186,.08);
+  }
+  .mini-arrow{color:var(--ink-dim); font-size:20px;}
+  .mini-rel{
+    font-family:'Spline Sans Mono',monospace; font-size:13px; color:var(--teal-soft);
+    border:2px solid var(--teal); border-radius:999px; padding:8px 14px; transform:rotate(0deg);
+  }
+
+  /* ---------- cards / grids ---------- */
+  .grid{
+    display:grid;
+    gap:20px;
+    margin-top:40px;
+  }
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .grid.cols-5{grid-template-columns:repeat(5,1fr);}
+  @media(max-width:900px){
+    .grid.cols-2,.grid.cols-3,.grid.cols-4,.grid.cols-5{grid-template-columns:1fr;}
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+  }
+  .card h4{
+    font-size:1.05rem;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .card p{color:var(--ink-soft); font-size:1rem; margin-bottom:0;}
+  .card .tag{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:16px;
+    color:var(--teal-soft);
+    letter-spacing:.03em;
+    display:block;
+    margin-bottom:10px;
+  }
+
+  /* ---------- section header pattern ---------- */
+  .sec-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:12px;
+  }
+  .sec-head h2{font-size:clamp(1.7rem,3.4vw,2.6rem);}
+  .sec-num{
+    font-family:'Spline Sans Mono',monospace;
+    color:var(--ink-dim);
+    font-size:16px;
+  }
+
+  /* ---------- table styling ---------- */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:30px;
+    font-size:1rem;
+  }
+  thead th{
+    text-align:left;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:16px;
+    letter-spacing:.03em;
+    color:var(--accent-text);
+    border-bottom:1px solid var(--line);
+    padding:10px 14px;
+  }
+  tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink-soft);
+    vertical-align:top;
+  }
+  tbody tr:hover td{color:var(--ink);}
+  td strong{color:var(--ink);}
+
+  /* ---------- alt panel section ---------- */
+  .panel-section{
+    background:var(--bg-alt);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- glossary elements grid ---------- */
+  .gloss{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:200px 1fr;
+    row-gap:0;
+  }
+  .gloss-row{display:contents;}
+  .gloss-term{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:1rem;
+    color:var(--accent-text);
+    padding:18px 20px 18px 0;
+    border-top:1px solid var(--line);
+  }
+  .gloss-def{
+    padding:18px 0;
+    border-top:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .gloss-def strong{color:var(--ink);}
+  @media(max-width:700px){
+    .gloss{grid-template-columns:1fr;}
+    .gloss-term{border-top:1px solid var(--line); padding-bottom:6px;}
+    .gloss-def{border-top:none; padding-top:0;}
+  }
+
+  /* ---------- pill list ---------- */
+  .pills{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;}
+  .pill{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:16px;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+  }
+
+  /* ---------- diagram figures ---------- */
+  figure.diagram{
+    margin:36px 0 0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+  }
+  figure.diagram svg{display:block; width:100%; height:auto; max-width:100%;}
+  figure.diagram figcaption{
+    margin-top:16px; font-size:.95rem; color:var(--ink-soft); max-width:100%;
+  }
+  figure.diagram figcaption strong{color:var(--ink);}
+  .diagram-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:36px;}
+  @media(max-width:900px){.diagram-grid{grid-template-columns:1fr;}}
+  .diagram-grid figure.diagram{margin-top:0;}
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:60px 24px 80px;
+    border-top:1px solid var(--line);
+  }
+  footer .inner{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:space-between; gap:30px; flex-wrap:wrap;}
+  footer p{color:var(--ink-dim); font-size:1.25rem; max-width:100%;}
+  footer a{color:var(--ink-soft);}
+
+  ol.steps{padding-left:0; list-style:none; counter-reset:step; margin-top:40px;}
+  ol.steps li{
+    counter-increment:step;
+    position:relative;
+    padding-left:46px;
+    margin-bottom:26px;
+    color:var(--ink-soft);
+  }
+  ol.steps li::before{
+    content:counter(step);
+    position:absolute; left:0; top:-2px;
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    color:var(--accent-text);
+    font-size:1.3rem;
+  }
+  ol.steps strong{color:var(--ink); display:block; margin-bottom:2px; font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem;}
+
+  .divider-quote{
+    max-width:var(--max);
+    font-family:'Fraunces',serif;
+    font-size:1.5rem;
+    font-style:italic;
+    color:var(--accent-text);
+    line-height:1.5;
+    margin:44px 0;
+  }
+
+  mark{
+    background:none;
+    color:var(--accent-text);
+    font-weight:600;
+  }
+
+  .callout{
+    margin-top:28px;
+    border-left:3px solid var(--clay);
+    background:rgba(58,207,186,.06);
+    border-radius:0 var(--radius) var(--radius) 0;
+    padding:18px 22px;
+    color:var(--ink-soft);
+    font-size:1rem;
+  }
+  .callout strong{color:var(--ink);}
+
+  .worked{
+    margin-top:36px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px 30px;
+  }
+  .worked h4{font-size:1rem; color:var(--accent-text); font-family:'Spline Sans Mono',monospace; text-transform:uppercase; letter-spacing:.03em; margin-bottom:14px;}
+  .worked p{color:var(--ink-soft); font-size:1rem;}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+  .theme-toggle{
+    display:flex; align-items:center; gap:8px; width:100%; margin-top:18px;
+    background:#292929; border:1px solid #3d3d3d; border-radius:6px;
+    color:#a6acc4; font-family:'Spline Sans Mono',monospace; font-size:13px;
+    padding:9px 12px; cursor:pointer; text-align:left;
+  }
+  .theme-toggle:hover{background:#333; color:#ece9e0;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="teoria.html" class="active">📖 Teoría</a>
+        <a href="actividades.html">📝 Actividades</a>
+        <a href="resumen.html">🎛️ Resumen</a>
+        
+      </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+  <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
+</aside>
+
+<div id="ut2-app" data-lang="es">
+<div class="langbar" role="group" aria-label="language selector">
+  <button id="btn-es" class="active" onclick="setLang('es')">ES</button>
+  <button id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+
+<nav class="toc">
+  <div class="inner">
+    <span class="brand">UT2</span>
+    <a href="#intro"><span data-i18n="es">Introducción</span><span data-i18n="en">Intro</span></a>
+    <a href="#modelo"><span data-i18n="es">Modelo E/R</span><span data-i18n="en">E/R model</span></a>
+    <a href="#entidades"><span data-i18n="es">Entidades</span><span data-i18n="en">Entities</span></a>
+    <a href="#atributos"><span data-i18n="es">Atributos</span><span data-i18n="en">Attributes</span></a>
+    <a href="#relaciones"><span data-i18n="es">Relaciones</span><span data-i18n="en">Relationships</span></a>
+    <a href="#restricciones"><span data-i18n="es">Restricciones</span><span data-i18n="en">Constraints</span></a>
+    <a href="#extendido"><span data-i18n="es">Modelo extendido</span><span data-i18n="en">Extended model</span></a>
+    <a href="#guia"><span data-i18n="es">Guía y ejemplo</span><span data-i18n="en">Guide & example</span></a>
+    <a href="actividades.html" style="color:var(--accent-text);"><span data-i18n="es">Actividades →</span><span data-i18n="en">Activities →</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="kicker">
+      <span data-i18n="es">UT2 · Base de datos · 1º DAM — Marina Preciados Agapito</span>
+      <span data-i18n="en">Unit 2 · Databases · 1st year DAM — Marina Preciados Agapito</span>
+    </span>
+    <h1>
+      <span data-i18n="es">UT2.<em>El modelo entidad-relación</em></span>
+      <span data-i18n="en">UT2.<em>The entity-relationship model</em></span>
+    </h1>
+    <p class="lede">
+      <span data-i18n="es">En la UT1 aprendimos a reconocer y valorar una base de datos. Ahora toca diseñarlas: antes de crear una sola tabla, necesitamos un lenguaje gráfico para capturar la realidad de un problema — entidades, relaciones y atributos — sin comprometernos todavía con ningún SGBD concreto.</span>
+      <span data-i18n="en">In UT1 we learned to recognise and value a database. Now it's time to design one: before creating a single table, we need a graphical language to capture the reality of a problem — entities, relationships and attributes — without committing yet to any particular DBMS.</span>
+    </p>
+    <div class="diagram-row" aria-hidden="true">
+      <div class="mini-ent">ALUMNO</div>
+      <span class="mini-arrow">—</span>
+      <div class="mini-rel">estudia</div>
+      <span class="mini-arrow">—</span>
+      <div class="mini-ent">ASIGNATURA</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 INTRO ============ -->
+<section id="intro">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">01</span>
+      <h2><span data-i18n="es">Por qué diseñar antes de crear tablas</span><span data-i18n="en">Why design before building tables</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">La mayoría de proyectos de bases de datos que fracasan no lo hacen por culpa del SGBD elegido, sino por un mal diseño previo. Las causas más habituales son conocidas: <strong>poca confianza en las metodologías de diseño</strong>, subestimar el tiempo o los recursos necesarios, documentación limitada y un mantenimiento después imposible de sostener.</span>
+      <span data-i18n="en">Most database projects that fail don't fail because of the chosen DBMS, but because of poor prior design. The usual causes are well known: <strong>too little trust in design methodologies</strong>, underestimating the time or resources needed, limited documentation, and maintenance that later becomes impossible to sustain.</span>
+    </p>
+    <p>
+      <span data-i18n="es">La metodología recomendada evita saltar directamente del problema real a las tablas. En su lugar, pasa primero por uno o dos esquemas intermedios, más cercanos al mundo real que a la máquina:</span>
+      <span data-i18n="en">The recommended methodology avoids jumping directly from the real problem to database tables. Instead, it first passes through one or two intermediate schemas, closer to the real world than to the machine:</span>
+    </p>
+  </div>
+
+  <div class="grid cols-3">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">MODELO CONCEPTUAL</span><span data-i18n="en">CONCEPTUAL MODEL</span></span>
+      <h4><span data-i18n="es">Independiente del SGBD</span><span data-i18n="en">Independent of the DBMS</span></h4>
+      <p><span data-i18n="es">Describe cómo se organiza el problema en el mundo real, sin pensar todavía en cómo se va a guardar. Ejemplo: el modelo entidad-relación, protagonista de esta unidad.</span><span data-i18n="en">Describes how the problem is organised in the real world, without yet thinking about how it will be stored. Example: the entity-relationship model, the star of this unit.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">MODELO LÓGICO</span><span data-i18n="en">LOGICAL MODEL</span></span>
+      <h4><span data-i18n="es">Depende del tipo de BD</span><span data-i18n="en">Depends on the type of database</span></h4>
+      <p><span data-i18n="es">Más técnico: establece la estructura de los datos y sus relaciones para un tipo de base de datos concreto. Ejemplo: el modelo relacional, que veremos en la próxima unidad.</span><span data-i18n="en">More technical: it establishes the structure of the data and its relationships for one specific type of database. Example: the relational model, covered in the next unit.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">MODELO FÍSICO</span><span data-i18n="en">PHYSICAL MODEL</span></span>
+      <h4><span data-i18n="es">Cómo se almacena de verdad</span><span data-i18n="en">How it's actually stored</span></h4>
+      <p><span data-i18n="es">Especifica los datos a nivel de ficheros, registros y estructuras físicas dentro de un SGBD concreto ya elegido.</span><span data-i18n="en">Specifies the data at the level of files, records and physical structures inside a specific, already-chosen DBMS.</span></p>
+    </div>
+  </div>
+
+  <p class="divider-quote">
+    <span data-i18n="es">"Saltarse el esquema conceptual conlleva un problema de pérdida de percepción con el problema real" — y, a la larga, incoherencia en los datos.</span>
+    <span data-i18n="en">"Skipping the conceptual schema means losing touch with the real problem" — and, in the long run, incoherent data.</span>
+  </p>
+
+  <div class="callout">
+    <strong><span data-i18n="es">Peter P. Chen (1976)</span><span data-i18n="en">Peter P. Chen (1976)</span></strong> —
+    <span data-i18n="es">en dos artículos publicados en 1976 y 1977, Chen detalló un modelo para representar de forma unificada los datos de una base de datos: el <strong>modelo entidad-relación (E/R)</strong>. Con el tiempo, otros autores lo ampliaron dando lugar al <strong>modelo E/R extendido (ERE)</strong>, que veremos más adelante en esta unidad. Existen varias notaciones gráficas para dibujarlo (UML, Barker, IDEF1X, Crow's Foot…); nosotros usaremos la <strong>notación de Chen</strong>, la más clásica y la que seguiremos durante todo el curso.</span>
+    <span data-i18n="en">in two papers published in 1976 and 1977, Chen laid out a model to represent a database's data in a unified way: the <strong>entity-relationship model (E/R)</strong>. Over time, other authors extended it into the <strong>extended E/R model (EER)</strong>, which we'll cover later in this unit. Several graphical notations exist for drawing it (UML, Barker, IDEF1X, Crow's Foot…); we'll use <strong>Chen's notation</strong>, the classic one and the one we'll stick to all course long.</span>
+  </div>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Quién trabaja con cada modelo</span><span data-i18n="en">Who works with each model</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Cada uno de los tres modelos anteriores tiene, además, un responsable distinto en la empresa. El <strong>usuario experto</strong> conoce el dominio del problema pero no sabe diseñar bases de datos; el <strong>informático diseñador de BBDD</strong> traduce ese conocimiento al modelo conceptual; el <strong>programador de BBDD</strong> lo lleva al modelo lógico; y el <strong>administrador de BBDD</strong> (DBA) lo instala y lo mantiene como modelo físico, ya sobre la base de datos real en marcha.</span>
+      <span data-i18n="en">Each of the three models above also has a different person responsible for it within the company. The <strong>expert user</strong> knows the problem domain but doesn't know how to design databases; the <strong>database designer</strong> translates that knowledge into the conceptual model; the <strong>database programmer</strong> takes it to the logical model; and the <strong>database administrator</strong> (DBA) installs and maintains it as the physical model, on the real, running database.</span>
+    </p>
+  </div>
+  <figure class="diagram" style="margin-top:24px;">
+    <svg viewBox="0 0 680 300" role="img" aria-labelledby="interaccion-title">
+      <title id="interaccion-title">Interacción entre modelos: usuario experto, informático diseñador, programador y administrador de BBDD</title>
+      <rect x="20" y="20" width="180" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="110" y="47" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">USUARIO EXPERTO</text>
+      <rect x="20" y="128" width="180" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="110" y="155" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">DOMINIO DEL PROBLEMA</text>
+      <rect x="20" y="236" width="180" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="110" y="263" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">BASE DE DATOS</text>
+      <line x1="110" y1="64" x2="110" y2="128" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      <line x1="110" y1="172" x2="110" y2="236" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+
+      <rect x="430" y="20" width="230" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="545" y="36" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">INFORMÁTICO</text>
+      <text x="545" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">DISEÑADOR BBDD</text>
+      <rect x="430" y="128" width="230" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="545" y="155" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">PROGRAMADOR BBDD</text>
+      <rect x="430" y="236" width="230" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="545" y="263" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;fill:var(--ink);">ADMINISTRADOR BBDD</text>
+      <line x1="545" y1="64" x2="545" y2="128" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      <line x1="545" y1="172" x2="545" y2="236" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+
+      <line x1="200" y1="42" x2="430" y2="42" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="315" y="34" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">MODELO CONCEPTUAL</text>
+      <line x1="200" y1="150" x2="430" y2="150" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="315" y="142" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">MODELO LÓGICO</text>
+      <line x1="200" y1="258" x2="430" y2="258" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="315" y="250" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">MODELO FÍSICO</text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">Cada modelo tiene un responsable a cada lado: a la izquierda, quien conoce el negocio (usuario experto, el dominio del problema, la base de datos ya en marcha); a la derecha, quien lo traduce técnicamente (informático diseñador, programador y administrador de BBDD). El modelo conceptual, el lógico y el físico son los tres puentes entre ambos mundos.</span>
+      <span data-i18n="en">Each model has someone responsible on each side: on the left, whoever knows the business (the expert user, the problem domain, the database once it's running); on the right, whoever translates it technically (the database designer, programmer and administrator). The conceptual, logical and physical models are the three bridges between both worlds.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ 02 MODELO E/R ============ -->
+<section class="panel-section" id="modelo">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">02</span>
+      <h2><span data-i18n="es">El modelo entidad-relación</span><span data-i18n="en">The entity-relationship model</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">El <strong>modelo E/R</strong> es un modelo de datos abstracto que permite representar de manera conceptual un problema del mundo real, usando sólo dos ingredientes: <strong>entidades</strong> (los objetos sobre los que queremos guardar información) y <strong>relaciones</strong> (los vínculos reales entre esos objetos). Un diagrama E/R se compone del propio diagrama más las <strong>restricciones</strong> asociadas que no se pueden dibujar directamente.</span>
+      <span data-i18n="en">The <strong>E/R model</strong> is an abstract data model that lets us conceptually represent a real-world problem using just two ingredients: <strong>entities</strong> (the objects we want to store information about) and <strong>relationships</strong> (the real links between those objects). An E/R diagram is made up of the diagram itself plus the associated <strong>constraints</strong> that can't be drawn directly.</span>
+    </p>
+    <p>
+      <span data-i18n="es">Este esquema encaja en la primera fase del ciclo de vida completo de una base de datos:</span>
+      <span data-i18n="en">This schema fits into the first stage of a database's full life cycle:</span>
+    </p>
+  </div>
+
+  <div class="grid cols-5">
+    <div class="card">
+      <span class="tag">1</span>
+      <h4><span data-i18n="es">Recopilar información</span><span data-i18n="en">Gather information</span></h4>
+      <p><span data-i18n="es">Entrevistas con el cliente: sus reglas, su forma de trabajar, sus necesidades. La información puede venir del cliente o del propio desarrollador.</span><span data-i18n="en">Interviews with the client: their rules, how they work, their needs. The information can come from the client or from the developer themselves.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag">2</span>
+      <h4><span data-i18n="es">Modelo entidad-relación</span><span data-i18n="en">Entity-relationship model</span></h4>
+      <p><span data-i18n="es">Se plasma todo lo recogido en entidades, atributos, relaciones y restricciones asociadas. <strong>Modelo conceptual.</strong></span><span data-i18n="en">Everything gathered is captured as entities, attributes, relationships and their associated constraints. <strong>Conceptual model.</strong></span></p>
+    </div>
+    <div class="card">
+      <span class="tag">3</span>
+      <h4><span data-i18n="es">Modelo relacional</span><span data-i18n="en">Relational model</span></h4>
+      <p><span data-i18n="es">Se transforma el diagrama E/R en tablas siguiendo reglas fijas. <strong>Modelo lógico</strong> — próxima unidad.</span><span data-i18n="en">The E/R diagram is transformed into tables following fixed rules. <strong>Logical model</strong> — next unit.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag">4</span>
+      <h4><span data-i18n="es">Normalización</span><span data-i18n="en">Normalisation</span></h4>
+      <p><span data-i18n="es">Se retoca el modelo relacional para hacerlo más eficiente de cara a su codificación.</span><span data-i18n="en">The relational model is refined to make it more efficient ahead of coding it.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag">5</span>
+      <h4><span data-i18n="es">Codificación</span><span data-i18n="en">Coding</span></h4>
+      <p><span data-i18n="es">Se elige el hardware y el SGBD, y se traslada el modelo lógico ya normalizado a una máquina física en SQL. <strong>Modelo físico.</strong></span><span data-i18n="en">The hardware and DBMS are chosen, and the already-normalised logical model is translated onto a physical machine using SQL. <strong>Physical model.</strong></span></p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Propiedades estáticas y dinámicas</span><span data-i18n="en">Static and dynamic properties</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Al definir entidades, relaciones y atributos en realidad estamos fijando dos tipos de reglas distintas. Las <strong>propiedades estáticas</strong> son restricciones que se pueden comprobar en un único instante de la base de datos: qué valores puede tomar un atributo, si puede quedar vacío, cómo se identifica de forma única una entidad, o cuántas veces puede participar una entidad en una relación (su cardinalidad). Las <strong>propiedades dinámicas</strong>, en cambio, sólo se detectan comparando dos instantes distintos de la base de datos: cómo deben evolucionar los datos con el tiempo.</span>
+      <span data-i18n="en">Defining entities, relationships and attributes actually means fixing two different kinds of rules. <strong>Static properties</strong> are constraints that can be checked at a single instant of the database: what values an attribute can take, whether it can be left empty, how an entity is uniquely identified, or how many times an entity can take part in a relationship (its cardinality). <strong>Dynamic properties</strong>, on the other hand, can only be detected by comparing two different instants of the database: how the data must evolve over time.</span>
+    </p>
+    <p>
+      <span data-i18n="es">Dos conceptos ligados a las propiedades dinámicas, que retomaremos más adelante en el curso: una <strong>operación</strong> es una acción elemental —indivisible— sobre un objeto o una relación (por ejemplo, dar de alta un pedido); una <strong>transacción</strong> es una secuencia de operaciones que se trata como si fuera una sola, de forma atómica: o se ejecutan todas, o no se ejecuta ninguna.</span>
+      <span data-i18n="en">Two concepts tied to dynamic properties, which we'll come back to later in the course: an <strong>operation</strong> is an elementary — indivisible — action on an object or a relationship (registering an order, say); a <strong>transaction</strong> is a sequence of operations treated as a single, atomic unit: either all of them run, or none do.</span>
+    </p>
+  </div>
+  <div class="callout" style="margin-top:8px;">
+    <strong><span data-i18n="es">Ejemplos</span><span data-i18n="en">Examples</span></strong> —
+    <span data-i18n="es"><strong>Estática:</strong> "el precio de un producto nunca puede ser negativo" (se comprueba mirando sólo el dato actual). <strong>Dinámica:</strong> "si se borra un cliente, deben borrarse también sus pedidos" (sólo se detecta comparando el estado de la base de datos antes y después del borrado).</span>
+    <span data-i18n="en"><strong>Static:</strong> "a product's price can never be negative" (checkable just by looking at the current value). <strong>Dynamic:</strong> "deleting a customer must also delete their orders" (only detectable by comparing the database's state before and after the deletion).</span>
+  </div>
+</section>
+
+<!-- ============ 03 ENTIDADES ============ -->
+<section id="entidades">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">03</span>
+      <h2><span data-i18n="es">Entidades</span><span data-i18n="en">Entities</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Una <strong>entidad</strong> es cualquier objeto o elemento, real o abstracto, sobre el que queremos almacenar información: personas, cosas, lugares, sucesos… Representa un conjunto de elementos con existencia propia que comparten las mismas propiedades. En el diagrama se dibuja como un <strong>rectángulo</strong> con el nombre de la entidad dentro, casi siempre un sustantivo en <strong>singular y mayúsculas</strong> (ALUMNO, no "alumnos"). Ese nombre no puede repetirse en el diagrama.</span>
+      <span data-i18n="en">An <strong>entity</strong> is any object or element, real or abstract, that we want to store information about: people, things, places, events… It represents a set of elements with their own existence that share the same properties. In the diagram it is drawn as a <strong>rectangle</strong> with the entity's name inside, almost always a <strong>singular, uppercase</strong> noun (STUDENT, not "students"). That name cannot repeat anywhere in the diagram.</span>
+    </p>
+    <p>
+      <span data-i18n="es">No hay que confundir la entidad con sus <strong>ocurrencias o ejemplares</strong>: ALUMNO es la entidad; cada alumno concreto de la clase es una ocurrencia de esa entidad.</span>
+      <span data-i18n="en">Don't confuse the entity with its <strong>occurrences or instances</strong>: STUDENT is the entity; each individual student in the class is an occurrence of that entity.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">Entidades fuertes y débiles</span><span data-i18n="en">Strong and weak entities</span></h3>
+  <div class="grid cols-2" style="margin-top:20px;">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">ENTIDAD FUERTE</span><span data-i18n="en">STRONG ENTITY</span></span>
+      <h4><span data-i18n="es">Tiene existencia propia</span><span data-i18n="en">Exists on its own</span></h4>
+      <p><span data-i18n="es">Puede identificarse por sí misma, con sus propios atributos, sin depender de ninguna otra entidad. La mayoría de entidades de un diagrama son fuertes.</span><span data-i18n="en">It can be identified on its own, with its own attributes, without depending on any other entity. Most entities in a diagram are strong.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">ENTIDAD DÉBIL</span><span data-i18n="en">WEAK ENTITY</span></span>
+      <h4><span data-i18n="es">Depende de una entidad fuerte</span><span data-i18n="en">Depends on a strong entity</span></h4>
+      <p><span data-i18n="es">Sus atributos no bastan para identificarla por completo: necesita la relación con su entidad fuerte para existir. Si desaparece el ejemplar fuerte, desaparecen también sus débiles asociados. Se dibuja con un <strong>rectángulo doble</strong>.</span><span data-i18n="en">Its attributes alone aren't enough to identify it: it needs its relationship with its strong entity to exist. If the strong instance disappears, its associated weak instances disappear too. It's drawn with a <strong>double rectangle</strong>.</span></p>
+    </div>
+  </div>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 640 210" role="img" aria-labelledby="dbg-title dbg-desc">
+      <title id="dbg-title">Entidad fuerte y entidad débil</title>
+      <desc id="dbg-desc">EMPLEADO es una entidad fuerte relacionada con FAMILIAR, una entidad débil dibujada con doble rectángulo.</desc>
+      <rect x="40" y="80" width="150" height="54" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="115" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:16px;fill:var(--ink);">EMPLEADO</text>
+
+      <polygon points="320,60 380,107 320,154 260,107" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="320" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">tiene</tspan></text>
+
+      <rect x="452" y="76" width="150" height="62" rx="4" style="fill:none;stroke:var(--teal);stroke-width:2"/>
+      <rect x="460" y="84" width="134" height="46" rx="3" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="527" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:16px;fill:var(--ink);">FAMILIAR</text>
+
+      <line x1="190" y1="107" x2="260" y2="107" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <line x1="380" y1="107" x2="452" y2="107" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <text x="222" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,N)</text>
+      <text x="415" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(1,1)</text>
+
+      <text x="115" y="176" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:13px;fill:var(--ink-dim);"><tspan data-i18n="es">entidad fuerte</tspan></text>
+      <text x="527" y="176" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:13px;fill:var(--ink-dim);"><tspan data-i18n="es">entidad débil (rect. doble)</tspan></text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es"><strong>Ejemplo:</strong> una empresa guarda información de sus empleados y, para cada uno, de sus familiares a su cargo. Sin el empleado, no tendría sentido guardar el familiar: FAMILIAR es la entidad débil. Cada familiar se relaciona con <strong>uno y sólo un</strong> empleado (1,1), y cada empleado puede tener cero o varios familiares registrados (0,N). A menudo hay además una <em>dependencia de identificación</em>: si un familiar se identifica con su nombre + el número de empleado del que depende, eso es la señal definitiva de que estamos ante una entidad débil.</span>
+      <span data-i18n="en"><strong>Example:</strong> a company keeps information about its employees and, for each one, about the family members in their care. Without the employee, storing the family member would make no sense: FAMILY MEMBER is the weak entity. Each family member relates to <strong>exactly one</strong> employee (1,1), and each employee can have zero or several family members on record (0,N). There is also often an <em>identifying dependency</em>: if a family member is identified by their name plus the employee number they depend on, that's the definitive sign of a weak entity.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ 04 ATRIBUTOS ============ -->
+<section class="panel-section" id="atributos">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">04</span>
+      <h2><span data-i18n="es">Atributos</span><span data-i18n="en">Attributes</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Los <strong>atributos</strong> describen propiedades de las entidades (y, a veces, de las relaciones): establecen qué información concreta queremos guardar de cada objeto. En la notación clásica de Chen se representan con una <strong>elipse</strong> unida mediante una línea a la entidad (o relación) a la que pertenecen.</span>
+      <span data-i18n="en">An <strong>attribute</strong> describes a property of an entity (and, sometimes, of a relationship): it establishes exactly what information we want to store about each object. In Chen's classic notation it is drawn as an <strong>ellipse</strong> joined by a line to the entity (or relationship) it belongs to.</span>
+    </p>
+  </div>
+
+  <div class="grid cols-5">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">CLAVE</span><span data-i18n="en">KEY</span></span>
+      <p><span data-i18n="es">Sus valores son únicos en cada ejemplar y nunca están vacíos. Se marca subrayando su nombre.</span><span data-i18n="en">Its values are unique per instance and never empty. Marked by underlining its name.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">COMPUESTO</span><span data-i18n="en">COMPOSITE</span></span>
+      <p><span data-i18n="es">Se puede descomponer en otros más sencillos (dirección → calle, número, código postal). Poco frecuente.</span><span data-i18n="en">Can be split into simpler ones (address → street, number, postcode). Not very common.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">MULTIVALUADO</span><span data-i18n="en">MULTI-VALUED</span></span>
+      <p><span data-i18n="es">Puede tomar varios valores a la vez (varios teléfonos de un mismo cliente). En la práctica, se convierte en una tabla nueva.</span><span data-i18n="en">Can take several values at once (several phone numbers for the same customer). In practice, it becomes a new table.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">OPCIONAL</span><span data-i18n="en">OPTIONAL</span></span>
+      <p><span data-i18n="es">Puede quedar vacío (valor nulo): un segundo teléfono que el cliente no siempre facilita.</span><span data-i18n="en">Can be left empty (a null value): a second phone number the customer doesn't always give.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">DERIVADO</span><span data-i18n="en">DERIVED</span></span>
+      <p><span data-i18n="es">Se calcula a partir de otros atributos: la edad se calcula desde la fecha de nacimiento.</span><span data-i18n="en">Calculated from other attributes: age is calculated from the date of birth.</span></p>
+    </div>
+  </div>
+
+  <figure class="diagram" style="margin-top:44px;">
+    <svg viewBox="0 0 460 200" role="img" aria-labelledby="att-title">
+      <title id="att-title">Atributos de la entidad ALUMNO</title>
+      <line x1="120" y1="66" x2="150" y2="118" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <ellipse cx="90" cy="46" rx="60" ry="24" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="90" y="42" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">DNI</text>
+      <line x1="65" y1="52" x2="115" y2="52" style="stroke:var(--ink);stroke-width:1.5"/>
+
+      <line x1="210" y1="70" x2="200" y2="118" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <ellipse cx="235" cy="46" rx="62" ry="24" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:2"/>
+      <text x="235" y="50" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">nombre</tspan></text>
+
+      <line x1="330" y1="70" x2="270" y2="118" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <ellipse cx="365" cy="46" rx="70" ry="24" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:2;stroke-dasharray:5 4"/>
+      <text x="365" y="50" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">teléfono</tspan></text>
+
+      <rect x="105" y="120" width="150" height="54" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="180" y="152" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:16px;fill:var(--ink);">ALUMNO</text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">El DNI es el <strong>atributo clave</strong> (nombre subrayado); nombre es un atributo normal; teléfono se dibuja con línea discontinua para indicar que es <strong>opcional</strong> (no todos los alumnos lo facilitan).</span>
+      <span data-i18n="en">The ID number is the <strong>key attribute</strong> (underlined name); name is a regular attribute; phone is drawn with a dashed outline to show it's <strong>optional</strong> (not every student provides one).</span>
+    </figcaption>
+  </figure>
+
+  <div class="callout" style="margin-top:36px;">
+    <strong><span data-i18n="es">Dominio de un atributo</span><span data-i18n="en">An attribute's domain</span></strong> —
+    <span data-i18n="es">es el conjunto de valores que ese atributo puede tomar (texto, número, fecha…). Para que un valor sea válido dentro de su dominio debe ser <strong>atómico</strong> — no se puede descomponer más ("Juan Pérez" vale; "Juan, Pérez" mezclando nombre y apellido en el mismo campo, no) — y <strong>univaluado</strong> — admite un único valor por campo ("612345678" vale; "612345678, 699887766" en el mismo campo, no). Los atributos compuestos y multivaluados de más abajo son, precisamente, la forma de modelar sin romper esta regla los casos en los que un dato real no cabe en un único valor atómico.</span>
+    <span data-i18n="en">this is the set of values that attribute can take (text, number, date…). For a value to be valid within its domain it must be <strong>atomic</strong> — it can't be broken down any further ("Juan Pérez" is fine; "Juan, Pérez" mixing first and last name in the same field is not) — and <strong>single-valued</strong> — it only allows one value per field ("612345678" is fine; "612345678, 699887766" in the same field is not). The composite and multi-valued attributes below are precisely how to model, without breaking this rule, the cases where a real piece of data doesn't fit into a single atomic value.</span>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">Notación de Chen: compuesto, multivaluado, derivado</span><span data-i18n="en">Chen's notation: composite, multi-valued, derived</span></h3>
+  <div class="diagram-grid" style="grid-template-columns:repeat(3,1fr);">
+    <figure class="diagram">
+      <svg viewBox="0 0 280 190" role="img" aria-labelledby="comp-title">
+        <title id="comp-title">Atributo compuesto: DIRECCIÓN se descompone en calle, ciudad y código postal</title>
+        <ellipse cx="140" cy="34" rx="62" ry="24" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
+        <text x="140" y="38" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">DIRECCIÓN</text>
+        <line x1="140" y1="58" x2="140" y2="76" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="140" y1="76" x2="42" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="140" y1="76" x2="140" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="140" y1="76" x2="238" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <ellipse cx="42" cy="140" rx="38" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="42" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">calle</text>
+        <ellipse cx="140" cy="140" rx="38" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="140" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ciudad</text>
+        <ellipse cx="238" cy="140" rx="40" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="238" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">cód. postal</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Compuesto</span><span data-i18n="en">Composite</span></strong> — <span data-i18n="es">se descompone en subatributos más simples. En el modelo lógico no tiene representación propia: se sustituye por sus componentes.</span><span data-i18n="en">breaks down into simpler sub-attributes. It has no representation of its own in the logical model: it's replaced by its components.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 190" role="img" aria-labelledby="multi-title">
+        <title id="multi-title">Atributo multivaluado: TELÉFONOS, elipse de doble línea</title>
+        <ellipse cx="130" cy="95" rx="76" ry="34" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
+        <ellipse cx="130" cy="95" rx="68" ry="27" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+        <text x="130" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">TELÉFONOS</text>
+        <line x1="130" y1="129" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Multivaluado</span><span data-i18n="en">Multi-valued</span></strong> — <span data-i18n="es">puede tomar varios valores a la vez para el mismo ejemplar. En el modelo lógico no tiene representación propia: se convierte en una entidad nueva.</span><span data-i18n="en">can take several values at once for the same instance. It has no representation of its own in the logical model: it becomes a new entity.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 190" role="img" aria-labelledby="deriv-title">
+        <title id="deriv-title">Atributo derivado: EDAD, elipse discontinua, calculado desde FECHA_NACIMIENTO</title>
+        <ellipse cx="130" cy="80" rx="62" ry="26" style="fill:var(--panel);stroke:var(--ink);stroke-width:1.6;stroke-dasharray:5 4"/>
+        <text x="130" y="84" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EDAD</text>
+        <line x1="130" y1="106" x2="130" y2="130" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="130" y="150" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:10px;fill:var(--ink-dim);">(desde F. NACIMIENTO)</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Derivado</span><span data-i18n="en">Derived</span></strong> — <span data-i18n="es">se calcula a partir de otro atributo, no se almacena directamente. Se dibuja con línea discontinua.</span><span data-i18n="en">calculated from another attribute, not stored directly. Drawn with a dashed outline.</span></figcaption>
+    </figure>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">¿Qué hace bueno a un identificador?</span><span data-i18n="en">What makes a good identifier?</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Todas las entidades deben tener un identificador único. Un buen identificador debe ser: <strong>único</strong> (nunca se repite entre ejemplares), tener <strong>siempre valor</strong> (nunca nulo), ser <strong>estable</strong> (no cambia con el tiempo) y ser <strong>simple</strong> (fácil de manejar, sin redundancia).</span>
+      <span data-i18n="en">Every entity must have a unique identifier. A good identifier should be: <strong>unique</strong> (never repeats across instances), <strong>always have a value</strong> (never null), be <strong>stable</strong> (doesn't change over time) and be <strong>simple</strong> (easy to handle, without redundancy).</span>
+    </p>
+    <p>
+      <span data-i18n="es">Cuando ningún atributo natural sirve, se añade un <strong>atributo artificial</strong>: la palabra <code>id_</code> seguida del nombre de la entidad (<code>id_alumno</code>, <code>id_libro</code>…). Sus valores no tienen ningún significado real — sólo necesitan ser distintos para cada ejemplar. Por ejemplo, en la entidad MÉDICO de un hospital podríamos usar el DNI o el número de licencia médica: cuál elegir depende de los requisitos concretos del cliente.</span>
+      <span data-i18n="en">When no natural attribute works, an <strong>artificial attribute</strong> is added: the word <code>id_</code> followed by the entity's name (<code>id_student</code>, <code>id_book</code>…). Its values carry no real meaning — they just need to differ for each instance. For example, in a hospital's DOCTOR entity we could use the national ID number or the medical licence number: which one to pick depends on the client's specific requirements.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">Superclave: el punto de partida</span><span data-i18n="en">Superkey: the starting point</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Una <strong>superclave</strong> es cualquier atributo o conjunto de atributos que identifica de forma única cada ejemplar de una entidad — sin más condición que esa. Por eso casi siempre sobran candidatos: en un ALUMNO con <code>num_expediente</code>, <code>DNI</code>, <code>nombre</code>, <code>apellidos</code> y <code>fecha_nacimiento</code>, son superclaves tanto <code>num_expediente</code> como <code>DNI</code>, pero también combinaciones más grandes y redundantes como <code>DNI + fecha_nacimiento</code> o <code>nombre + apellidos + fecha_nacimiento</code>.</span>
+      <span data-i18n="en">A <strong>superkey</strong> is any attribute or set of attributes that uniquely identifies every instance of an entity — with no further condition than that. That's why there are almost always more candidates than needed: in a STUDENT with <code>student_number</code>, <code>ID number</code>, <code>first name</code>, <code>surname</code> and <code>date of birth</code>, both <code>student_number</code> and <code>ID number</code> are superkeys, but so are bigger, redundant combinations like <code>ID number + date of birth</code> or <code>first name + surname + date of birth</code>.</span>
+    </p>
+    <p>
+      <span data-i18n="es">Una <strong>clave candidata</strong> es, precisamente, una superclave <strong>mínima</strong>: ninguno de sus atributos se puede quitar sin perder la unicidad. En el ejemplo anterior, <code>DNI + fecha_nacimiento</code> deja de ser candidata en cuanto comprobamos que <code>DNI</code> por sí solo ya identifica al alumno — el atributo de más sobra.</span>
+      <span data-i18n="en">A <strong>candidate key</strong> is precisely a <strong>minimal</strong> superkey: none of its attributes can be dropped without losing uniqueness. In the example above, <code>ID number + date of birth</code> stops being a candidate as soon as we check that <code>ID number</code> alone already identifies the student — the extra attribute is redundant.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">Claves candidatas: cuando sobran identificadores</span><span data-i18n="en">Candidate keys: when there's more than one identifier</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">A veces varios atributos podrían identificar la entidad por sí solos: son <strong>claves candidatas</strong>. Se elige una como <strong>clave primaria</strong> (subrayado continuo) y el resto quedan como <strong>claves alternativas</strong> (subrayado discontinuo), por si algún día se necesitan. Por ejemplo, una entidad PERSONA podría identificarse por su DNI, su número de la seguridad social o su número de pasaporte: cualquiera de los tres sirve, pero sólo uno se marca como clave primaria en el diagrama.</span>
+      <span data-i18n="en">Sometimes several attributes could identify the entity on their own: these are <strong>candidate keys</strong>. One is chosen as the <strong>primary key</strong> (solid underline) and the rest remain <strong>alternate keys</strong> (dashed underline), in case they're ever needed. A PERSON entity, for instance, could be identified by their ID number, social security number or passport number: any of the three would work, but only one is marked as the primary key in the diagram.</span>
+    </p>
+    <p>
+      <span data-i18n="es">Para decidir entre varios candidatos conviene comprobar cada uno contra las cuatro propiedades de un buen identificador. Con una entidad USUARIO de una aplicación (login, password, email, nombre, teléfono):</span>
+      <span data-i18n="en">To choose between several candidates, it helps to check each one against the four properties of a good identifier. With a USER entity from an app (login, password, email, name, phone):</span>
+    </p>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th><span data-i18n="es">Atributo</span><span data-i18n="en">Attribute</span></th>
+        <th><span data-i18n="es">¿Único?</span><span data-i18n="en">Unique?</span></th>
+        <th><span data-i18n="es">¿Siempre con valor?</span><span data-i18n="en">Always has a value?</span></th>
+        <th><span data-i18n="es">¿Estable?</span><span data-i18n="en">Stable?</span></th>
+        <th><span data-i18n="es">¿Simple?</span><span data-i18n="en">Simple?</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>login</code></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+      </tr>
+      <tr>
+        <td><code>password</code></td>
+        <td><span data-i18n="es">No</span><span data-i18n="en">No</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">No, cambia</span><span data-i18n="en">No, it changes</span></td>
+        <td><span data-i18n="es">No</span><span data-i18n="en">No</span></td>
+      </tr>
+      <tr>
+        <td><code>email</code></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">No, puede cambiar</span><span data-i18n="en">No, it can change</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+      </tr>
+      <tr>
+        <td><code>nombre</code></td>
+        <td><span data-i18n="es">No</span><span data-i18n="en">No</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+      </tr>
+      <tr>
+        <td><code>telefono</code></td>
+        <td><span data-i18n="es">No</span><span data-i18n="en">No</span></td>
+        <td><span data-i18n="es">No, opcional</span><span data-i18n="en">No, optional</span></td>
+        <td><span data-i18n="es">No</span><span data-i18n="en">No</span></td>
+        <td><span data-i18n="es">Sí</span><span data-i18n="en">Yes</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="prose" style="margin-top:20px;color:var(--ink-soft);font-size:1rem;">
+    <span data-i18n="es"><code>login</code> cumple las cuatro condiciones: es la <strong>clave primaria</strong>. <code>email</code> también es único y siempre tiene valor, aunque puede cambiar — buena <strong>clave alternativa</strong>. <code>password</code>, <code>nombre</code> y <code>telefono</code> quedan descartados como identificadores.</span>
+    <span data-i18n="en"><code>login</code> meets all four conditions: it becomes the <strong>primary key</strong>. <code>email</code> is also unique and always has a value, though it can change — a good <strong>alternate key</strong>. <code>password</code>, <code>name</code> and <code>phone</code> are ruled out as identifiers.</span>
+  </p>
+
+  <div class="grid cols-2" style="margin-top:36px;">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">USA UNA CLAVE NATURAL CUANDO…</span><span data-i18n="en">USE A NATURAL KEY WHEN…</span></span>
+      <p><span data-i18n="es">Ya existe un atributo único, simple y estable; la tabla es pequeña y apenas se relaciona con otras.</span><span data-i18n="en">A unique, simple and stable attribute already exists; the table is small and barely relates to others.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">CREA UNA CLAVE ARTIFICIAL CUANDO…</span><span data-i18n="en">CREATE AN ARTIFICIAL KEY WHEN…</span></span>
+      <p><span data-i18n="es">No hay garantía fácil de unicidad, otras tablas van a referenciar esta entidad, se necesita flexibilidad futura, o la clave natural es larga o contiene datos sensibles (como el DNI).</span><span data-i18n="en">There's no easy uniqueness guarantee, other tables will reference this entity, future flexibility is needed, or the natural key is long or holds sensitive data (like a national ID number).</span></p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:52px;"><span data-i18n="es">Clave ajena o foránea</span><span data-i18n="en">Foreign key</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Una <strong>clave ajena</strong> (o foránea) es un atributo de una entidad que es, en realidad, la clave primaria de otra entidad con la que se relaciona — es lo que permite reconstruir esa conexión más adelante, en el modelo lógico. En el diagrama E/R no se dibuja de forma explícita (esa es tarea del modelo lógico), pero ya empieza a asomar en las <strong>entidades débiles</strong>: cuando una débil se identifica por dependencia de identificación, la clave de la fuerte que "presta" pasa a formar parte de la clave primaria de la débil — por ejemplo, el código de sucursal dentro de la clave de una CUENTA, o el código de pedido dentro de la clave de una LINEA_PEDIDO.</span>
+      <span data-i18n="en">A <strong>foreign key</strong> is an attribute of one entity that is, in fact, the primary key of another entity it relates to — it's what lets that connection be rebuilt later, in the logical model. It isn't drawn explicitly in the E/R diagram (that's the logical model's job), but it already starts to show up in <strong>weak entities</strong>: when a weak entity is identified by identification dependency, the strong entity's key that "lends" itself becomes part of the weak entity's own primary key — for example, the branch code inside an ACCOUNT's key, or the order code inside an ORDER_LINE's key.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============ 05 RELACIONES ============ -->
+<section id="relaciones">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">05</span>
+      <h2><span data-i18n="es">Relaciones</span><span data-i18n="en">Relationships</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Una <strong>relación</strong> representa una asociación real entre ejemplares de una o más entidades — sin relaciones, sólo tendríamos islas de información aislada. Se dibuja con un <strong>rombo</strong> unido mediante líneas a las entidades que intervienen, con su nombre en minúsculas dentro, casi siempre un <strong>verbo en infinitivo</strong> (estudia, trabaja en, factura…).</span>
+      <span data-i18n="en">A <strong>relationship</strong> represents a real association between instances of one or more entities — without relationships, we'd only have isolated islands of information. It is drawn as a <strong>diamond</strong> joined by lines to the entities involved, with its name in lowercase inside, almost always an <strong>infinitive verb</strong> (studies, works at, invoices…).</span>
+    </p>
+    <p>
+      <span data-i18n="es">Toda relación tiene tres propiedades: su <strong>grado</strong>, su <strong>cardinalidad</strong> y su <strong>tipo de correspondencia</strong>.</span>
+      <span data-i18n="en">Every relationship has three properties: its <strong>degree</strong>, its <strong>cardinality</strong> and its <strong>correspondence type</strong>.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:16px;"><span data-i18n="es">Grado: cuántas entidades intervienen</span><span data-i18n="en">Degree: how many entities are involved</span></h3>
+  <div class="diagram-grid" style="grid-template-columns:repeat(2,1fr);">
+    <figure class="diagram">
+      <svg viewBox="0 0 260 140">
+        <rect x="10" y="55" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="50" y="76" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">A</text>
+        <polygon points="130,50 155,72 130,94 105,72" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <rect x="170" y="55" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="210" y="76" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">B</text>
+        <line x1="90" y1="72" x2="105" y2="72" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="155" y1="72" x2="170" y2="72" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Binaria</span><span data-i18n="en">Binary</span></strong> — <span data-i18n="es">asocia dos entidades. La más común, con diferencia.</span><span data-i18n="en">links two entities. By far the most common.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 150">
+        <rect x="90" y="8" width="80" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="130" y="28" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">A</text>
+        <rect x="10" y="105" width="80" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="50" y="125" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">B</text>
+        <rect x="170" y="105" width="80" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="210" y="125" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">C</text>
+        <polygon points="130,55 152,75 130,95 108,75" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <line x1="120" y1="60" x2="90" y2="35" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="115" y1="82" x2="90" y2="112" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="145" y1="82" x2="170" y2="112" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Ternaria</span><span data-i18n="en">Ternary</span></strong> — <span data-i18n="es">relaciona tres entidades. A veces se simplifica en binarias, no siempre es posible.</span><span data-i18n="en">links three entities. Sometimes simplified into binary ones, but not always possible.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 150">
+        <rect x="90" y="90" width="90" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="135" y="111" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">EMPLEADO</text>
+        <polygon points="135,20 160,42 135,64 110,42" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="135" y="46" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">es jefe de</text>
+        <path d="M 108,50 C 60,50 60,100 100,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6"/>
+        <path d="M 162,50 C 210,50 210,100 170,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="55" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);">jefe</text>
+        <text x="195" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);" text-anchor="end">subordinado</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Reflexiva</span><span data-i18n="en">Reflexive</span></strong> — <span data-i18n="es">relaciona dos ejemplares de la misma entidad. Los <strong>roles</strong> (jefe / subordinado) evitan la ambigüedad.</span><span data-i18n="en">links two instances of the same entity. <strong>Roles</strong> (boss / subordinate) remove the ambiguity.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 220" role="img" aria-labelledby="naria-title">
+        <title id="naria-title">Relación N-aria: imparte asocia AULA, PROFESOR, ASIGNATURA y GRUPO</title>
+        <rect x="95" y="15" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="130" y="35" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">AULA</text>
+        <rect x="8" y="94" width="78" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="47" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">PROFESOR</text>
+        <rect x="174" y="94" width="80" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="214" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">ASIGNATURA</text>
+        <rect x="95" y="173" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="130" y="193" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">GRUPO</text>
+        <polygon points="130,85 155,110 130,135 105,110" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="130" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;fill:var(--ink);">imparte</text>
+        <line x1="130" y1="47" x2="130" y2="85" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="86" y1="110" x2="105" y2="110" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="155" y1="110" x2="174" y2="110" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="130" y1="135" x2="130" y2="173" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      </svg>
+      <figcaption><strong><span data-i18n="es">N-aria</span><span data-i18n="en">N-ary</span></strong> — <span data-i18n="es">relaciona más de tres entidades a la vez. Aquí <code>imparte</code> asocia de golpe AULA, PROFESOR, ASIGNATURA y GRUPO en una única relación de grado 4.</span><span data-i18n="en">links more than three entities at once. Here <code>imparte</code> (teaches) associates CLASSROOM, TEACHER, SUBJECT and GROUP all at once, in a single degree-4 relationship.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="prose" style="margin-top:32px;">
+    <p>
+      <span data-i18n="es">El <strong>rol</strong> es la etiqueta, en minúsculas, que indica la función concreta que cumple una entidad dentro de una relación. En una relación binaria normal casi nunca hace falta escribirlo, porque el nombre de la relación y de las entidades ya lo dejan claro (CLIENTE <em>compra</em> PRODUCTO no necesita roles). En las relaciones reflexivas, en cambio, la misma entidad aparece dos veces y el rol es imprescindible para distinguir cada papel — como "jefe" y "subordinado" en el ejemplo anterior.</span>
+      <span data-i18n="en">The <strong>role</strong> is the lowercase label that states the specific function an entity plays within a relationship. In a normal binary relationship it's almost never needed, since the relationship's and entities' names already make it clear (CUSTOMER <em>buys</em> PRODUCT needs no roles). In reflexive relationships, though, the same entity appears twice and the role becomes essential to tell each part apart — like "boss" and "subordinate" in the example above.</span>
+    </p>
+  </div>
+
+  <div class="callout" style="margin-top:36px;">
+    <strong><span data-i18n="es">Error común: no se pueden encadenar relaciones</span><span data-i18n="en">Common mistake: relationships can't be chained</span></strong> —
+    <span data-i18n="es">un rombo sólo puede unirse a <strong>entidades</strong>, nunca directamente a otro rombo. Si ALUMNO <em>estudia</em> ASIGNATURA y, además, queremos reflejar que esa asignatura <em>utiliza</em> un LIBRO, no se puede colgar el segundo rombo del primero — cada relación tiene que partir de una entidad. Aquí, <em>utiliza</em> debe unir ASIGNATURA con LIBRO directamente, como una relación independiente.</span>
+    <span data-i18n="en">a diamond can only connect to <strong>entities</strong>, never directly to another diamond. If STUDENT <em>studies</em> SUBJECT, and we also want to capture that the subject <em>uses</em> a BOOK, the second diamond can't hang off the first one — every relationship has to start from an entity. Here, <em>uses</em> must join SUBJECT directly to BOOK, as an independent relationship.</span>
+  </div>
+  <div class="diagram-grid" style="grid-template-columns:repeat(2,1fr);margin-top:20px;">
+    <figure class="diagram">
+      <svg viewBox="0 0 300 250" role="img" aria-labelledby="noperm-title">
+        <title id="noperm-title">Incorrecto: la relación utiliza cuelga directamente de la relación estudia</title>
+        <rect x="10" y="74" width="85" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="52" y="95" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ALUMNO</text>
+        <polygon points="150,64 176,90 150,116 124,90" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="150" y="93" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">estudia</text>
+        <rect x="205" y="74" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="250" y="95" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">ASIGNATURA</text>
+        <line x1="95" y1="90" x2="124" y2="90" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="176" y1="90" x2="205" y2="90" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="150" y1="116" x2="150" y2="144" style="stroke:#c0392b;stroke-width:2"/>
+        <polygon points="150,144 176,170 150,196 124,170" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="150" y="173" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">utiliza</text>
+        <rect x="105" y="210" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="150" y="231" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">LIBRO</text>
+        <line x1="150" y1="196" x2="150" y2="210" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="178" y="134" style="font-family:'Inter',sans-serif;font-size:16px;font-weight:700;fill:#c0392b;">✗</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Incorrecto</span><span data-i18n="en">Incorrect</span></strong> — <span data-i18n="es">un rombo no puede colgar de otro rombo.</span><span data-i18n="en">a diamond can't hang off another diamond.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 300 250" role="img" aria-labelledby="perm-title">
+        <title id="perm-title">Correcto: estudia y utiliza son relaciones independientes, ambas entre entidades</title>
+        <rect x="10" y="30" width="85" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="52" y="51" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ALUMNO</text>
+        <polygon points="150,20 176,46 150,72 124,46" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="150" y="49" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">estudia</text>
+        <rect x="205" y="30" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="250" y="51" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">ASIGNATURA</text>
+        <line x1="95" y1="46" x2="124" y2="46" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="176" y1="46" x2="205" y2="46" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="250" y1="62" x2="250" y2="114" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <polygon points="250,114 276,140 250,166 224,140" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <text x="250" y="143" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">utiliza</text>
+        <rect x="205" y="180" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="250" y="201" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">LIBRO</text>
+        <line x1="250" y1="166" x2="250" y2="180" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Correcto</span><span data-i18n="en">Correct</span></strong> — <span data-i18n="es"><em>utiliza</em> une directamente ASIGNATURA con LIBRO, como relación independiente de <em>estudia</em>.</span><span data-i18n="en"><em>uses</em> directly joins SUBJECT with BOOK, as a relationship independent from <em>studies</em>.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="worked" style="margin-top:44px;">
+    <h4><span data-i18n="es">Ejemplo: dos relaciones entre las mismas entidades</span><span data-i18n="en">Example: two relationships between the same entities</span></h4>
+    <p>
+      <span data-i18n="es">Nada impide que dos entidades se relacionen de más de una forma a la vez. Una empresa quiere guardar sus empleados (DNI, nombre, fecha de nacimiento, salario) organizados en departamentos (nombre, número de despacho). Cada empleado trabaja en un departamento, y cada departamento tiene un empleado que lo dirige.</span>
+      <span data-i18n="en">Nothing stops two entities from being related in more than one way at once. A company wants to store its employees (ID number, name, date of birth, salary) organised into departments (name, office number). Each employee works in one department, and each department has one employee who directs it.</span>
+    </p>
+  </div>
+  <figure class="diagram" style="margin-top:24px;">
+    <svg viewBox="0 0 620 220" role="img" aria-labelledby="dosrel-title">
+      <title id="dosrel-title">EMPLEADO y DPTO relacionados por TRABAJAR y SER_JEFE</title>
+      <rect x="20" y="88" width="140" height="42" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="90" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EMPLEADO</text>
+      <rect x="460" y="88" width="140" height="42" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="530" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">DPTO</text>
+
+      <polygon points="290,30 335,64 290,98 245,64" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="290" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">trabajar</text>
+      <path d="M 160,100 C 220,80 240,75 258,58" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
+      <path d="M 322,58 C 400,50 430,80 460,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="215" y="72" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
+      <text x="410" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,N)</text>
+
+      <polygon points="290,142 335,176 290,210 245,176" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="290" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ser_jefe</text>
+      <path d="M 160,118 C 220,140 240,150 258,168" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
+      <path d="M 322,168 C 400,150 430,140 460,118" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="215" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
+      <text x="410" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(1,1)</text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es"><code>TRABAJAR</code> es 1:N — <code>Card(EMPLEADO,TRABAJAR)=(0,1)</code>, <code>Card(DPTO,TRABAJAR)=(0,N)</code> — porque un empleado trabaja como mucho en un departamento, y un departamento tiene varios empleados (o ninguno todavía). <code>SER_JEFE</code> es 1:1 — <code>Card(EMPLEADO,SER_JEFE)=(0,1)</code>, <code>Card(DPTO,SER_JEFE)=(1,1)</code> — porque no todo empleado dirige un departamento, pero todo departamento tiene exactamente un director.</span>
+      <span data-i18n="en"><code>WORKS_IN</code> is 1:N — <code>Card(EMPLOYEE,WORKS_IN)=(0,1)</code>, <code>Card(DEPT,WORKS_IN)=(0,N)</code> — because an employee works in at most one department, and a department has several employees (or none yet). <code>MANAGES</code> is 1:1 — <code>Card(EMPLOYEE,MANAGES)=(0,1)</code>, <code>Card(DEPT,MANAGES)=(1,1)</code> — because not every employee directs a department, but every department has exactly one director.</span>
+    </figcaption>
+  </figure>
+
+  <h3 style="margin-top:60px;"><span data-i18n="es">Cardinalidad: mínimo y máximo</span><span data-i18n="en">Cardinality: minimum and maximum</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">La <strong>cardinalidad</strong> indica el número mínimo y máximo de veces que un ejemplar de una entidad puede aparecer en la relación, asociado a ejemplares de la otra entidad. Los valores posibles son <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> y <code>(1,N)</code>, y se anotan junto a cada entidad, sobre la línea que la une a la relación.</span>
+      <span data-i18n="en"><strong>Cardinality</strong> states the minimum and maximum number of times an entity's instance can appear in the relationship, linked to instances of the other entity. The possible values are <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> and <code>(1,N)</code>, noted next to each entity, on the line joining it to the relationship.</span>
+    </p>
+  </div>
+  <figure class="diagram">
+    <svg viewBox="0 0 560 150">
+      <rect x="20" y="58" width="130" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="85" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">JUGADOR</text>
+      <polygon points="280,38 330,78 280,118 230,78" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="280" y="82" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">juega en</text>
+      <rect x="410" y="58" width="130" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="475" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EQUIPO</text>
+      <line x1="150" y1="78" x2="230" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <line x1="330" y1="78" x2="410" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(0,1)</text>
+      <text x="370" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(1,N)</text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">Un jugador tiene cardinalidad mínima 0 (puede no estar en ningún equipo todavía) y máxima 1 (nunca en dos equipos a la vez): <code>(0,1)</code>. Cada equipo tiene cardinalidad mínima 1 (por convenio, aunque en la realidad exigiría más) y máxima N (muchos jugadores por equipo): <code>(1,N)</code>.</span>
+      <span data-i18n="en">A player has a minimum cardinality of 0 (they might not be on any team yet) and a maximum of 1 (never on two teams at once): <code>(0,1)</code>. Each team has a minimum cardinality of 1 (by convention, though reality would require more) and a maximum of N (many players per team): <code>(1,N)</code>.</span>
+    </figcaption>
+  </figure>
+
+  <div class="callout" style="margin-top:32px;">
+    <strong><span data-i18n="es">Método para calcular una cardinalidad</span><span data-i18n="en">Method to work out a cardinality</span></strong> —
+    <span data-i18n="es">toma <strong>un</strong> ejemplar concreto de la entidad que estás anotando y pregúntate: "¿con cuántos ejemplares de la otra entidad se puede relacionar, como mínimo y como máximo?". La cardinalidad se anota siempre <strong>en el extremo opuesto</strong> a la entidad de la que hablas: el número que sale de pensar en JUGADOR se escribe pegado a la relación, del lado de JUGADOR — no del lado de EQUIPO.</span>
+    <span data-i18n="en">take <strong>one</strong> specific instance of the entity you're annotating and ask yourself: "at minimum and at maximum, how many instances of the other entity can it relate to?" The cardinality is always written <strong>on the opposite end</strong> from the entity you're reasoning about: the number you get from thinking about PLAYER is written next to the relationship, on PLAYER's side of the line — not EQUIPO's.</span>
+  </div>
+
+  <h3 style="margin-top:60px;"><span data-i18n="es">Tipo de correspondencia</span><span data-i18n="en">Correspondence type</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">El <strong>tipo de correspondencia</strong> se obtiene tomando el valor máximo de la cardinalidad de cada entidad, y se anota con un par <code>X:Y</code> sobre el rombo. Es habitual representar cardinalidad y tipo de correspondencia juntos, por comodidad para las siguientes fases del diseño.</span>
+      <span data-i18n="en">The <strong>correspondence type</strong> is obtained by taking the maximum cardinality value of each entity, and it's noted as an <code>X:Y</code> pair above the diamond. Cardinality and correspondence type are usually shown together, for convenience in the following design stages.</span>
+    </p>
+  </div>
+  <div class="diagram-grid">
+    <figure class="diagram">
+      <svg viewBox="0 0 260 130">
+        <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">PERSONA</text>
+        <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">DNI</text>
+        <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">1:1</text>
+      </svg>
+      <figcaption><span data-i18n="es">Una persona tiene un único DNI y un DNI pertenece a una única persona.</span><span data-i18n="en">A person has exactly one ID and an ID belongs to exactly one person.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 130">
+        <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">CLIENTE</text>
+        <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">PEDIDO</text>
+        <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">1:N</text>
+      </svg>
+      <figcaption><span data-i18n="es">Un cliente hace muchos pedidos, pero cada pedido es de un único cliente.</span><span data-i18n="en">A customer places many orders, but each order belongs to a single customer.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 130">
+        <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">ALUMNO</text>
+        <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
+        <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">ASIGNATURA</text>
+        <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
+        <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">N:M</text>
+      </svg>
+      <figcaption><span data-i18n="es">Un alumno estudia varias asignaturas y una asignatura la estudian varios alumnos.</span><span data-i18n="en">A student studies several subjects and a subject is studied by several students.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="callout" style="margin-top:24px;">
+    <strong><span data-i18n="es">Aviso</span><span data-i18n="en">Note</span></strong> —
+    <span data-i18n="es">si al anotar el tipo de correspondencia hay que poner una segunda N, esa segunda N se transforma por convenio en una <strong>M</strong> — así <code>N:N</code> se escribe siempre <code>N:M</code> — pero su significado no cambia en absoluto: sigue siendo "muchos a muchos".</span>
+    <span data-i18n="en">if writing the correspondence type calls for a second N, that second N is turned by convention into an <strong>M</strong> — so <code>N:N</code> is always written <code>N:M</code> — but its meaning doesn't change at all: it still means "many to many".</span>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">La paradoja de las cardinalidades obligatorias</span><span data-i18n="en">The mandatory-cardinality paradox</span></strong> —
+    <span data-i18n="es">en una relación 1:1, marcar <code>(1,1)</code> en ambos lados a la vez crea una dependencia circular: para insertar el primer PERSONA necesitarías ya su DNI, y para insertar el primer DNI necesitarías ya su PERSONA — ninguno de los dos podría crearse primero. En la práctica, siempre que aparezca este problema, una de las dos cardinalidades mínimas se relaja a 0 (normalmente la del lado que tenga menos sentido exigir desde el principio).</span>
+    <span data-i18n="en">in a 1:1 relationship, marking <code>(1,1)</code> on both sides at once creates a circular dependency: to insert the first PERSON you'd already need their ID number, and to insert the first ID number you'd already need its PERSON — neither could be created first. In practice, whenever this shows up, one of the two minimum cardinalities is relaxed to 0 (usually whichever side makes least sense to require from the very start).</span>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">¿En qué entidad va un atributo de relación?</span><span data-i18n="en">Which entity does a relationship's attribute belong to?</span></strong> —
+    <span data-i18n="es">en una relación <strong>1:N</strong>, un atributo que "cuelga" del rombo a veces puede trasladarse a la entidad del lado <strong>N</strong>, porque cada ejemplar de esa entidad sólo participa una vez en la relación. Ejemplo: si DEPARTAMENTO <em>controla</em> PROYECTO (1:N, un proyecto sólo tiene un departamento controlador), el atributo <code>fechaControl</code> puede vivir perfectamente dentro de PROYECTO. En una relación <strong>N:M</strong>, en cambio, esto no es posible — un ejemplar puede participar muchas veces, así que el atributo <strong>debe</strong> quedarse en la relación. Ejemplo: si EMPLEADO <em>dedica</em> horas a varios PROYECTO (N:M), <code>horasSemanales</code> no puede vivir en ninguna de las dos entidades — cada empleado dedica un número de horas distinto a cada proyecto.</span>
+    <span data-i18n="en">in a <strong>1:N</strong> relationship, an attribute hanging off the diamond can sometimes move into the entity on the <strong>N</strong> side, because each instance of that entity only takes part in the relationship once. Example: if DEPARTMENT <em>controls</em> PROJECT (1:N, a project only has one controlling department), the attribute <code>controlDate</code> can live perfectly well inside PROJECT. In an <strong>N:M</strong> relationship, though, this isn't possible — an instance can take part many times, so the attribute <strong>must</strong> stay on the relationship. Example: if EMPLOYEE <em>dedicates</em> hours to several PROJECTs (N:M), <code>weeklyHours</code> can't live in either entity — each employee dedicates a different number of hours to each project.</span>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">Cuando N:M no basta: relaciones repetidas</span><span data-i18n="en">When N:M isn't enough: repeated relationships</span></strong> —
+    <span data-i18n="es">una relación N:M simple sólo permite <strong>un</strong> vínculo entre cada pareja de ejemplares. Eso es un problema si, por ejemplo, un mismo USUARIO alquila la misma BICICLETA en varias ocasiones distintas: con un N:M simple no habría forma de distinguir un alquiler de otro. La solución pasa por añadir a la relación un atributo compuesto y multivaluado con las fechas de recogida y devolución de <em>cada</em> alquiler, o —de forma más limpia— promocionar la relación a una <strong>entidad débil</strong> (por ejemplo, ALQUILER), con su propio identificador y capaz de guardar tantos ejemplares como alquileres reales haya entre ese usuario y esa bicicleta.</span>
+    <span data-i18n="en">a simple N:M relationship only allows <strong>one</strong> link between each pair of instances. That's a problem if, say, the same USER rents the same BICYCLE on several separate occasions: a simple N:M would give no way to tell one rental from another. The fix is either adding a composite, multi-valued attribute to the relationship holding each rental's pickup and return dates, or — more cleanly — promoting the relationship into a <strong>weak entity</strong> (a RENTAL, say), with its own identifier, able to store as many instances as there are actual rentals between that user and that bicycle.</span>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">Atributos de relación</span><span data-i18n="en">Relationship attributes</span></strong> —
+    <span data-i18n="es">a veces un dato no pertenece a ninguna de las dos entidades por separado, sino a la relación entre ambas. Ejemplo clásico: MECÁNICO <em>repara</em> VEHÍCULO, y queremos guardar la <em>fecha de reparación</em>. Ese dato no puede vivir en MECÁNICO (no sabríamos de qué vehículo) ni en VEHÍCULO (no sabríamos qué mecánico) — sólo tiene sentido colgado del rombo <em>repara</em>.</span>
+    <span data-i18n="en">sometimes a piece of data doesn't belong to either entity on its own, but to the relationship between them. Classic example: MECHANIC <em>repairs</em> VEHICLE, and we want to store the <em>repair date</em>. That data can't live in MECHANIC (we wouldn't know which vehicle) or in VEHICLE (we wouldn't know which mechanic) — it only makes sense hanging off the <em>repairs</em> diamond.</span>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">Entidad asociativa</span><span data-i18n="en">Associative entity</span></strong> —
+    <span data-i18n="es">cuando una relación con atributos (o una relación N:M que necesita distinguir varios vínculos entre la misma pareja de ejemplares, como el alquiler de bicicletas de arriba) empieza a comportarse como una entidad por derecho propio, conviene <strong>promocionarla a entidad</strong>: se dibuja como un rectángulo con el rombo dentro, su clave es la unión de las claves primarias de las entidades que asocia (más, en su caso, algún atributo propio), y desde ahí puede relacionarse con otras entidades igual que cualquier otra.</span>
+    <span data-i18n="en">when a relationship with attributes (or an N:M relationship that needs to tell apart several links between the same pair of instances, like the bicycle rental above) starts behaving like an entity in its own right, it's worth <strong>promoting it to an entity</strong>: it's drawn as a rectangle with the diamond inside it, its key is the union of the primary keys of the entities it associates (plus, where relevant, an attribute of its own), and from then on it can relate to other entities just like any other.</span>
+  </div>
+</section>
+
+<!-- ============ 06 RESTRICCIONES ============ -->
+<section class="panel-section" id="restricciones">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">06</span>
+      <h2><span data-i18n="es">Restricciones</span><span data-i18n="en">Constraints</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">No todo lo que necesitamos decir sobre un problema cabe dentro de un rectángulo, un rombo o una elipse. Esta sección recoge tres herramientas para precisar —o reconocer los límites de— lo que el diagrama puede expresar por sí solo.</span>
+      <span data-i18n="en">Not everything we need to say about a problem fits inside a rectangle, a diamond or an ellipse. This section covers three tools for sharpening — or recognising the limits of — what the diagram can express on its own.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:16px;"><span data-i18n="es">Dependencia existencial y de identificación</span><span data-i18n="en">Existential and identification dependency</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Ya vimos que una entidad débil depende de una fuerte, pero esa dependencia puede ser de dos tipos, y conviene distinguirlos porque cambian cómo se identifica la entidad débil:</span>
+      <span data-i18n="en">We already saw that a weak entity depends on a strong one, but that dependency can be of two types, and it's worth telling them apart because they change how the weak entity is identified:</span>
+    </p>
+  </div>
+  <div class="grid cols-2" style="margin-top:20px;">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">DEPENDENCIA EXISTENCIAL (E)</span><span data-i18n="en">EXISTENTIAL DEPENDENCY (E)</span></span>
+      <h4><span data-i18n="es">No puede existir sin la fuerte</span><span data-i18n="en">Can't exist without the strong entity</span></h4>
+      <p><span data-i18n="es">La entidad débil desaparece si desaparece su entidad fuerte asociada, pero conserva su propio identificador. Se marca con una <strong>E</strong> junto a la línea de unión. Su cardinalidad mínima hacia la fuerte es siempre 1.</span><span data-i18n="en">The weak entity disappears if its associated strong entity disappears, but it keeps its own identifier. Marked with an <strong>E</strong> next to the connecting line. Its minimum cardinality towards the strong entity is always 1.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">DEPENDENCIA DE IDENTIFICACIÓN (ID)</span><span data-i18n="en">IDENTIFICATION DEPENDENCY (ID)</span></span>
+      <h4><span data-i18n="es">Además, no puede identificarse sola</span><span data-i18n="en">It also can't identify itself alone</span></h4>
+      <p><span data-i18n="es">Implica siempre dependencia existencial, y además la débil no tiene atributos propios suficientes: su identificador se <strong>completa</strong> con el de la entidad fuerte. Se marca con <strong>ID</strong> o con un rombo doble.</span><span data-i18n="en">Always implies existential dependency, and on top of that the weak entity lacks enough attributes of its own: its identifier is <strong>completed</strong> with the strong entity's. Marked with <strong>ID</strong> or a double diamond.</span></p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:28px;">
+    <strong><span data-i18n="es">Ejemplo</span><span data-i18n="en">Example</span></strong> —
+    <span data-i18n="es">LINEA_PEDIDO (débil) depende de PEDIDO (fuerte) por identificación: una línea no puede existir sin su pedido, y tampoco puede identificarse sólo con su número de línea — "línea 1" no significa nada por sí sola. Su identificador real es <em>número de línea + código de pedido</em> ("línea 1 del pedido R2024A01"). Es habitual, además, que estos identificadores se <strong>reinicien</strong> con cada nuevo ejemplar fuerte: la línea 1 del pedido R2024A01 y la línea 1 del pedido R2024A02 son ejemplares distintos.</span>
+    <span data-i18n="en">ORDER_LINE (weak) depends on ORDER (strong) by identification: a line can't exist without its order, and it can't be identified just by its line number either — "line 1" means nothing on its own. Its real identifier is <em>line number + order code</em> ("line 1 of order R2024A01"). It's also common for these identifiers to <strong>reset</strong> with each new strong instance: line 1 of order R2024A01 and line 1 of order R2024A02 are different instances.</span>
+  </div>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Exclusividad entre relaciones</span><span data-i18n="en">Exclusivity between relationships</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">No hay que confundirla con la exclusividad de las jerarquías ISA (sección 07): aquí lo que se excluye es la <strong>participación simultánea</strong> de un mismo ejemplar en dos relaciones distintas. Ocurre cuando la existencia de una relación, para un ejemplar concreto, impide la existencia de otra relación para ese mismo ejemplar. Se representa con un <strong>arco</strong> que atraviesa las dos relaciones implicadas.</span>
+      <span data-i18n="en">Not to be confused with the exclusivity used in ISA hierarchies (section 07): here what gets excluded is the <strong>simultaneous participation</strong> of the same instance in two different relationships. It happens when the existence of one relationship, for a specific instance, rules out the existence of another relationship for that same instance. It's shown with an <strong>arc</strong> crossing the two relationships involved.</span>
+    </p>
+  </div>
+  <figure class="diagram" style="margin-top:20px;">
+    <svg viewBox="0 0 380 220" role="img" aria-labelledby="exclrel-title">
+      <title id="exclrel-title">MONITOR imparte o recibe CURSO, nunca ambas cosas para el mismo curso</title>
+      <rect x="145" y="10" width="90" height="34" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="190" y="32" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">MONITOR</text>
+      <path d="M 118,72 A 92,26 0 0 1 262,72" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+      <line x1="170" y1="44" x2="120" y2="86" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <line x1="210" y1="44" x2="260" y2="86" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <polygon points="100,90 130,116 100,142 70,116" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="100" y="119" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">imparte</text>
+      <polygon points="280,90 310,116 280,142 250,116" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="280" y="119" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">recibe</text>
+      <rect x="145" y="172" width="90" height="34" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="190" y="194" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">CURSO</text>
+      <line x1="107" y1="138" x2="168" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <line x1="273" y1="138" x2="212" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">Un mismo CURSO no puede ser impartido y recibido a la vez por el mismo MONITOR: si <em>imparte</em> existe para ese par, <em>recibe</em> no puede existir para el mismo par (y viceversa). El arco marca esa exclusividad entre ambas relaciones.</span>
+      <span data-i18n="en">The same COURSE can't be both taught and taken at once by the same INSTRUCTOR: if <em>teaches</em> exists for that pair, <em>takes</em> can't exist for the same pair (and vice-versa). The arc marks that exclusivity between the two relationships.</span>
+    </figcaption>
+  </figure>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Cardinalidades exactas</span><span data-i18n="en">Exact cardinalities</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Cuando el problema fija de antemano un mínimo o un máximo concreto, no hace falta conformarse con 0, 1 o N: se anota <strong>el número real</strong>. Por ejemplo, si un curso necesita un mínimo de 5 alumnos matriculados para abrirse y admite como máximo 24, la cardinalidad de CURSO en la relación con ALUMNO se anota <code>(5,24)</code> en lugar de <code>(1,N)</code>.</span>
+      <span data-i18n="en">When the problem sets a concrete minimum or maximum up front, there's no need to settle for 0, 1 or N: <strong>the real number</strong> is written instead. If a class needs a minimum of 5 enrolled students to run and admits a maximum of 24, for instance, CLASS's cardinality in its relationship with STUDENT is written as <code>(5,24)</code> rather than <code>(1,N)</code>.</span>
+    </p>
+  </div>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Pérdida expresiva</span><span data-i18n="en">Semantic loss</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">A veces el modelo conceptual, con todas sus herramientas, sigue sin poder expresar una regla del negocio. A esa limitación se la llama <strong>pérdida expresiva</strong>, y no significa que el diagrama esté mal — significa que esa regla concreta hay que documentarla aparte, normalmente como una nota <strong>PE</strong> al pie del diagrama, para no perderla de cara a las siguientes fases del diseño.</span>
+      <span data-i18n="en">Sometimes the conceptual model, with all its tools, still can't express a business rule. That limitation is called <strong>semantic loss</strong>, and it doesn't mean the diagram is wrong — it means that specific rule needs to be documented separately, usually as a <strong>PE</strong> ("pérdida expresiva") note at the bottom of the diagram, so it isn't lost by the time later design stages come around.</span>
+    </p>
+  </div>
+  <div class="pills">
+    <span class="pill"><span data-i18n="es">PE: un empleado no puede dirigir su propio departamento</span><span data-i18n="en">PE: an employee cannot manage their own department</span></span>
+    <span class="pill"><span data-i18n="es">PE: un empleado sólo puede trabajar en proyectos de su departamento</span><span data-i18n="en">PE: an employee may only work on projects belonging to their department</span></span>
+    <span class="pill"><span data-i18n="es">PE: el nº de alumnos matriculados no puede superar la capacidad del aula</span><span data-i18n="en">PE: the number of enrolled students cannot exceed the classroom's capacity</span></span>
+  </div>
+</section>
+
+<!-- ============ 07 MODELO EXTENDIDO ============ -->
+<section class="panel-section" id="extendido">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">07</span>
+      <h2><span data-i18n="es">El modelo E/R extendido: herencia y agregación</span><span data-i18n="en">The extended E/R model: inheritance and aggregation</span></h2>
+    </div>
+  </div>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Las <strong>relaciones de herencia</strong> (en inglés, ISA — "is a") permiten distinguir tipos de una entidad más general: agrupar varias entidades parecidas en una más genérica (<strong>generalización</strong>), o dividir una entidad en tipos más específicos (<strong>especialización</strong>). La superentidad concentra los atributos comunes; las subentidades los heredan sin necesidad de repetirlos en el diagrama.</span>
+      <span data-i18n="en"><strong>Inheritance relationships</strong> (ISA — "is a") let us distinguish types within a more general entity: grouping several similar entities into a more generic one (<strong>generalisation</strong>), or splitting one entity into more specific types (<strong>specialisation</strong>). The super-entity holds the shared attributes; the sub-entities inherit them without needing to repeat them in the diagram.</span>
+    </p>
+    <p>
+      <span data-i18n="es">En España es habitual dibujar la ISA con un <strong>triángulo hacia abajo</strong>. Sobre él se pueden anotar dos matices independientes:</span>
+      <span data-i18n="en">In Spain it's common to draw the ISA relationship as a <strong>downward-pointing triangle</strong>. Two independent nuances can be marked on it:</span>
+    </p>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">Herencia de atributos</span><span data-i18n="en">Attribute inheritance</span></strong> —
+    <span data-i18n="es">los atributos del nivel más alto (la superentidad) son heredados por todas las entidades de nivel más bajo, sin necesidad de repetirlos en el diagrama. Por ejemplo, PERSONA (nombre, calle, ciudad) es superentidad de CLIENTE y EMPLEADO: ambas heredan esos tres atributos y sólo añaden los suyos propios — CLIENTE suma <code>id_cliente</code>; EMPLEADO suma <code>id_empleado</code> y <code>sueldo</code>. Ese identificador propio de cada subentidad se dibuja, además, con su propio círculo relleno junto al rectángulo — como en <code>EMPLEADOS → ALBAÑILES / ARQUITECTOS</code>, donde ambas subentidades conservan el DNI heredado y cada una añade el suyo (<code>num_colegiado</code> sólo tiene sentido para ARQUITECTOS).</span>
+    <span data-i18n="en">the attributes of the highest level (the super-entity) are inherited by every lower-level entity, with no need to repeat them in the diagram. For example, PERSON (name, street, city) is the super-entity of CUSTOMER and EMPLOYEE: both inherit those three attributes and only add their own — CUSTOMER adds <code>customer_id</code>; EMPLOYEE adds <code>employee_id</code> and <code>salary</code>. Each sub-entity's own identifier is also drawn with its own filled circle next to the rectangle — as in <code>EMPLOYEES → BRICKLAYERS / ARCHITECTS</code>, where both sub-entities keep the inherited ID number and each adds its own (<code>license_number</code> only makes sense for ARCHITECTS).</span>
+  </div>
+
+  <div class="grid cols-2" style="margin-top:20px;">
+    <div class="card">
+      <span class="tag"><span data-i18n="es">OBLIGATORIEDAD</span><span data-i18n="en">MANDATORINESS</span></span>
+      <h4><span data-i18n="es">Total vs. parcial</span><span data-i18n="en">Total vs. partial</span></h4>
+      <p><span data-i18n="es"><strong>Total:</strong> todo ejemplar de la superentidad pertenece obligatoriamente a alguna subentidad. <strong>Parcial</strong> (se marca con un círculo sobre el triángulo): puede haber ejemplares que no pertenezcan a ninguna.</span><span data-i18n="en"><strong>Total:</strong> every instance of the super-entity must belong to some sub-entity. <strong>Partial</strong> (marked with a circle over the triangle): there can be instances that belong to none.</span></p>
+    </div>
+    <div class="card">
+      <span class="tag"><span data-i18n="es">NÚMERO DE RELACIONES</span><span data-i18n="en">NUMBER OF RELATIONSHIPS</span></span>
+      <h4><span data-i18n="es">Exclusiva vs. solapada</span><span data-i18n="en">Exclusive vs. overlapping</span></h4>
+      <p><span data-i18n="es"><strong>Exclusiva</strong> (arco sobre las líneas): cada ejemplar pertenece como mucho a una subentidad. <strong>Solapada</strong> (sin arco): un mismo ejemplar puede pertenecer a varias subentidades a la vez.</span><span data-i18n="en"><strong>Exclusive</strong> (arc across the lines): each instance belongs to at most one sub-entity. <strong>Overlapping</strong> (no arc): the same instance can belong to several sub-entities at once.</span></p>
+    </div>
+  </div>
+
+  <figure class="diagram" style="margin-top:36px;">
+    <svg viewBox="0 0 560 230" role="img" aria-labelledby="isa-title">
+      <title id="isa-title">Notación ISA con triángulo hacia abajo</title>
+      <rect x="220" y="14" width="120" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="280" y="39" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">PERSONAL</tspan></text>
+      <line x1="280" y1="54" x2="280" y2="80" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <circle cx="280" cy="88" r="9" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
+      <text x="280" y="92" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">P</text>
+      <polygon points="245,105 315,105 280,140" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
+      <text x="280" y="122" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">ISA</text>
+      <path d="M 200,150 A 90,26 0 0 1 360,150" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+      <line x1="280" y1="140" x2="90" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <line x1="280" y1="140" x2="280" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <line x1="280" y1="140" x2="470" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <rect x="20" y="185" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="90" y="210" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">PROFESOR</tspan></text>
+      <rect x="210" y="185" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="280" y="210" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">BEDEL</tspan></text>
+      <rect x="400" y="185" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="470" y="210" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">TÉCNICO</tspan></text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">El círculo <strong>P</strong> sobre el triángulo marca esta jerarquía como <strong>parcial</strong> (puede haber personal que no sea profesor, bedel ni técnico — por ejemplo, un cargo directivo); el <strong>arco</strong> bajo el triángulo la marca como <strong>exclusiva</strong> (nadie puede ser a la vez profesor y bedel). Sin círculo sería total; sin arco sería solapada.</span>
+      <span data-i18n="en">The circle marked <strong>P</strong> over the triangle marks this hierarchy as <strong>partial</strong> (there can be staff who are neither teacher, porter nor technician — a management role, say); the <strong>arc</strong> under the triangle marks it as <strong>exclusive</strong> (nobody can be both a teacher and a porter). No circle would mean total; no arc would mean overlapping.</span>
+    </figcaption>
+  </figure>
+
+  <h3 style="margin-top:56px;"><span data-i18n="es">Las cuatro combinaciones posibles</span><span data-i18n="en">The four possible combinations</span></h3>
+  <table>
+    <thead>
+      <tr>
+        <th><span data-i18n="es">Combinación</span><span data-i18n="en">Combination</span></th>
+        <th><span data-i18n="es">Significa</span><span data-i18n="en">Means</span></th>
+        <th><span data-i18n="es">Ejemplo (EMPLEADO → técnico / científico / astronauta)</span><span data-i18n="en">Example (EMPLOYEE → technician / scientist / astronaut)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong><span data-i18n="es">Exclusiva y total</span><span data-i18n="en">Exclusive & total</span></strong></td>
+        <td><span data-i18n="es">Todos pertenecen a una subentidad, y sólo a una.</span><span data-i18n="en">Everyone belongs to a sub-entity, and only one.</span></td>
+        <td><span data-i18n="es">Todo empleado es técnico, científico o astronauta — nunca más de uno a la vez, ni ningún otro puesto.</span><span data-i18n="en">Every employee is a technician, scientist or astronaut — never more than one at a time, and no other role.</span></td>
+      </tr>
+      <tr>
+        <td><strong><span data-i18n="es">Exclusiva y parcial</span><span data-i18n="en">Exclusive & partial</span></strong></td>
+        <td><span data-i18n="es">Como mucho una subentidad, pero puede que ninguna.</span><span data-i18n="en">At most one sub-entity, but possibly none.</span></td>
+        <td><span data-i18n="es">Un empleado puede ser técnico, astronauta, científico — o desempeñar otro puesto distinto (por ejemplo, físico), pero nunca dos de estos tres a la vez.</span><span data-i18n="en">An employee can be a technician, astronaut, scientist — or hold a different role entirely (a physicist, say), but never two of these three at once.</span></td>
+      </tr>
+      <tr>
+        <td><strong><span data-i18n="es">Solapada y total</span><span data-i18n="en">Overlapping & total</span></strong></td>
+        <td><span data-i18n="es">Todos pertenecen a al menos una subentidad, y pueden pertenecer a varias.</span><span data-i18n="en">Everyone belongs to at least one sub-entity, and can belong to several.</span></td>
+        <td><span data-i18n="es">Todo empleado es técnico, astronauta o científico, y puede ser varias cosas a la vez (técnico y astronauta, por ejemplo).</span><span data-i18n="en">Every employee is a technician, astronaut or scientist, and can be several at once (technician and astronaut, say).</span></td>
+      </tr>
+      <tr>
+        <td><strong><span data-i18n="es">Solapada y parcial</span><span data-i18n="en">Overlapping & partial</span></strong></td>
+        <td><span data-i18n="es">Puede pertenecer a varias subentidades, o a ninguna.</span><span data-i18n="en">Can belong to several sub-entities, or to none.</span></td>
+        <td><span data-i18n="es">Un empleado puede ser técnico y científico a la vez, sólo astronauta, o desempeñar un puesto totalmente distinto.</span><span data-i18n="en">An employee can be technician and scientist at once, only an astronaut, or hold a completely different role.</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:36px;">
+    <strong><span data-i18n="es">¿Cuándo usar relaciones ISA?</span><span data-i18n="en">When should you use ISA relationships?</span></strong>
+    <span data-i18n="es">Los diseñadores principiantes tienden a abusar de ellas, y cada relación de herencia añade entidades y complejidad al diagrama. Úsalas sólo cuando las subentidades tengan <strong>atributos distintos</strong> o <strong>relaciones distintas</strong>; si sólo cambia una etiqueta, suele bastar con un simple atributo "tipo" en la entidad general.</span>
+    <span data-i18n="en">Beginner designers tend to overuse them, and every inheritance relationship adds entities and complexity to the diagram. Use them only when the sub-entities have <strong>different attributes</strong> or <strong>different relationships</strong>; if only a label changes, a simple "type" attribute on the general entity is usually enough.</span>
+  </div>
+
+  <h3 style="margin-top:64px;"><span data-i18n="es">Agregación: relacionar una relación</span><span data-i18n="en">Aggregation: relating a relationship</span></h3>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">El modelo E/R básico tiene una limitación concreta: no permite que una relación se relacione, a su vez, con una tercera entidad. La <strong>agregación</strong> resuelve esto tratando una relación (junto con las entidades que une) como si fuera, ella misma, una entidad de nivel superior — con la que sí se puede construir una nueva relación.</span>
+      <span data-i18n="en">The basic E/R model has one specific limitation: it doesn't allow a relationship to, in turn, relate to a third entity. <strong>Aggregation</strong> solves this by treating a relationship (together with the entities it joins) as if it were itself a higher-level entity — one a new relationship can actually be built with.</span>
+    </p>
+    <p>
+      <span data-i18n="es">Un instituto quiere registrar las incidencias que ocurren durante las clases. Cada DOCENTE <em>imparte</em> clase en varias AULA, y cada AULA recibe clase de varios DOCENTE (N:M). El problema es que una incidencia no pertenece ni al docente ni al aula por separado, sino a la <strong>sesión concreta</strong> en la que ese docente estaba en esa aula. Sin agregación, tendríamos que recurrir a una relación ternaria DOCENTE–AULA–INCIDENCIA, forzando una asociación que en realidad no es directa entre las tres.</span>
+      <span data-i18n="en">A school wants to log incidents that happen during classes. Each TEACHER <em>teaches</em> in several CLASSROOMs, and each CLASSROOM is taught in by several TEACHERs (N:M). The problem is that an incident belongs neither to the teacher nor to the classroom on their own, but to the <strong>specific session</strong> in which that teacher was in that classroom. Without aggregation we'd have to resort to a ternary TEACHER–CLASSROOM–INCIDENT relationship, forcing an association that isn't really direct between all three.</span>
+    </p>
+  </div>
+  <figure class="diagram" style="margin-top:24px;">
+    <svg viewBox="0 0 640 230" role="img" aria-labelledby="agr-title">
+      <title id="agr-title">Agregación: DOCENTE-imparte-AULA como entidad agregada, relacionada con INCIDENCIA</title>
+      <rect x="16" y="16" width="330" height="120" rx="6" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6;stroke-dasharray:5 4"/>
+      <rect x="30" y="46" width="120" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="90" y="71" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">DOCENTE</tspan></text>
+      <polygon points="230,44 268,74 230,104 192,74" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="230" y="78" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">imparte</tspan></text>
+      <rect x="270" y="46" width="60" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="300" y="71" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">AULA</tspan></text>
+      <line x1="150" y1="66" x2="192" y2="74" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <line x1="268" y1="74" x2="270" y2="66" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="30" y="20" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);"><tspan data-i18n="es">agregado</tspan></text>
+
+      <line x1="180" y1="136" x2="180" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <polygon points="285,145 330,175 285,205 240,175" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="285" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">registra</tspan></text>
+      <line x1="210" y1="176" x2="240" y2="175" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <rect x="480" y="155" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="550" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">INCIDENCIA</tspan></text>
+      <line x1="330" y1="175" x2="480" y2="175" style="stroke:var(--ink-dim);stroke-width:1.8"/>
+      <text x="222" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,N)</text>
+      <text x="415" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,1)</text>
+    </svg>
+    <figcaption>
+      <span data-i18n="es">El recuadro punteado marca la <strong>agregación</strong>: DOCENTE + <em>imparte</em> + AULA pasa a comportarse como una única entidad de nivel superior (la "sesión" docente-aula), que es la que de verdad <em>registra</em> incidencias — no el docente ni el aula por separado.</span>
+      <span data-i18n="en">The dashed box marks the <strong>aggregation</strong>: TEACHER + <em>teaches</em> + CLASSROOM now behaves as a single higher-level entity (the teacher-classroom "session"), which is what actually <em>logs</em> incidents — not the teacher or the classroom on their own.</span>
+    </figcaption>
+  </figure>
+  <div class="callout" style="margin-top:28px;">
+    <strong><span data-i18n="es">Agregación vs. relación ternaria</span><span data-i18n="en">Aggregation vs. a ternary relationship</span></strong> —
+    <span data-i18n="es">una ternaria implica que las <strong>tres</strong> entidades participan a la vez en una única asociación real. La agregación, en cambio, dice algo distinto: la asociación entre las dos primeras entidades ya existe por sí sola (con su propia cardinalidad), y es <em>esa asociación completa</em> la que se relaciona con la tercera — sin forzar que las tres tengan que aparecer siempre juntas.</span>
+    <span data-i18n="en">a ternary relationship implies that all <strong>three</strong> entities take part at once in a single real association. Aggregation says something different: the association between the first two entities already exists on its own (with its own cardinality), and it's <em>that whole association</em> that relates to the third one — without forcing all three to always show up together.</span>
+  </div>
+</section>
+
+<!-- ============ 08 GUÍA Y EJEMPLO ============ -->
+<section id="guia">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">08</span>
+      <h2><span data-i18n="es">Guía para construir un diagrama E/R</span><span data-i18n="en">Guide to building an E/R diagram</span></h2>
+    </div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <strong><span data-i18n="es">Leer el enunciado varias veces</span><span data-i18n="en">Read the problem statement several times</span></strong>
+      <span data-i18n="es">hasta entender por completo los requisitos del sistema, antes de dibujar nada.</span>
+      <span data-i18n="en">until you fully understand the system's requirements, before drawing anything.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Buscar entidades: los nombres comunes</span><span data-i18n="en">Find entities: the common nouns</span></strong>
+      <span data-i18n="es">del texto. Si un nombre común aporta muy poca información, quizá funcione mejor como atributo de otra entidad. No te obsesiones aún con distinguir fuertes de débiles.</span>
+      <span data-i18n="en">in the text. If a common noun carries very little information, it may work better as an attribute of another entity. Don't obsess yet over telling strong from weak entities.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Extraer atributos: los adjetivos</span><span data-i18n="en">Extract attributes: the adjectives</span></strong>
+      <span data-i18n="es">y datos concretos de cada entidad, y distingue cuál (o cuáles) hará de clave.</span>
+      <span data-i18n="en">and specific data for each entity, and work out which one (or ones) will act as the key.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Buscar relaciones: los verbos</span><span data-i18n="en">Find relationships: the verbs</span></strong>
+      <span data-i18n="es">que conectan las entidades, y comprueba si tienen atributos propios.</span>
+      <span data-i18n="en">that connect the entities, and check whether they have attributes of their own.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Calcular cardinalidades y tipos de correspondencia</span><span data-i18n="en">Work out cardinalities and correspondence types</span></strong>
+      <span data-i18n="es">analizando cómo se relacionan realmente las entidades entre sí.</span>
+      <span data-i18n="en">by analysing how the entities actually relate to one another.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Complementar el modelo</span><span data-i18n="en">Complement the model</span></strong>
+      <span data-i18n="es">con las listas de atributos de cada entidad y una nota aparte para cualquier restricción que el diagrama no pueda expresar por sí solo (dependencias, cardinalidades exactas, pérdida expresiva…).</span>
+      <span data-i18n="en">with each entity's attribute lists and a separate note for any constraint the diagram can't express on its own (dependencies, exact cardinalities, semantic loss…).</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Refinar el diagrama</span><span data-i18n="en">Refine the diagram</span></strong>
+      <span data-i18n="es">y, si queda alguna duda, volver a hablar con el cliente en lugar de suponer.</span>
+      <span data-i18n="en">and, if any doubt remains, go back and talk to the client instead of guessing.</span>
+    </li>
+  </ol>
+
+  <div class="worked">
+    <h4><span data-i18n="es">Ejemplo resuelto</span><span data-i18n="en">Worked example</span></h4>
+    <p>
+      <span data-i18n="es">"Una empresa vende productos a varios clientes. Se necesita conocer los datos personales de los clientes (nombre, apellidos, DNI, dirección y fecha de nacimiento). Cada producto tiene un nombre y un código, así como un precio unitario. Un cliente puede comprar varios productos a la empresa, y un mismo producto puede ser comprado por varios clientes. Los productos son suministrados por diferentes proveedores. Un producto sólo puede ser suministrado por un proveedor, y un proveedor puede suministrar diferentes productos. De cada proveedor se desea conocer el NIF, nombre y dirección."</span>
+      <span data-i18n="en">"A company sells products to several customers. We need to know the customers' personal details (first name, surname, ID number, address and date of birth). Each product has a name and a code, as well as a unit price. A customer can buy several products from the company, and the same product can be bought by several customers. Products are supplied by different suppliers. A product can only be supplied by one supplier, and a supplier can supply different products. For each supplier we want to know their tax ID, name and address."</span>
+    </p>
+  </div>
+
+  <figure class="diagram" style="margin-top:24px;">
+    <svg viewBox="0 0 640 200" role="img" aria-labelledby="ejfin-title">
+      <title id="ejfin-title">Diagrama E/R del ejemplo: CLIENTE, PRODUCTO, PROVEEDOR</title>
+      <rect x="10" y="80" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="80" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">CLIENTE</tspan></text>
+      <polygon points="250,60 295,100 250,140 205,100" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="250" y="104" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">compra</tspan></text>
+      <rect x="345" y="80" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+      <text x="415" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">PRODUCTO</tspan></text>
+      <polygon points="560,68 598,100 560,132 522,100" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
+      <text x="560" y="104" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">suministra</tspan></text>
+      <line x1="150" y1="100" x2="205" y2="100" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <line x1="295" y1="100" x2="345" y2="100" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <text x="177" y="90" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">N:M</text>
+      <text x="320" y="66" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:10px;fill:var(--ink-dim);"><tspan data-i18n="es">(0,N) — (0,N)</tspan></text>
+      <line x1="485" y1="100" x2="522" y2="100" style="stroke:var(--ink-dim);stroke-width:2"/>
+      <text x="503" y="90" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">1:N</text>
+      <line x1="598" y1="100" x2="630" y2="100" style="stroke:var(--ink-dim);stroke-width:2"/>
+    </svg>
+    <figcaption>
+      <span data-i18n="es"><strong>Entidades:</strong> CLIENTE (nombre, apellidos, <u>DNI</u>, dirección, fecha de nacimiento), PRODUCTO (<u>código</u>, nombre, precio unitario), PROVEEDOR (<u>NIF</u>, nombre, dirección) — los tres son nombres comunes del enunciado. <strong>Relaciones (verbos):</strong> "compra" entre CLIENTE y PRODUCTO, con tipo de correspondencia <strong>N:M</strong> (un cliente compra varios productos y un producto lo compran varios clientes); "suministra" entre PROVEEDOR y PRODUCTO, con tipo de correspondencia <strong>1:N</strong> (un proveedor suministra varios productos, pero cada producto sólo tiene un proveedor).</span>
+      <span data-i18n="en"><strong>Entities:</strong> CUSTOMER (first name, surname, <u>ID number</u>, address, date of birth), PRODUCT (<u>code</u>, name, unit price), SUPPLIER (<u>tax ID</u>, name, address) — all three are common nouns from the statement. <strong>Relationships (verbs):</strong> "buys" between CUSTOMER and PRODUCT, correspondence type <strong>N:M</strong> (a customer buys several products and a product is bought by several customers); "supplies" between SUPPLIER and PRODUCT, correspondence type <strong>1:N</strong> (a supplier supplies several products, but each product has only one supplier).</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ RESUMEN ============ -->
+<section class="panel-section" id="resumen">
+  <div class="sec-head">
+    <div>
+      <span class="sec-num">09</span>
+      <h2><span data-i18n="es">En resumen</span><span data-i18n="en">In summary</span></h2>
+    </div>
+  </div>
+  <ol class="steps">
+    <li>
+      <strong><span data-i18n="es">El modelo E/R</span><span data-i18n="en">The E/R model</span></strong>
+      <span data-i18n="es">es un modelo conceptual, independiente del SGBD, que representa un problema con entidades, relaciones y atributos, siguiendo la notación de Chen.</span>
+      <span data-i18n="en">is a conceptual model, independent of any DBMS, that represents a problem using entities, relationships and attributes, following Chen's notation.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Una entidad</span><span data-i18n="en">An entity</span></strong>
+      <span data-i18n="es">se dibuja como un rectángulo (doble si es débil); una relación, como un rombo con un verbo; un atributo, como una elipse, subrayada si es clave.</span>
+      <span data-i18n="en">is drawn as a rectangle (double if it's weak); a relationship, as a diamond with a verb; an attribute, as an ellipse, underlined if it's a key.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Toda relación</span><span data-i18n="en">Every relationship</span></strong>
+      <span data-i18n="es">tiene un grado (binaria, ternaria, reflexiva…), una cardinalidad (0,1 / 1,1 / 0,N / 1,N) y un tipo de correspondencia (1:1, 1:N, N:M).</span>
+      <span data-i18n="en">has a degree (binary, ternary, reflexive…), a cardinality (0,1 / 1,1 / 0,N / 1,N) and a correspondence type (1:1, 1:N, N:M).</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Los identificadores</span><span data-i18n="en">Identifiers</span></strong>
+      <span data-i18n="es">deben ser únicos, siempre con valor, estables y simples; cuando sobran candidatos, uno se marca como clave primaria y el resto como alternativas.</span>
+      <span data-i18n="en">must be unique, always have a value, be stable and be simple; when there's more than one candidate, one is marked as the primary key and the rest as alternates.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Las restricciones</span><span data-i18n="en">Constraints</span></strong>
+      <span data-i18n="es">precisan lo que el diagrama no dice del todo: dependencia existencial o de identificación en las entidades débiles, cardinalidades exactas, y notas de pérdida expresiva cuando ni así basta.</span>
+      <span data-i18n="en">sharpen what the diagram doesn't fully say: existential or identification dependency in weak entities, exact cardinalities, and semantic-loss notes when even that isn't enough.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Las relaciones ISA</span><span data-i18n="en">ISA relationships</span></strong>
+      <span data-i18n="es">expresan herencia entre entidades, combinando obligatoriedad (total/parcial) y número de relaciones (exclusiva/solapada) — cuatro combinaciones en total. La <strong>agregación</strong> resuelve el caso en que una relación necesita, a su vez, relacionarse con una tercera entidad.</span>
+      <span data-i18n="en">express inheritance between entities, combining mandatoriness (total/partial) and number of relationships (exclusive/overlapping) — four combinations in total. <strong>Aggregation</strong> solves the case where a relationship itself needs to relate to a third entity.</span>
+    </li>
+    <li>
+      <strong><span data-i18n="es">Diseñar bien</span><span data-i18n="en">Designing well</span></strong>
+      <span data-i18n="es">consiste en leer el problema, identificar nombres (entidades), adjetivos (atributos) y verbos (relaciones), y no tener miedo a volver a preguntar al cliente.</span>
+      <span data-i18n="en">means reading the problem, spotting nouns (entities), adjectives (attributes) and verbs (relationships), and not being afraid to go back and ask the client.</span>
+    </li>
+  </ol>
+</section>
+
+<footer>
+  <div class="inner">
+
+  </div>
+</footer>
+
+</div><!-- /#ut2-app -->
+<script>
+function setLang(lang){
+  var app = document.getElementById('ut2-app');
+  if(app) app.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.getElementById('btn-es').classList.toggle('active', lang==='es');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  try{ localStorage.setItem('ut2-lang', lang); }catch(e){}
+}
+(function(){
+  var saved = null;
+  try{ saved = localStorage.getItem('ut2-lang'); }catch(e){}
+  if(saved === 'en' || saved === 'es'){ setLang(saved); }
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  var THEME_KEY = 'bbdd-theme';
+  var btn = document.getElementById('theme-toggle');
+  var icon = document.getElementById('theme-toggle-icon');
+  var label = document.getElementById('theme-toggle-label');
+  function apply(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    if(icon) icon.textContent = theme === 'light' ? '🌙' : '☀️';
+    if(label) label.textContent = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(e){}
+  apply(saved === 'light' ? 'light' : 'dark');
+  if(btn){
+    btn.addEventListener('click', function(){
+      var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      apply(next);
+      try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    });
+  }
+})();
+</script>
+</body>
+</html>
