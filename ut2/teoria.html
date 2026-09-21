@@ -495,7 +495,7 @@
         <a href="teoria.html" class="active">📖 Teoría</a>
         <a href="actividades.html">📝 Actividades</a>
         <a href="resumen.html">🎛️ Resumen</a>
-        
+        <a href="diapositivas.html">🖥️ Diapositivas</a>
       </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
   </nav>
   <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
@@ -690,15 +690,74 @@
       <span data-i18n="es">Al definir entidades, relaciones y atributos en realidad estamos fijando dos tipos de reglas distintas. Las <strong>propiedades estáticas</strong> son restricciones que se pueden comprobar en un único instante de la base de datos: qué valores puede tomar un atributo, si puede quedar vacío, cómo se identifica de forma única una entidad, o cuántas veces puede participar una entidad en una relación (su cardinalidad). Las <strong>propiedades dinámicas</strong>, en cambio, sólo se detectan comparando dos instantes distintos de la base de datos: cómo deben evolucionar los datos con el tiempo.</span>
       <span data-i18n="en">Defining entities, relationships and attributes actually means fixing two different kinds of rules. <strong>Static properties</strong> are constraints that can be checked at a single instant of the database: what values an attribute can take, whether it can be left empty, how an entity is uniquely identified, or how many times an entity can take part in a relationship (its cardinality). <strong>Dynamic properties</strong>, on the other hand, can only be detected by comparing two different instants of the database: how the data must evolve over time.</span>
     </p>
+  </div>
+
+  <h4 style="margin-top:36px;"><span data-i18n="es">Propiedades estáticas</span><span data-i18n="en">Static properties</span></h4>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Son las restricciones que siempre deben cumplirse en el estado actual de la base de datos. Es decir, qué datos son válidos o no válidos en un momento dado. Por ejemplo:</span>
+      <span data-i18n="en">These are the constraints that must always hold in the database's current state — in other words, which data is valid or invalid at a given moment. For example:</span>
+    </p>
+  </div>
+  <div class="callout" style="margin-top:8px;">
+    <span data-i18n="es">"No puede haber un alumno sin número de matrícula". · "Una relación 'matricula' solo puede existir entre un alumno y una asignatura existentes".</span>
+    <span data-i18n="en">"There can't be a student without an enrolment number." · "An 'enrols' relationship can only exist between a student and a subject that already exist."</span>
+  </div>
+  <div class="prose" style="margin-top:16px;">
+    <p>
+      <span data-i18n="es">Estas propiedades se pueden definir sobre los atributos, las entidades o las relaciones:</span>
+      <span data-i18n="en">These properties can be defined on attributes, entities or relationships:</span>
+    </p>
+    <ul>
+      <li>
+        <span data-i18n="es"><strong>Sobre atributos:</strong> restringen los valores que puede tener un atributo.</span>
+        <span data-i18n="en"><strong>On attributes:</strong> they restrict the values an attribute can hold.</span>
+        <ul>
+          <li><span data-i18n="es"><strong>Valores posibles:</strong> por ejemplo, el atributo <code>nota</code> debe estar entre 0 y 10 (no se permite 12 o -3).</span><span data-i18n="en"><strong>Possible values:</strong> for example, the <code>grade</code> attribute must be between 0 and 10 (12 or -3 aren't allowed).</span></li>
+          <li><span data-i18n="es"><strong>Valor no nulo:</strong> por ejemplo, el atributo <code>DNI</code> de un alumno no puede ser nulo (todos deben tener uno).</span><span data-i18n="en"><strong>Not-null value:</strong> for example, a student's <code>ID number</code> attribute can't be null (every student must have one).</span></li>
+        </ul>
+      </li>
+      <li>
+        <span data-i18n="es"><strong>Sobre entidades:</strong> afectan a la identificación de las entidades (cómo las distinguimos).</span>
+        <span data-i18n="en"><strong>On entities:</strong> they affect how entities are identified (how we tell them apart).</span>
+        <ul>
+          <li><span data-i18n="es"><strong>Restricción de identificación:</strong> por ejemplo, dos alumnos no pueden tener el mismo número de matrícula (es la clave primaria en términos de base de datos).</span><span data-i18n="en"><strong>Identification constraint:</strong> for example, two students can't share the same enrolment number (this is the primary key, in database terms).</span></li>
+        </ul>
+      </li>
+      <li>
+        <span data-i18n="es"><strong>Sobre relaciones:</strong> controlan cómo se vinculan las entidades entre sí.</span>
+        <span data-i18n="en"><strong>On relationships:</strong> they control how entities are linked to one another.</span>
+        <ul>
+          <li><span data-i18n="es"><strong>Restricciones de cardinalidad:</strong> indican cuántas veces puede participar una entidad en una relación. Por ejemplo, un alumno puede estar matriculado en varias asignaturas, y cada asignatura puede tener varios alumnos (relación muchos a muchos).</span><span data-i18n="en"><strong>Cardinality constraints:</strong> they state how many times an entity can take part in a relationship. For example, a student can be enrolled in several subjects, and each subject can have several students (a many-to-many relationship).</span></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h4 style="margin-top:44px;"><span data-i18n="es">Propiedades dinámicas</span><span data-i18n="en">Dynamic properties</span></h4>
+  <div class="prose">
+    <p>
+      <span data-i18n="es">Estas tienen que ver con cómo cambian los datos con el tiempo, es decir, con las operaciones (inserciones, actualizaciones, borrados) y transacciones que se realizan. Se usan para expresar reglas de negocio que afectan a la evolución del sistema. Por ejemplo:</span>
+      <span data-i18n="en">These have to do with how data changes over time — that is, with the operations (inserts, updates, deletes) and transactions carried out on it. They're used to express business rules that affect how the system evolves. For example:</span>
+    </p>
+  </div>
+  <div class="callout" style="margin-top:8px;">
+    <span data-i18n="es">"El número de alumnado matriculado en una asignatura debe ser menor o igual a 20".</span>
+    <span data-i18n="en">"The number of students enrolled in a subject must be less than or equal to 20."</span>
+  </div>
+  <div class="prose" style="margin-top:16px;">
+    <p>
+      <span data-i18n="es">Esto significa que no es una restricción fija sobre un solo dato, sino sobre cómo evoluciona la relación "matrícula". Si ya hay 20 alumnos matriculados, no se permite añadir otro. Otros ejemplos:</span>
+      <span data-i18n="en">This means it isn't a fixed constraint on a single piece of data, but on how the "enrols" relationship evolves. If there are already 20 students enrolled, adding another isn't allowed. Other examples:</span>
+    </p>
+    <ul>
+      <li><span data-i18n="es">"Un pedido solo puede pasar al estado enviado si tiene al menos un producto."</span><span data-i18n="en">"An order can only move to the 'shipped' state if it has at least one product."</span></li>
+      <li><span data-i18n="es">"Si se borra un cliente, deben borrarse también sus pedidos" (restricción dinámica de tipo en cascada).</span><span data-i18n="en">"If a customer is deleted, their orders must be deleted too" (a cascading-type dynamic constraint).</span></li>
+    </ul>
     <p>
       <span data-i18n="es">Dos conceptos ligados a las propiedades dinámicas, que retomaremos más adelante en el curso: una <strong>operación</strong> es una acción elemental —indivisible— sobre un objeto o una relación (por ejemplo, dar de alta un pedido); una <strong>transacción</strong> es una secuencia de operaciones que se trata como si fuera una sola, de forma atómica: o se ejecutan todas, o no se ejecuta ninguna.</span>
       <span data-i18n="en">Two concepts tied to dynamic properties, which we'll come back to later in the course: an <strong>operation</strong> is an elementary — indivisible — action on an object or a relationship (registering an order, say); a <strong>transaction</strong> is a sequence of operations treated as a single, atomic unit: either all of them run, or none do.</span>
     </p>
-  </div>
-  <div class="callout" style="margin-top:8px;">
-    <strong><span data-i18n="es">Ejemplos</span><span data-i18n="en">Examples</span></strong> —
-    <span data-i18n="es"><strong>Estática:</strong> "el precio de un producto nunca puede ser negativo" (se comprueba mirando sólo el dato actual). <strong>Dinámica:</strong> "si se borra un cliente, deben borrarse también sus pedidos" (sólo se detecta comparando el estado de la base de datos antes y después del borrado).</span>
-    <span data-i18n="en"><strong>Static:</strong> "a product's price can never be negative" (checkable just by looking at the current value). <strong>Dynamic:</strong> "deleting a customer must also delete their orders" (only detectable by comparing the database's state before and after the deletion).</span>
   </div>
 </section>
 
