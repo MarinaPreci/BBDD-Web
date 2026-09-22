@@ -810,15 +810,15 @@
 
       <line x1="190" y1="107" x2="260" y2="107" style="stroke:var(--ink-dim);stroke-width:2"/>
       <line x1="380" y1="107" x2="452" y2="107" style="stroke:var(--ink-dim);stroke-width:2"/>
-      <text x="222" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,N)</text>
-      <text x="415" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(1,1)</text>
+      <text x="222" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(1,1)</text>
+      <text x="415" y="98" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,N)</text>
 
       <text x="115" y="176" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:13px;fill:var(--ink-dim);"><tspan data-i18n="es">entidad fuerte</tspan></text>
       <text x="527" y="176" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:13px;fill:var(--ink-dim);"><tspan data-i18n="es">entidad débil (rect. doble)</tspan></text>
     </svg>
     <figcaption>
-      <span data-i18n="es"><strong>Ejemplo:</strong> una empresa guarda información de sus empleados y, para cada uno, de sus familiares a su cargo. Sin el empleado, no tendría sentido guardar el familiar: FAMILIAR es la entidad débil. Cada familiar se relaciona con <strong>uno y sólo un</strong> empleado (1,1), y cada empleado puede tener cero o varios familiares registrados (0,N). A menudo hay además una <em>dependencia de identificación</em>: si un familiar se identifica con su nombre + el número de empleado del que depende, eso es la señal definitiva de que estamos ante una entidad débil.</span>
-      <span data-i18n="en"><strong>Example:</strong> a company keeps information about its employees and, for each one, about the family members in their care. Without the employee, storing the family member would make no sense: FAMILY MEMBER is the weak entity. Each family member relates to <strong>exactly one</strong> employee (1,1), and each employee can have zero or several family members on record (0,N). There is also often an <em>identifying dependency</em>: if a family member is identified by their name plus the employee number they depend on, that's the definitive sign of a weak entity.</span>
+      <span data-i18n="es"><strong>Ejemplo:</strong> una empresa guarda información de sus empleados y, para cada uno, de sus familiares a su cargo. Sin el empleado, no tendría sentido guardar el familiar: FAMILIAR es la entidad débil. Cada familiar se relaciona con <strong>uno y sólo un</strong> empleado, y cada empleado puede tener cero o varios familiares registrados. Recuerda que la cardinalidad se anota cruzada: el <code>(1,1)</code> de FAMILIAR se escribe del lado de EMPLEADO, y el <code>(0,N)</code> de EMPLEADO se escribe del lado de FAMILIAR. A menudo hay además una <em>dependencia de identificación</em>: si un familiar se identifica con su nombre + el número de empleado del que depende, eso es la señal definitiva de que estamos ante una entidad débil.</span>
+      <span data-i18n="en"><strong>Example:</strong> a company keeps information about its employees and, for each one, about the family members in their care. Without the employee, storing the family member would make no sense: FAMILY MEMBER is the weak entity. Each family member relates to <strong>exactly one</strong> employee, and each employee can have zero or several family members on record. Remember that cardinality is written crossed here: FAMILY MEMBER's <code>(1,1)</code> is written on EMPLOYEE's side, and EMPLOYEE's <code>(0,N)</code> is written on FAMILY MEMBER's side. There is also often an <em>identifying dependency</em>: if a family member is identified by their name plus the employee number they depend on, that's the definitive sign of a weak entity.</span>
     </figcaption>
   </figure>
 </section>
@@ -1200,27 +1200,27 @@
       <text x="290" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">trabajar</text>
       <path d="M 160,100 C 220,80 240,75 258,58" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <path d="M 322,58 C 400,50 430,80 460,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
-      <text x="215" y="72" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
-      <text x="410" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,N)</text>
+      <text x="215" y="72" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,N)</text>
+      <text x="410" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
 
       <polygon points="290,142 335,176 290,210 245,176" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
       <text x="290" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ser_jefe</text>
       <path d="M 160,118 C 220,140 240,150 258,168" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <path d="M 322,168 C 400,150 430,140 460,118" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
-      <text x="215" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
-      <text x="410" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(1,1)</text>
+      <text x="215" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(1,1)</text>
+      <text x="410" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
     </svg>
     <figcaption>
-      <span data-i18n="es"><code>TRABAJAR</code> es 1:N — <code>Card(EMPLEADO,TRABAJAR)=(0,1)</code>, <code>Card(DPTO,TRABAJAR)=(0,N)</code> — porque un empleado trabaja como mucho en un departamento, y un departamento tiene varios empleados (o ninguno todavía). <code>SER_JEFE</code> es 1:1 — <code>Card(EMPLEADO,SER_JEFE)=(0,1)</code>, <code>Card(DPTO,SER_JEFE)=(1,1)</code> — porque no todo empleado dirige un departamento, pero todo departamento tiene exactamente un director.</span>
-      <span data-i18n="en"><code>WORKS_IN</code> is 1:N — <code>Card(EMPLOYEE,WORKS_IN)=(0,1)</code>, <code>Card(DEPT,WORKS_IN)=(0,N)</code> — because an employee works in at most one department, and a department has several employees (or none yet). <code>MANAGES</code> is 1:1 — <code>Card(EMPLOYEE,MANAGES)=(0,1)</code>, <code>Card(DEPT,MANAGES)=(1,1)</code> — because not every employee directs a department, but every department has exactly one director.</span>
+      <span data-i18n="es"><code>TRABAJAR</code> es 1:N — un empleado trabaja como mucho en un departamento, y un departamento tiene varios empleados (o ninguno todavía); como la cardinalidad va cruzada, el diagrama escribe <code>(0,N)</code> junto a EMPLEADO y <code>(0,1)</code> junto a DPTO. <code>SER_JEFE</code> es 1:1 — no todo empleado dirige un departamento, pero todo departamento tiene exactamente un director; cruzado, el diagrama escribe <code>(1,1)</code> junto a EMPLEADO y <code>(0,1)</code> junto a DPTO.</span>
+      <span data-i18n="en"><code>WORKS_IN</code> is 1:N — an employee works in at most one department, and a department has several employees (or none yet); since cardinality is crossed here, the diagram writes <code>(0,N)</code> next to EMPLOYEE and <code>(0,1)</code> next to DEPT. <code>MANAGES</code> is 1:1 — not every employee directs a department, but every department has exactly one director; crossed, the diagram writes <code>(1,1)</code> next to EMPLOYEE and <code>(0,1)</code> next to DEPT.</span>
     </figcaption>
   </figure>
 
   <h3 style="margin-top:60px;"><span data-i18n="es">Cardinalidad: mínimo y máximo</span><span data-i18n="en">Cardinality: minimum and maximum</span></h3>
   <div class="prose">
     <p>
-      <span data-i18n="es">La <strong>cardinalidad</strong> indica el número mínimo y máximo de veces que un ejemplar de una entidad puede aparecer en la relación, asociado a ejemplares de la otra entidad. Los valores posibles son <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> y <code>(1,N)</code>, y se anotan junto a cada entidad, sobre la línea que la une a la relación.</span>
-      <span data-i18n="en"><strong>Cardinality</strong> states the minimum and maximum number of times an entity's instance can appear in the relationship, linked to instances of the other entity. The possible values are <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> and <code>(1,N)</code>, noted next to each entity, on the line joining it to the relationship.</span>
+      <span data-i18n="es">La <strong>cardinalidad</strong> indica el número mínimo y máximo de veces que un ejemplar de una entidad puede aparecer en la relación, asociado a ejemplares de la otra entidad. Los valores posibles son <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> y <code>(1,N)</code>. En estos apuntes se anotan <strong>cruzados</strong>: el par que resulta de pensar en una entidad se escribe junto a la línea, del lado de la <strong>otra</strong> entidad — no del lado propio.</span>
+      <span data-i18n="en"><strong>Cardinality</strong> states the minimum and maximum number of times an entity's instance can appear in the relationship, linked to instances of the other entity. The possible values are <code>(0,1)</code>, <code>(1,1)</code>, <code>(0,N)</code> and <code>(1,N)</code>. In these notes they are written <strong>crossed</strong>: the pair that results from thinking about one entity is written next to the line, on the <strong>other</strong> entity's side — not its own.</span>
     </p>
   </div>
   <figure class="diagram">
@@ -1233,19 +1233,19 @@
       <text x="475" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EQUIPO</text>
       <line x1="150" y1="78" x2="230" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
       <line x1="330" y1="78" x2="410" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
-      <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(0,1)</text>
-      <text x="370" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(1,N)</text>
+      <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(1,N)</text>
+      <text x="370" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(0,1)</text>
     </svg>
     <figcaption>
-      <span data-i18n="es">Un jugador tiene cardinalidad mínima 0 (puede no estar en ningún equipo todavía) y máxima 1 (nunca en dos equipos a la vez): <code>(0,1)</code>. Cada equipo tiene cardinalidad mínima 1 (por convenio, aunque en la realidad exigiría más) y máxima N (muchos jugadores por equipo): <code>(1,N)</code>.</span>
-      <span data-i18n="en">A player has a minimum cardinality of 0 (they might not be on any team yet) and a maximum of 1 (never on two teams at once): <code>(0,1)</code>. Each team has a minimum cardinality of 1 (by convention, though reality would require more) and a maximum of N (many players per team): <code>(1,N)</code>.</span>
+      <span data-i18n="es">Un jugador tiene cardinalidad mínima 0 (puede no estar en ningún equipo todavía) y máxima 1 (nunca en dos equipos a la vez). Cada equipo tiene cardinalidad mínima 1 (por convenio, aunque en la realidad exigiría más) y máxima N (muchos jugadores por equipo). Cruzado: el <code>(0,1)</code> de JUGADOR se escribe junto a EQUIPO, y el <code>(1,N)</code> de EQUIPO se escribe junto a JUGADOR.</span>
+      <span data-i18n="en">A player has a minimum cardinality of 0 (they might not be on any team yet) and a maximum of 1 (never on two teams at once). Each team has a minimum cardinality of 1 (by convention, though reality would require more) and a maximum of N (many players per team). Crossed: PLAYER's <code>(0,1)</code> is written next to TEAM, and TEAM's <code>(1,N)</code> is written next to PLAYER.</span>
     </figcaption>
   </figure>
 
   <div class="callout" style="margin-top:32px;">
     <strong><span data-i18n="es">Método para calcular una cardinalidad</span><span data-i18n="en">Method to work out a cardinality</span></strong> —
-    <span data-i18n="es">toma <strong>un</strong> ejemplar concreto de la entidad que estás anotando y pregúntate: "¿con cuántos ejemplares de la otra entidad se puede relacionar, como mínimo y como máximo?". La cardinalidad se anota siempre <strong>en el extremo opuesto</strong> a la entidad de la que hablas: el número que sale de pensar en JUGADOR se escribe pegado a la relación, del lado de JUGADOR — no del lado de EQUIPO.</span>
-    <span data-i18n="en">take <strong>one</strong> specific instance of the entity you're annotating and ask yourself: "at minimum and at maximum, how many instances of the other entity can it relate to?" The cardinality is always written <strong>on the opposite end</strong> from the entity you're reasoning about: the number you get from thinking about PLAYER is written next to the relationship, on PLAYER's side of the line — not EQUIPO's.</span>
+    <span data-i18n="es">toma <strong>un</strong> ejemplar concreto de la entidad que estás anotando y pregúntate: "¿con cuántos ejemplares de la otra entidad se puede relacionar, como mínimo y como máximo?". En estos apuntes, esa cardinalidad se escribe <strong>cruzada</strong>: el número que sale de pensar en JUGADOR se escribe pegado a la relación, del lado de EQUIPO — no del lado de JUGADOR.</span>
+    <span data-i18n="en">take <strong>one</strong> specific instance of the entity you're annotating and ask yourself: "at minimum and at maximum, how many instances of the other entity can it relate to?" In these notes, that cardinality is written <strong>crossed</strong>: the number you get from thinking about PLAYER is written next to the relationship, on EQUIPO's side of the line — not PLAYER's.</span>
   </div>
 
   <h3 style="margin-top:60px;"><span data-i18n="es">Tipo de correspondencia</span><span data-i18n="en">Correspondence type</span></h3>
@@ -1562,8 +1562,8 @@
       <rect x="480" y="155" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
       <text x="550" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">INCIDENCIA</tspan></text>
       <line x1="330" y1="175" x2="480" y2="175" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <text x="222" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,N)</text>
-      <text x="415" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,1)</text>
+      <text x="222" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,1)</text>
+      <text x="415" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,N)</text>
     </svg>
     <figcaption>
       <span data-i18n="es">El recuadro punteado marca la <strong>agregación</strong>: DOCENTE + <em>imparte</em> + AULA pasa a comportarse como una única entidad de nivel superior (la "sesión" docente-aula), que es la que de verdad <em>registra</em> incidencias — no el docente ni el aula por separado.</span>

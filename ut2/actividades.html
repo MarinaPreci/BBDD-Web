@@ -470,8 +470,8 @@
       <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
       <div class="answer-body">
         <p>
-        <span data-i18n="es">SOCIO: <code>(0,N)</code> — puede tener cero o varios libros prestados. LIBRO: <code>(0,1)</code> — en cada momento está prestado a cero o un socio, nunca a dos a la vez. Tomando los máximos de cada lado, el tipo de correspondencia es <strong>1:N</strong> (un socio, muchos libros prestados; cada libro, un único socio).</span>
-        <span data-i18n="en">MEMBER: <code>(0,N)</code> — can have zero or several books on loan. BOOK: <code>(0,1)</code> — at any moment it's on loan to zero or one member, never two at once. Taking the maximum on each side, the correspondence type is <strong>1:N</strong> (one member, many borrowed books; each book, a single member).</span>
+        <span data-i18n="es">SOCIO: <code>(0,N)</code> — puede tener cero o varios libros prestados. LIBRO: <code>(0,1)</code> — en cada momento está prestado a cero o un socio, nunca a dos a la vez. Tomando los máximos de cada lado, el tipo de correspondencia es <strong>1:N</strong> (un socio, muchos libros prestados; cada libro, un único socio). Recuerda que en el diagrama la cardinalidad se anota <strong>cruzada</strong>: el <code>(0,N)</code> de SOCIO se escribe junto a LIBRO, y el <code>(0,1)</code> de LIBRO se escribe junto a SOCIO.</span>
+        <span data-i18n="en">MEMBER: <code>(0,N)</code> — can have zero or several books on loan. BOOK: <code>(0,1)</code> — at any moment it's on loan to zero or one member, never two at once. Taking the maximum on each side, the correspondence type is <strong>1:N</strong> (one member, many borrowed books; each book, a single member). Remember that in the diagram cardinality is written <strong>crossed</strong>: MEMBER's <code>(0,N)</code> is written next to BOOK, and BOOK's <code>(0,1)</code> is written next to MEMBER.</span>
         </p>
 
         <figure class="diagram">
@@ -485,10 +485,10 @@
             <text x="475" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">LIBRO</text>
             <line x1="150" y1="78" x2="230" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
             <line x1="330" y1="78" x2="410" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
-            <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,N)</text>
-            <text x="370" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,1)</text>
+            <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,1)</text>
+            <text x="370" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">(0,N)</text>
           </svg>
-          <figcaption><span data-i18n="es">Correspondencia <strong>1:N</strong>: un socio puede tener varios libros prestados <code>(0,N)</code>; un libro, en cada momento, está prestado a lo sumo a un socio <code>(0,1)</code>.</span><span data-i18n="en">Correspondence <strong>1:N</strong>: a member can have several books on loan <code>(0,N)</code>; a book, at any moment, is on loan to at most one member <code>(0,1)</code>.</span></figcaption>
+          <figcaption><span data-i18n="es">Correspondencia <strong>1:N</strong>: un socio puede tener varios libros prestados; un libro, en cada momento, está prestado a lo sumo a un socio. (Cruzado: <code>(0,N)</code> de SOCIO junto a LIBRO, <code>(0,1)</code> de LIBRO junto a SOCIO.)</span><span data-i18n="en">Correspondence <strong>1:N</strong>: a member can have several books on loan; a book, at any moment, is on loan to at most one member. (Crossed: MEMBER's <code>(0,N)</code> next to BOOK, BOOK's <code>(0,1)</code> next to MEMBER.)</span></figcaption>
         </figure>
       </div>
     </details>
