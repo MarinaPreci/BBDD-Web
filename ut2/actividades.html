@@ -210,7 +210,6 @@
         <a href="teoria.html">📖 Teoría</a>
         <a href="actividades.html" class="active">📝 Actividades</a>
         <a href="resumen.html">🎛️ Resumen</a>
-       
       </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
   </nav>
   <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
@@ -242,8 +241,8 @@
       <span data-i18n="en">Activities: the entity-relationship model</span>
     </h1>
     <p class="lede">
-      <span data-i18n="es">13 ejercicios que recorren entidades, atributos, relaciones, cardinalidad, el modelo E/R extendido y las restricciones adicionales (claves candidatas, dependencias, agregación). Cada pregunta tiene su solución oculta — haz clic en "Ver solución" para comprobar tu respuesta. En varias actividades tendrás que dibujar tú mismo/a el diagrama en papel o pizarra: describimos qué debe contener, no lo dibujamos por ti.</span>
-      <span data-i18n="en">13 exercises covering entities, attributes, relationships, cardinality, the extended E/R model and additional constraints (candidate keys, dependencies, aggregation). Each question has a hidden solution — click "Show solution" to check your answer. In several activities you'll need to sketch the diagram yourself on paper or the whiteboard: we describe what it must contain, not draw it for you.</span>
+      <span data-i18n="es">11 ejercicios que recorren entidades, atributos, relaciones, cardinalidad, el modelo E/R extendido y las claves (candidatas, primaria, natural o artificial). Cada pregunta tiene su solución oculta — haz clic en "Ver solución" para comprobar tu respuesta. En varias actividades tendrás que dibujar tú mismo/a el diagrama en papel o pizarra: describimos qué debe contener, no lo dibujamos por ti.</span>
+      <span data-i18n="en">11 exercises covering entities, attributes, relationships, cardinality, the extended E/R model and keys (candidate, primary, natural or artificial). Each question has a hidden solution — click "Show solution" to check your answer. In several activities you'll need to sketch the diagram yourself on paper or the whiteboard: we describe what it must contain, not draw it for you.</span>
     </p>
   </div>
 </header>
@@ -465,13 +464,13 @@
       <div class="answer-body">
         <span data-i18n="es">
         <p><strong>1. Falso.</strong> Los atributos comunes se indican una única vez en la superentidad; las subentidades los heredan sin repetirlos.</p>
-        <p><strong>2. Verdadero.</strong> Total = sin excepciones, todo ejemplar pertenece a alguna subentidad (sin círculo sobre el triángulo).</p>
+        <p><strong>2. Verdadero.</strong> Total = sin excepciones, todo ejemplar pertenece a alguna subentidad (con círculo sobre la línea).</p>
         <p><strong>3. Verdadero.</strong> Solapada = sin arco de exclusividad, un ejemplar puede pertenecer a varias subentidades a la vez.</p>
         <p><strong>4. Falso.</strong> Se recomienda <em>no</em> abusar de ellas: úsalas sólo si las subentidades tienen atributos o relaciones distintas; si no, basta un atributo "tipo".</p>
         </span>
         <span data-i18n="en">
         <p><strong>1. False.</strong> Shared attributes are stated once, on the super-entity; sub-entities inherit them without repeating them.</p>
-        <p><strong>2. True.</strong> Total = no exceptions, every instance belongs to some sub-entity (no circle on the triangle).</p>
+        <p><strong>2. True.</strong> Total = no exceptions, every instance belongs to some sub-entity (circle on the line).</p>
         <p><strong>3. True.</strong> Overlapping = no exclusivity arc, an instance can belong to several sub-entities at once.</p>
         <p><strong>4. False.</strong> They're recommended <em>against</em> overuse: use them only when sub-entities have different attributes or relationships; otherwise a "type" attribute is enough.</p>
         </span>
@@ -495,8 +494,8 @@
       <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
       <div class="answer-body">
         <p>
-        <span data-i18n="es"><strong>Exclusiva y total.</strong> Es <em>total</em> porque "todo vehículo... pertenece obligatoriamente" a una categoría (sin excepciones, sin círculo sobre el triángulo). Es <em>exclusiva</em> porque "nunca a más de una a la vez" (con arco de exclusividad bajo el triángulo).</span>
-        <span data-i18n="en"><strong>Exclusive and total.</strong> It's <em>total</em> because "every vehicle... must belong" to a category (no exceptions, no circle over the triangle). It's <em>exclusive</em> because "never... more than one at a time" (with an exclusivity arc under the triangle).</span>
+        <span data-i18n="es"><strong>Exclusiva y total.</strong> Es <em>total</em> porque "todo vehículo... pertenece obligatoriamente" a una categoría (sin excepciones, con círculo sobre la línea). Es <em>exclusiva</em> porque "nunca a más de una a la vez" (con arco de exclusividad bajo el triángulo).</span>
+        <span data-i18n="en"><strong>Exclusive and total.</strong> It's <em>total</em> because "every vehicle... must belong" to a category (no exceptions, circle on the line). It's <em>exclusive</em> because "never... more than one at a time" (with an exclusivity arc under the triangle).</span>
         </p>
       </div>
     </details>
@@ -515,17 +514,17 @@
       <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
       <div class="answer-body">
         <p>
-        <span data-i18n="es">Sí se justifica una <strong>relación ISA</strong>, porque MONITOR y RECEPCIONISTA tienen <strong>atributos distintos</strong> (especialidad vs. turno) — un simple atributo "tipo" no podría guardar esos datos adicionales. La jerarquía es <strong>solapada</strong> (un empleado puede ser monitor y recepcionista a la vez → sin arco de exclusividad) y <strong>parcial</strong> (puede haber empleados de mantenimiento que no sean ninguna de las dos subentidades → con círculo sobre el triángulo).</span>
-        <span data-i18n="en">Yes, an <strong>ISA relationship</strong> is justified, because INSTRUCTOR and RECEPTIONIST have <strong>different attributes</strong> (specialty vs. shift) — a simple "type" attribute couldn't hold that extra data. The hierarchy is <strong>overlapping</strong> (an employee can be both instructor and receptionist → no exclusivity arc) and <strong>partial</strong> (there can be maintenance staff who are neither sub-entity → circle over the triangle).</span>
+        <span data-i18n="es">Sí se justifica una <strong>relación ISA</strong>, porque MONITOR y RECEPCIONISTA tienen <strong>atributos distintos</strong> (especialidad vs. turno) — un simple atributo "tipo" no podría guardar esos datos adicionales. La jerarquía es <strong>solapada</strong> (un empleado puede ser monitor y recepcionista a la vez → sin arco de exclusividad) y <strong>parcial</strong> (puede haber empleados de mantenimiento que no sean ninguna de las dos subentidades → sin círculo sobre la línea).</span>
+        <span data-i18n="en">Yes, an <strong>ISA relationship</strong> is justified, because INSTRUCTOR and RECEPTIONIST have <strong>different attributes</strong> (specialty vs. shift) — a simple "type" attribute couldn't hold that extra data. The hierarchy is <strong>overlapping</strong> (an employee can be both instructor and receptionist → no exclusivity arc) and <strong>partial</strong> (there can be maintenance staff who are neither sub-entity → no circle on the line).</span>
         </p>
       </div>
     </details>
   </div>
 
-  <!-- ============ BLOQUE 5: CLAVES, RESTRICCIONES Y AGREGACIÓN ============ -->
+  <!-- ============ BLOQUE 5: CLAVES ============ -->
   <div class="section-title">
     <span class="n">05</span>
-    <h2><span data-i18n="es">Claves, restricciones y agregación</span><span data-i18n="en">Keys, constraints and aggregation</span></h2>
+    <h2><span data-i18n="es">Claves</span><span data-i18n="en">Keys</span></h2>
     <div class="line"></div>
   </div>
 
@@ -544,52 +543,6 @@
         <p>
         <span data-i18n="es">a) Son claves candidatas <code>código_barras</code>, <code>referencia_interna</code> e <code>id_producto</code>: las tres son únicas y siempre tienen valor. <code>nombre</code> queda descartado porque no es único. b) La mejor clave primaria es <code>id_producto</code>: cumple las cuatro propiedades (único, siempre con valor, <strong>estable</strong> y simple), mientras que <code>referencia_interna</code> falla en estabilidad (puede cambiar) — aunque sigue siendo válida como <strong>clave alternativa</strong>. <code>código_barras</code> también sería una alternativa aceptable. c) <code>id_producto</code> es una clave <strong>artificial</strong>: no proviene del mundo real del negocio, la genera el propio sistema sólo para identificar de forma estable.</span>
         <span data-i18n="en">a) The candidate keys are <code>barcode</code>, <code>internal_reference</code> and <code>product_id</code>: all three are unique and always have a value. <code>name</code> is ruled out because it isn't unique. b) The best primary key is <code>product_id</code>: it meets all four properties (unique, always valued, <strong>stable</strong> and simple), while <code>internal_reference</code> fails on stability (it can change) — though it's still valid as an <strong>alternate key</strong>. <code>barcode</code> would also be an acceptable alternative. c) <code>product_id</code> is an <strong>artificial</strong> key: it doesn't come from the real-world business, the system itself generates it purely to identify records stably.</span>
-        </p>
-      </div>
-    </details>
-  </div>
-
-  <div class="q-block">
-    <div class="q-head">
-      <span class="q-num">12</span>
-      <div class="q-body">
-        <span class="q-tag"><span data-i18n="es">RESTRICCIONES</span><span data-i18n="en">CONSTRAINTS</span></span>
-        <div class="er-scenario">
-          <span data-i18n="es">Una academia organiza CONVOCATORIAS de examen para cada CURSO. Cada convocatoria se identifica por su número de orden dentro del curso (1ª, 2ª, 3ª...) — ese número se repite en cursos distintos y no tiene sentido si no sabemos de qué curso hablamos. Además, el reglamento dice que un aula de examen debe tener entre 8 y 20 alumnos matriculados, ni uno menos ni uno más. Por último, un profesor no puede ser el que corrija el examen de un curso en el que él mismo imparte clase — pero el diagrama E/R no tiene forma de expresar esa condición.</span>
-          <span data-i18n="en">An academy organizes exam SITTINGS for each COURSE. Each sitting is identified by its sequence number within the course (1st, 2nd, 3rd...) — that number repeats across different courses and means nothing without knowing which course it belongs to. The rules also state that an exam room must have between 8 and 20 enrolled students, no fewer and no more. Finally, a teacher cannot be the one grading the exam for a course they themselves teach — but the E/R diagram has no way to express that condition.</span>
-        </div>
-        <p><span data-i18n="es">a) ¿Qué tipo de dependencia tiene CONVOCATORIA respecto a CURSO: existencial o de identificación? Justifícalo. b) ¿Cómo escribirías la cardinalidad del aula de examen en vez de usar <code>(0,N)</code>? c) ¿Cómo se documenta la restricción del profesor examinador en el diagrama?</span><span data-i18n="en">a) What kind of dependency does SITTING have on COURSE: existential or identifying? Justify it. b) How would you write the exam room's cardinality instead of using <code>(0,N)</code>? c) How is the examiner restriction documented on the diagram?</span></p>
-      </div>
-    </div>
-    <details class="answer">
-      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
-      <div class="answer-body">
-        <p>
-        <span data-i18n="es">a) Es <strong>dependencia de identificación</strong>: el enunciado dice explícitamente que el número de convocatoria "se repite en cursos distintos y no tiene sentido si no sabemos de qué curso hablamos" — CONVOCATORIA necesita el identificador de CURSO para formar su propia clave (número de convocatoria + código de curso). b) Al conocer los límites exactos del negocio, se escribe la <strong>cardinalidad exacta</strong>: <code>(8,20)</code> en vez del genérico <code>(0,N)</code>. c) Es <strong>pérdida expresiva</strong>: se anota como una nota <strong>PE</strong> al pie del diagrama ("PE: un profesor no puede corregir el examen de un curso en el que imparte clase"), porque ninguna cardinalidad ni símbolo del modelo E/R básico puede representar esa regla de negocio.</span>
-        <span data-i18n="en">a) It's an <strong>identifying dependency</strong>: the statement explicitly says the sitting number "repeats across different courses and means nothing without knowing which course it belongs to" — SITTING needs COURSE's identifier to form its own key (sitting number + course code). b) Since the exact business limits are known, you write the <strong>exact cardinality</strong>: <code>(8,20)</code> instead of the generic <code>(0,N)</code>. c) It's <strong>semantic loss (pérdida expresiva)</strong>: it's recorded as a <strong>PE</strong> note at the foot of the diagram ("PE: a teacher cannot grade the exam for a course they teach"), because no cardinality or symbol in the basic E/R model can express that business rule.</span>
-        </p>
-      </div>
-    </details>
-  </div>
-
-  <div class="q-block">
-    <div class="q-head">
-      <span class="q-num">13</span>
-      <div class="q-body">
-        <span class="q-tag"><span data-i18n="es">AGREGACIÓN</span><span data-i18n="en">AGGREGATION</span></span>
-        <div class="er-scenario">
-          <span data-i18n="es">Una autoescuela asigna PROFESORES a VEHÍCULOS para dar clases prácticas (relación "imparte_en"). Ahora quieren registrar además qué ALUMNO evalúa cada combinación profesor-vehículo concreta al final del curso, guardando la nota de esa evaluación. Un mismo alumno puede evaluar varias combinaciones profesor-vehículo distintas a lo largo del curso.</span>
-          <span data-i18n="en">A driving school assigns TEACHERS to VEHICLES to give practical lessons (the "teaches_in" relationship). Now they also want to record which STUDENT evaluates each specific teacher-vehicle combination at the end of the course, storing that evaluation's grade. The same student can evaluate several different teacher-vehicle combinations over the course.</span>
-        </div>
-        <p><span data-i18n="es">a) ¿Por qué no basta con una relación ternaria directa entre PROFESOR, VEHÍCULO y ALUMNO? b) Describe (sin dibujarlo) cómo se resolvería con <strong>agregación</strong>: qué se agrega, qué nueva relación aparece y con qué cardinalidades.</span><span data-i18n="en">a) Why isn't a direct ternary relationship between TEACHER, VEHICLE and STUDENT enough? b) Describe (without drawing it) how this would be solved with <strong>aggregation</strong>: what gets aggregated, what new relationship appears, and with what cardinalities.</span></p>
-      </div>
-    </div>
-    <details class="answer">
-      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
-      <div class="answer-body">
-        <p>
-        <span data-i18n="es">a) Una relación ternaria uniría PROFESOR-VEHÍCULO-ALUMNO como si los tres participasen simultáneamente en un único hecho, pero aquí hay dos hechos distintos en el tiempo: primero se forma la pareja profesor-vehículo ("imparte_en"), y <em>después</em> un alumno evalúa esa pareja ya existente. La ternaria no puede expresar que lo que se evalúa es la combinación ya formada, no una nueva coincidencia de los tres a la vez. b) Se <strong>agrega</strong> la relación "imparte_en" junto con sus dos entidades (PROFESOR y VEHÍCULO), tratando ese conjunto como si fuera una entidad de orden superior. Sobre esa agregación se crea una nueva relación binaria, por ejemplo "evalúa", con ALUMNO: cardinalidad <code>(0,N)</code> en la agregación (una combinación profesor-vehículo puede recibir varias evaluaciones, o ninguna) y <code>(0,N)</code> en ALUMNO (un alumno puede evaluar varias combinaciones, o ninguna).</span>
-        <span data-i18n="en">a) A ternary relationship would join TEACHER-VEHICLE-STUDENT as if all three took part in one single fact at once, but here there are two separate facts at different times: first the teacher-vehicle pair is formed ("teaches_in"), and only <em>afterwards</em> does a student evaluate that already-existing pair. A ternary relationship can't express that what's being evaluated is the pair already formed, not a fresh three-way coincidence. b) You <strong>aggregate</strong> the "teaches_in" relationship together with its two entities (TEACHER and VEHICLE), treating that whole set as a higher-level entity. A new binary relationship is then built on top of that aggregation, e.g. "evaluates", with STUDENT: cardinality <code>(0,N)</code> on the aggregation (a teacher-vehicle combination can receive several evaluations, or none) and <code>(0,N)</code> on STUDENT (a student can evaluate several combinations, or none).</span>
         </p>
       </div>
     </details>

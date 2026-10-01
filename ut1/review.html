@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT1 Review — Classroom Activities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1b1b1b;
+    --bg-alt: #232323;
+    --panel: #292929;
+    --line: #3d3d3d;
+    --ink: #ece9e0;
+    --ink-soft: #a6acc4;
+    --ink-dim: #767c98;
+    --clay: #3acfba;
+    --clay-soft: #a9ecdf;
+    --teal: #49a89c;
+    --teal-soft: #bfe3dd;
+    --ok: #6fbf8b;
+    --warn: #e0a458;
+    --maxw: 1000px;
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--clay);color:#12211e;}
+  h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:700;line-height:1.15;margin:0 0 .5em;letter-spacing:-0.01em;}
+  p{margin:0 0 1em;}
+  code{font-family:'Spline Sans Mono',monospace;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:3px;font-size:.95em;}
+
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(18,20,28,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  nav.toc .inner{max-width:var(--maxw);margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+  nav.toc .brand{font-family:'Fraunces',serif;font-weight:700;color:var(--ink);font-size:16px;}
+  nav.toc .meta{font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--ink-dim);}
+
+  header.hero{padding:64px 24px 48px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse 900px 500px at 10% -10%, rgba(58,207,186,.13), transparent 60%),radial-gradient(ellipse 700px 500px at 100% 0%, rgba(73,168,156,.13), transparent 55%);}
+  .hero-inner{max-width:var(--maxw);margin:0 auto;}
+  .kicker{font-family:'Spline Sans Mono',monospace;font-size:15px;color:var(--clay-soft);letter-spacing:.04em;margin-bottom:14px;display:block;}
+  .hero h1{font-size:clamp(1.8rem,4.4vw,2.9rem);max-width:20ch;}
+  .hero .lede{font-size:1.05rem;color:var(--ink-soft);max-width:640px;margin-top:16px;}
+
+  main{max-width:var(--maxw);margin:0 auto;padding:48px 24px 100px;}
+
+  .teacher-note{
+    background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);
+    border-radius:var(--radius);padding:20px 24px;margin-bottom:56px;
+  }
+  .teacher-note summary{cursor:pointer;list-style:none;font-family:'Spline Sans Mono',monospace;font-size:14px;letter-spacing:.03em;color:var(--warn);display:flex;align-items:center;gap:8px;user-select:none;}
+  .teacher-note summary::-webkit-details-marker{display:none;}
+  .teacher-note summary::before{content:"▸";display:inline-block;transition:transform .18s ease;}
+  .teacher-note[open] summary::before{transform:rotate(90deg);}
+  .teacher-note .body{padding-top:16px;color:var(--ink-soft);font-size:.98rem;}
+  .teacher-note .body strong{color:var(--ink);}
+  .teacher-note .body ul{padding-left:20px;margin:0 0 10px;}
+  .teacher-note .body li{margin-bottom:6px;}
+
+  .section-title{display:flex;align-items:baseline;gap:14px;margin:64px 0 8px;}
+  .section-title:first-of-type{margin-top:0;}
+  .section-title .n{font-family:'Spline Sans Mono',monospace;color:var(--clay);font-size:15px;}
+  .section-title h2{font-size:1.7rem;margin:0;}
+  .activity-meta{font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--ink-dim);margin-bottom:28px;letter-spacing:.02em;}
+  .activity-meta span{margin-right:18px;}
+
+  .intro-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;color:var(--ink-soft);font-size:1rem;}
+  .intro-box strong{color:var(--ink);}
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px;}
+  .cards.cols-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:900px){.cards,.cards.cols-4{grid-template-columns:1fr;}}
+
+  .case-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 20px;display:flex;flex-direction:column;}
+  .case-card .tag{font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--clay-soft);letter-spacing:.05em;margin-bottom:10px;}
+  .case-card h3{font-size:1.05rem;font-family:'Inter',sans-serif;font-weight:600;margin-bottom:10px;color:var(--ink);}
+  .case-card p{font-size:.97rem;color:var(--ink-soft);margin-bottom:0;flex:1;}
+
+  .q-list{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;margin-bottom:20px;}
+  .q-list h4{font-family:'Spline Sans Mono',monospace;font-size:14px;letter-spacing:.04em;color:var(--teal-soft);margin-bottom:14px;text-transform:uppercase;}
+  .q-list ol{padding-left:22px;margin:0;color:var(--ink-soft);}
+  .q-list ol li{margin-bottom:10px;}
+  .q-list ol li::marker{color:var(--clay);font-family:'Spline Sans Mono',monospace;}
+  .q-list ol li strong{color:var(--ink);}
+
+  .checklist{background:rgba(58,207,186,.06);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:var(--radius);padding:22px 26px;margin-bottom:20px;}
+  .checklist h4{font-family:'Spline Sans Mono',monospace;font-size:14px;letter-spacing:.04em;color:var(--clay-soft);margin-bottom:14px;text-transform:uppercase;}
+  .checklist ul{padding-left:20px;margin:0;color:var(--ink-soft);}
+  .checklist li{margin-bottom:10px;}
+
+  .task-steps{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;margin-bottom:20px;}
+  .task-steps h4{font-family:'Spline Sans Mono',monospace;font-size:14px;letter-spacing:.04em;color:var(--teal-soft);margin-bottom:14px;text-transform:uppercase;}
+  .task-steps ol{padding-left:22px;margin:0;color:var(--ink-soft);}
+  .task-steps li{margin-bottom:12px;}
+  .task-steps li::marker{color:var(--clay);font-weight:600;}
+  .task-steps li strong{color:var(--ink);}
+
+  .fill-lines{border:1px dashed var(--line);border-radius:var(--radius);padding:16px 20px;margin-top:6px;color:var(--ink-dim);font-family:'Spline Sans Mono',monospace;font-size:14px;}
+  .fill-lines .line{border-bottom:1px solid var(--line);height:26px;}
+  .fill-lines .line:last-child{margin-bottom:0;}
+
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0;}
+  .pillrow .pill{font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:4px 12px;}
+
+  footer{padding:40px 24px 70px;border-top:1px solid var(--line);}
+  footer .inner{max-width:var(--maxw);margin:0 auto;}
+  footer p{color:var(--ink-dim);font-size:.95rem;max-width:600px;}
+</style>
+</head>
+<body>
+
+<nav class="toc">
+  <div class="inner">
+    <span class="brand">UT1 · Review Session</span>
+    <span class="meta">Databases · 1st year DAM bilingual programme</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="kicker">UT1 · Databases · 1st year DAM — Marina Preciados Agapito</span>
+    <h1>UT1 Review — Classroom Activities</h1>
+  </div>
+</header>
+
+<main>
+
+
+  <!-- ============ ACTIVITY 1 ============ -->
+  <div class="section-title">
+    <span class="n">01</span>
+    <h2>Spot the Problem</h2>
+  </div>
+  <div class="activity-meta"><span></span><span>👥 groups of 3</span><span>🗣 group discussion + short oral report</span></div>
+
+  <div class="intro-box">
+    <strong>Instructions: </strong>Read your group's case carefully. Discuss it together and answer the four questions in English. Choose one reporter to explain your answer to the class in about one minute.
+  </div>
+
+  <div class="cards">
+    <div class="case-card">
+      <span class="tag">CASE A</span>
+      <h3>The Electronics Shop</h3>
+      <p>An online electronics shop has two departments. The Warehouse team keeps a spreadsheet with each customer's shipping address, to send out orders. The Customer Service team keeps a <em>different</em> spreadsheet with the same customers' contact details, to answer complaints. Last week, a customer called Warehouse to update her address. Two days later, Customer Service sent her an email confirming a delivery — to her old address.</p>
+    </div>
+    <div class="case-card">
+      <span class="tag">CASE B</span>
+      <h3>The Language Academy</h3>
+      <p>A small language academy keeps student records in two separate systems: one for attendance (managed by the teachers) and one for payments (managed by the office). Both systems use the student's full name as the only identifier — there is no shared ID number. When two students happen to have the same name, the office cannot always tell which payment record belongs to which attendance record.</p>
+    </div>
+    <div class="case-card">
+      <span class="tag">CASE C</span>
+      <h3>The Gym Front Desk</h3>
+      <p>A gym has one shared computer at the front desk. Two receptionists are both updating the same membership file at the same time: one is adding a new member, the other is renewing an existing membership. When both save their changes, one of the two updates disappears completely.</p>
+    </div>
+  </div>
+
+  <div class="q-list">
+    <h4>Questions — answer for your case</h4>
+    <ol>
+      <li>What exactly goes wrong in your case? Describe it in your own words.</li>
+      <li>Which file problem(s) does this illustrate — <strong>data redundancy</strong>, <strong>inconsistency</strong>, <strong>data isolation</strong>, or <strong>concurrent access</strong>? More than one may apply — or none, if you think it's something else.</li>
+      <li>How would storing this data in a proper <strong>database</strong> instead of separate files solve the problem?</li>
+      <li>Prepare a one-minute explanation for the class.</li>
+    </ol>
+  </div>
+
+  <!-- ============ ACTIVITY 2 ============ -->
+  <div class="section-title">
+    <span class="n">02</span>
+    <h2>Design Your Table</h2>
+  </div>
+  <div class="activity-meta"><span></span><span>👥 groups of 2</span><span>🗣 written design + peer review</span></div>
+
+  <div class="intro-box">
+    <strong>Instructions: </strong>Your group has been given a real-world situation. Design <strong>one table</strong> that could store this information in a database. In the last five minutes, you will swap your worksheet with another group and review each other's work.
+  </div>
+
+  <div class="cards cols-4">
+    <div class="case-card">
+      <span class="tag">GROUP 1</span>
+      <h3>School Library</h3>
+      <p>The library needs to keep track of every book it owns.</p>
+    </div>
+    <div class="case-card">
+      <span class="tag">GROUP 2</span>
+      <h3>Gym</h3>
+      <p>The gym needs to keep track of every member.</p>
+    </div>
+    <div class="case-card">
+      <span class="tag">GROUP 3</span>
+      <h3>Veterinary Clinic</h3>
+      <p>The clinic needs to keep track of every animal patient.</p>
+    </div>
+    <div class="case-card">
+      <span class="tag">GROUP 4</span>
+      <h3>Car Rental Company</h3>
+      <p>The company needs to keep track of every vehicle in its fleet.</p>
+    </div>
+  </div>
+
+  <div class="task-steps">
+    <h4>Your task</h4>
+    <ol>
+      <li><strong>List at least 4 fields</strong> your table needs, with a short description of what each one stores.
+        <div class="fill-lines"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
+      </li>
+      <li><strong>Write one example record</strong> — real-looking, made-up data for all 4 fields.
+        <div class="fill-lines"><div class="line"></div></div>
+      </li>
+      <li><strong>Choose your primary key</strong> and justify it: why is this field unique for every record? Why couldn't you use any of the other fields instead?</li>
+      <li><strong>Decide:</strong> would an <strong>index</strong> be useful for this table? Explain briefly.</li>
+    </ol>
+  </div>
+
+  
+
+</main>
+
+<footer>
+  <div class="inner">
+    <p>UT1 · Information storage systems — Databases — Marina Preciados Agapito. </p>
+  </div>
+</footer>
+
+</body>
+</html>

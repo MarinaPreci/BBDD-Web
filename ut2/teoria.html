@@ -495,7 +495,6 @@
         <a href="teoria.html" class="active">📖 Teoría</a>
         <a href="actividades.html">📝 Actividades</a>
         <a href="resumen.html">🎛️ Resumen</a>
-        
       </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
   </nav>
   <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
@@ -827,54 +826,6 @@
     </figcaption>
   </figure>
 
-  <div class="callout" style="margin-top:36px;">
-    <strong><span data-i18n="es">Dominio de un atributo</span><span data-i18n="en">An attribute's domain</span></strong> —
-    <span data-i18n="es">es el conjunto de valores que ese atributo puede tomar (texto, número, fecha…). Para que un valor sea válido dentro de su dominio debe ser <strong>atómico</strong> — no se puede descomponer más ("Juan Pérez" vale; "Juan, Pérez" mezclando nombre y apellido en el mismo campo, no) — y <strong>univaluado</strong> — admite un único valor por campo ("612345678" vale; "612345678, 699887766" en el mismo campo, no). Los atributos compuestos y multivaluados de más abajo son, precisamente, la forma de modelar sin romper esta regla los casos en los que un dato real no cabe en un único valor atómico.</span>
-    <span data-i18n="en">this is the set of values that attribute can take (text, number, date…). For a value to be valid within its domain it must be <strong>atomic</strong> — it can't be broken down any further ("Juan Pérez" is fine; "Juan, Pérez" mixing first and last name in the same field is not) — and <strong>single-valued</strong> — it only allows one value per field ("612345678" is fine; "612345678, 699887766" in the same field is not). The composite and multi-valued attributes below are precisely how to model, without breaking this rule, the cases where a real piece of data doesn't fit into a single atomic value.</span>
-  </div>
-
-  <h3 style="margin-top:52px;"><span data-i18n="es">Notación de Chen: compuesto, multivaluado, derivado</span><span data-i18n="en">Chen's notation: composite, multi-valued, derived</span></h3>
-  <div class="diagram-grid" style="grid-template-columns:repeat(3,1fr);">
-    <figure class="diagram">
-      <svg viewBox="0 0 280 190" role="img" aria-labelledby="comp-title">
-        <title id="comp-title">Atributo compuesto: DIRECCIÓN se descompone en calle, ciudad y código postal</title>
-        <ellipse cx="140" cy="34" rx="62" ry="24" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
-        <text x="140" y="38" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">DIRECCIÓN</text>
-        <line x1="140" y1="58" x2="140" y2="76" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="140" y1="76" x2="42" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="140" y1="76" x2="140" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="140" y1="76" x2="238" y2="118" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <ellipse cx="42" cy="140" rx="38" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="42" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">calle</text>
-        <ellipse cx="140" cy="140" rx="38" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="140" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ciudad</text>
-        <ellipse cx="238" cy="140" rx="40" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="238" y="144" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">cód. postal</text>
-      </svg>
-      <figcaption><strong><span data-i18n="es">Compuesto</span><span data-i18n="en">Composite</span></strong> — <span data-i18n="es">se descompone en subatributos más simples. En el modelo lógico no tiene representación propia: se sustituye por sus componentes.</span><span data-i18n="en">breaks down into simpler sub-attributes. It has no representation of its own in the logical model: it's replaced by its components.</span></figcaption>
-    </figure>
-    <figure class="diagram">
-      <svg viewBox="0 0 260 190" role="img" aria-labelledby="multi-title">
-        <title id="multi-title">Atributo multivaluado: TELÉFONOS, elipse de doble línea</title>
-        <ellipse cx="130" cy="95" rx="76" ry="34" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
-        <ellipse cx="130" cy="95" rx="68" ry="27" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
-        <text x="130" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">TELÉFONOS</text>
-        <line x1="130" y1="129" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-      </svg>
-      <figcaption><strong><span data-i18n="es">Multivaluado</span><span data-i18n="en">Multi-valued</span></strong> — <span data-i18n="es">puede tomar varios valores a la vez para el mismo ejemplar. En el modelo lógico no tiene representación propia: se convierte en una entidad nueva.</span><span data-i18n="en">can take several values at once for the same instance. It has no representation of its own in the logical model: it becomes a new entity.</span></figcaption>
-    </figure>
-    <figure class="diagram">
-      <svg viewBox="0 0 260 190" role="img" aria-labelledby="deriv-title">
-        <title id="deriv-title">Atributo derivado: EDAD, elipse discontinua, calculado desde FECHA_NACIMIENTO</title>
-        <ellipse cx="130" cy="80" rx="62" ry="26" style="fill:var(--panel);stroke:var(--ink);stroke-width:1.6;stroke-dasharray:5 4"/>
-        <text x="130" y="84" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EDAD</text>
-        <line x1="130" y1="106" x2="130" y2="130" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="130" y="150" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:10px;fill:var(--ink-dim);">(desde F. NACIMIENTO)</text>
-      </svg>
-      <figcaption><strong><span data-i18n="es">Derivado</span><span data-i18n="en">Derived</span></strong> — <span data-i18n="es">se calcula a partir de otro atributo, no se almacena directamente. Se dibuja con línea discontinua.</span><span data-i18n="en">calculated from another attribute, not stored directly. Drawn with a dashed outline.</span></figcaption>
-    </figure>
-  </div>
-
   <h3 style="margin-top:52px;"><span data-i18n="es">¿Qué hace bueno a un identificador?</span><span data-i18n="en">What makes a good identifier?</span></h3>
   <div class="prose">
     <p>
@@ -884,18 +835,6 @@
     <p>
       <span data-i18n="es">Cuando ningún atributo natural sirve, se añade un <strong>atributo artificial</strong>: la palabra <code>id_</code> seguida del nombre de la entidad (<code>id_alumno</code>, <code>id_libro</code>…). Sus valores no tienen ningún significado real — sólo necesitan ser distintos para cada ejemplar. Por ejemplo, en la entidad MÉDICO de un hospital podríamos usar el DNI o el número de licencia médica: cuál elegir depende de los requisitos concretos del cliente.</span>
       <span data-i18n="en">When no natural attribute works, an <strong>artificial attribute</strong> is added: the word <code>id_</code> followed by the entity's name (<code>id_student</code>, <code>id_book</code>…). Its values carry no real meaning — they just need to differ for each instance. For example, in a hospital's DOCTOR entity we could use the national ID number or the medical licence number: which one to pick depends on the client's specific requirements.</span>
-    </p>
-  </div>
-
-  <h3 style="margin-top:52px;"><span data-i18n="es">Superclave: el punto de partida</span><span data-i18n="en">Superkey: the starting point</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">Una <strong>superclave</strong> es cualquier atributo o conjunto de atributos que identifica de forma única cada ejemplar de una entidad — sin más condición que esa. Por eso casi siempre sobran candidatos: en un ALUMNO con <code>num_expediente</code>, <code>DNI</code>, <code>nombre</code>, <code>apellidos</code> y <code>fecha_nacimiento</code>, son superclaves tanto <code>num_expediente</code> como <code>DNI</code>, pero también combinaciones más grandes y redundantes como <code>DNI + fecha_nacimiento</code> o <code>nombre + apellidos + fecha_nacimiento</code>.</span>
-      <span data-i18n="en">A <strong>superkey</strong> is any attribute or set of attributes that uniquely identifies every instance of an entity — with no further condition than that. That's why there are almost always more candidates than needed: in a STUDENT with <code>student_number</code>, <code>ID number</code>, <code>first name</code>, <code>surname</code> and <code>date of birth</code>, both <code>student_number</code> and <code>ID number</code> are superkeys, but so are bigger, redundant combinations like <code>ID number + date of birth</code> or <code>first name + surname + date of birth</code>.</span>
-    </p>
-    <p>
-      <span data-i18n="es">Una <strong>clave candidata</strong> es, precisamente, una superclave <strong>mínima</strong>: ninguno de sus atributos se puede quitar sin perder la unicidad. En el ejemplo anterior, <code>DNI + fecha_nacimiento</code> deja de ser candidata en cuanto comprobamos que <code>DNI</code> por sí solo ya identifica al alumno — el atributo de más sobra.</span>
-      <span data-i18n="en">A <strong>candidate key</strong> is precisely a <strong>minimal</strong> superkey: none of its attributes can be dropped without losing uniqueness. In the example above, <code>ID number + date of birth</code> stops being a candidate as soon as we check that <code>ID number</code> alone already identifies the student — the extra attribute is redundant.</span>
     </p>
   </div>
 
@@ -973,14 +912,6 @@
       <p><span data-i18n="es">No hay garantía fácil de unicidad, otras tablas van a referenciar esta entidad, se necesita flexibilidad futura, o la clave natural es larga o contiene datos sensibles (como el DNI).</span><span data-i18n="en">There's no easy uniqueness guarantee, other tables will reference this entity, future flexibility is needed, or the natural key is long or holds sensitive data (like a national ID number).</span></p>
     </div>
   </div>
-
-  <h3 style="margin-top:52px;"><span data-i18n="es">Clave ajena o foránea</span><span data-i18n="en">Foreign key</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">Una <strong>clave ajena</strong> (o foránea) es un atributo de una entidad que es, en realidad, la clave primaria de otra entidad con la que se relaciona — es lo que permite reconstruir esa conexión más adelante, en el modelo lógico. En el diagrama E/R no se dibuja de forma explícita (esa es tarea del modelo lógico), pero ya empieza a asomar en las <strong>entidades débiles</strong>: cuando una débil se identifica por dependencia de identificación, la clave de la fuerte que "presta" pasa a formar parte de la clave primaria de la débil — por ejemplo, el código de sucursal dentro de la clave de una CUENTA, o el código de pedido dentro de la clave de una LINEA_PEDIDO.</span>
-      <span data-i18n="en">A <strong>foreign key</strong> is an attribute of one entity that is, in fact, the primary key of another entity it relates to — it's what lets that connection be rebuilt later, in the logical model. It isn't drawn explicitly in the E/R diagram (that's the logical model's job), but it already starts to show up in <strong>weak entities</strong>: when a weak entity is identified by identification dependency, the strong entity's key that "lends" itself becomes part of the weak entity's own primary key — for example, the branch code inside an ACCOUNT's key, or the order code inside an ORDER_LINE's key.</span>
-    </p>
-  </div>
 </section>
 
 <!-- ============ 05 RELACIONES ============ -->
@@ -1034,13 +965,13 @@
     <figure class="diagram">
       <svg viewBox="0 0 260 150">
         <rect x="90" y="90" width="90" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="135" y="111" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">EMPLEADO</text>
+        <text x="135" y="111" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
         <polygon points="135,20 160,42 135,64 110,42" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
-        <text x="135" y="46" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">es jefe de</text>
+        <text x="135" y="46" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">es jefe de</tspan></text>
         <path d="M 108,50 C 60,50 60,100 100,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6"/>
         <path d="M 162,50 C 210,50 210,100 170,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="55" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);">jefe</text>
-        <text x="195" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);" text-anchor="end">subordinado</text>
+        <text x="55" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);"><tspan data-i18n="es">jefe</tspan></text>
+        <text x="195" y="78" style="font-family:'Inter',sans-serif;font-size:9px;fill:var(--accent-text);" text-anchor="end"><tspan data-i18n="es">subordinado</tspan></text>
       </svg>
       <figcaption><strong><span data-i18n="es">Reflexiva</span><span data-i18n="en">Reflexive</span></strong> — <span data-i18n="es">relaciona dos ejemplares de la misma entidad. Los <strong>roles</strong> (jefe / subordinado) evitan la ambigüedad.</span><span data-i18n="en">links two instances of the same entity. <strong>Roles</strong> (boss / subordinate) remove the ambiguity.</span></figcaption>
     </figure>
@@ -1073,55 +1004,6 @@
     </p>
   </div>
 
-  <div class="callout" style="margin-top:36px;">
-    <strong><span data-i18n="es">Error común: no se pueden encadenar relaciones</span><span data-i18n="en">Common mistake: relationships can't be chained</span></strong> —
-    <span data-i18n="es">un rombo sólo puede unirse a <strong>entidades</strong>, nunca directamente a otro rombo. Si ALUMNO <em>estudia</em> ASIGNATURA y, además, queremos reflejar que esa asignatura <em>utiliza</em> un LIBRO, no se puede colgar el segundo rombo del primero — cada relación tiene que partir de una entidad. Aquí, <em>utiliza</em> debe unir ASIGNATURA con LIBRO directamente, como una relación independiente.</span>
-    <span data-i18n="en">a diamond can only connect to <strong>entities</strong>, never directly to another diamond. If STUDENT <em>studies</em> SUBJECT, and we also want to capture that the subject <em>uses</em> a BOOK, the second diamond can't hang off the first one — every relationship has to start from an entity. Here, <em>uses</em> must join SUBJECT directly to BOOK, as an independent relationship.</span>
-  </div>
-  <div class="diagram-grid" style="grid-template-columns:repeat(2,1fr);margin-top:20px;">
-    <figure class="diagram">
-      <svg viewBox="0 0 300 250" role="img" aria-labelledby="noperm-title">
-        <title id="noperm-title">Incorrecto: la relación utiliza cuelga directamente de la relación estudia</title>
-        <rect x="10" y="74" width="85" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="52" y="95" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ALUMNO</text>
-        <polygon points="150,64 176,90 150,116 124,90" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
-        <text x="150" y="93" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">estudia</text>
-        <rect x="205" y="74" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="250" y="95" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">ASIGNATURA</text>
-        <line x1="95" y1="90" x2="124" y2="90" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="176" y1="90" x2="205" y2="90" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="150" y1="116" x2="150" y2="144" style="stroke:#c0392b;stroke-width:2"/>
-        <polygon points="150,144 176,170 150,196 124,170" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
-        <text x="150" y="173" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">utiliza</text>
-        <rect x="105" y="210" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="150" y="231" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">LIBRO</text>
-        <line x1="150" y1="196" x2="150" y2="210" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <text x="178" y="134" style="font-family:'Inter',sans-serif;font-size:16px;font-weight:700;fill:#c0392b;">✗</text>
-      </svg>
-      <figcaption><strong><span data-i18n="es">Incorrecto</span><span data-i18n="en">Incorrect</span></strong> — <span data-i18n="es">un rombo no puede colgar de otro rombo.</span><span data-i18n="en">a diamond can't hang off another diamond.</span></figcaption>
-    </figure>
-    <figure class="diagram">
-      <svg viewBox="0 0 300 250" role="img" aria-labelledby="perm-title">
-        <title id="perm-title">Correcto: estudia y utiliza son relaciones independientes, ambas entre entidades</title>
-        <rect x="10" y="30" width="85" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="52" y="51" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">ALUMNO</text>
-        <polygon points="150,20 176,46 150,72 124,46" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
-        <text x="150" y="49" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">estudia</text>
-        <rect x="205" y="30" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="250" y="51" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;fill:var(--ink);">ASIGNATURA</text>
-        <line x1="95" y1="46" x2="124" y2="46" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="176" y1="46" x2="205" y2="46" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <line x1="250" y1="62" x2="250" y2="114" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-        <polygon points="250,114 276,140 250,166 224,140" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
-        <text x="250" y="143" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">utiliza</text>
-        <rect x="205" y="180" width="90" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="250" y="201" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;fill:var(--ink);">LIBRO</text>
-        <line x1="250" y1="166" x2="250" y2="180" style="stroke:var(--ink-dim);stroke-width:1.6"/>
-      </svg>
-      <figcaption><strong><span data-i18n="es">Correcto</span><span data-i18n="en">Correct</span></strong> — <span data-i18n="es"><em>utiliza</em> une directamente ASIGNATURA con LIBRO, como relación independiente de <em>estudia</em>.</span><span data-i18n="en"><em>uses</em> directly joins SUBJECT with BOOK, as a relationship independent from <em>studies</em>.</span></figcaption>
-    </figure>
-  </div>
-
   <div class="worked" style="margin-top:44px;">
     <h4><span data-i18n="es">Ejemplo: dos relaciones entre las mismas entidades</span><span data-i18n="en">Example: two relationships between the same entities</span></h4>
     <p>
@@ -1133,19 +1015,19 @@
     <svg viewBox="0 0 620 220" role="img" aria-labelledby="dosrel-title">
       <title id="dosrel-title">EMPLEADO y DPTO relacionados por TRABAJAR y SER_JEFE</title>
       <rect x="20" y="88" width="140" height="42" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="90" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EMPLEADO</text>
+      <text x="90" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
       <rect x="460" y="88" width="140" height="42" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="530" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">DPTO</text>
+      <text x="530" y="114" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">DPTO</tspan></text>
 
       <polygon points="290,30 335,64 290,98 245,64" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="290" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);">trabajar</text>
+      <text x="290" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">trabajar</tspan></text>
       <path d="M 160,100 C 220,80 240,75 258,58" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <path d="M 322,58 C 400,50 430,80 460,100" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <text x="215" y="72" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
       <text x="410" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,N)</text>
 
       <polygon points="290,142 335,176 290,210 245,176" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="290" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ser_jefe</text>
+      <text x="290" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">ser_jefe</tspan></text>
       <path d="M 160,118 C 220,140 240,150 258,168" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <path d="M 322,168 C 400,150 430,140 460,118" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/>
       <text x="215" y="150" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--accent-text);">(0,1)</text>
@@ -1167,11 +1049,11 @@
   <figure class="diagram">
     <svg viewBox="0 0 560 150">
       <rect x="20" y="58" width="130" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="85" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">JUGADOR</text>
+      <text x="85" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">JUGADOR</tspan></text>
       <polygon points="280,38 330,78 280,118 230,78" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="280" y="82" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">juega en</text>
+      <text x="280" y="82" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">juega en</tspan></text>
       <rect x="410" y="58" width="130" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="475" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">EQUIPO</text>
+      <text x="475" y="83" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">EQUIPO</tspan></text>
       <line x1="150" y1="78" x2="230" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
       <line x1="330" y1="78" x2="410" y2="78" style="stroke:var(--ink-dim);stroke-width:2"/>
       <text x="190" y="68" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--accent-text);">(0,1)</text>
@@ -1200,10 +1082,10 @@
     <figure class="diagram">
       <svg viewBox="0 0 260 130">
         <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">PERSONA</text>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">PERSONA</tspan></text>
         <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
         <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">DNI</text>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">DNI</tspan></text>
         <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">1:1</text>
@@ -1213,10 +1095,10 @@
     <figure class="diagram">
       <svg viewBox="0 0 260 130">
         <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">CLIENTE</text>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">CLIENTE</tspan></text>
         <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
         <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">PEDIDO</text>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">PEDIDO</tspan></text>
         <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">1:N</text>
@@ -1226,10 +1108,10 @@
     <figure class="diagram">
       <svg viewBox="0 0 260 130">
         <rect x="10" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">ALUMNO</text>
+        <text x="50" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">ALUMNO</tspan></text>
         <polygon points="130,43 155,65 130,87 105,65" style="fill:var(--panel);stroke:var(--teal);stroke-width:2"/>
         <rect x="170" y="48" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2"/>
-        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">ASIGNATURA</text>
+        <text x="210" y="69" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">ASIGNATURA</tspan></text>
         <line x1="90" y1="65" x2="105" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <line x1="155" y1="65" x2="170" y2="65" style="stroke:var(--ink-dim);stroke-width:1.6"/>
         <text x="130" y="30" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--accent-text);">N:M</text>
@@ -1267,12 +1149,6 @@
     <span data-i18n="es">a veces un dato no pertenece a ninguna de las dos entidades por separado, sino a la relación entre ambas. Ejemplo clásico: MECÁNICO <em>repara</em> VEHÍCULO, y queremos guardar la <em>fecha de reparación</em>. Ese dato no puede vivir en MECÁNICO (no sabríamos de qué vehículo) ni en VEHÍCULO (no sabríamos qué mecánico) — sólo tiene sentido colgado del rombo <em>repara</em>.</span>
     <span data-i18n="en">sometimes a piece of data doesn't belong to either entity on its own, but to the relationship between them. Classic example: MECHANIC <em>repairs</em> VEHICLE, and we want to store the <em>repair date</em>. That data can't live in MECHANIC (we wouldn't know which vehicle) or in VEHICLE (we wouldn't know which mechanic) — it only makes sense hanging off the <em>repairs</em> diamond.</span>
   </div>
-
-  <div class="callout" style="margin-top:20px;">
-    <strong><span data-i18n="es">Entidad asociativa</span><span data-i18n="en">Associative entity</span></strong> —
-    <span data-i18n="es">cuando una relación con atributos (o una relación N:M que necesita distinguir varios vínculos entre la misma pareja de ejemplares, como el alquiler de bicicletas de arriba) empieza a comportarse como una entidad por derecho propio, conviene <strong>promocionarla a entidad</strong>: se dibuja como un rectángulo con el rombo dentro, su clave es la unión de las claves primarias de las entidades que asocia (más, en su caso, algún atributo propio), y desde ahí puede relacionarse con otras entidades igual que cualquier otra.</span>
-    <span data-i18n="en">when a relationship with attributes (or an N:M relationship that needs to tell apart several links between the same pair of instances, like the bicycle rental above) starts behaving like an entity in its own right, it's worth <strong>promoting it to an entity</strong>: it's drawn as a rectangle with the diamond inside it, its key is the union of the primary keys of the entities it associates (plus, where relevant, an attribute of its own), and from then on it can relate to other entities just like any other.</span>
-  </div>
 </section>
 
 <!-- ============ 06 RESTRICCIONES ============ -->
@@ -1283,87 +1159,10 @@
       <h2><span data-i18n="es">Restricciones</span><span data-i18n="en">Constraints</span></h2>
     </div>
   </div>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">No todo lo que necesitamos decir sobre un problema cabe dentro de un rectángulo, un rombo o una elipse. Esta sección recoge tres herramientas para precisar —o reconocer los límites de— lo que el diagrama puede expresar por sí solo.</span>
-      <span data-i18n="en">Not everything we need to say about a problem fits inside a rectangle, a diamond or an ellipse. This section covers three tools for sharpening — or recognising the limits of — what the diagram can express on its own.</span>
-    </p>
-  </div>
-
-  <h3 style="margin-top:16px;"><span data-i18n="es">Dependencia existencial y de identificación</span><span data-i18n="en">Existential and identification dependency</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">Ya vimos que una entidad débil depende de una fuerte, pero esa dependencia puede ser de dos tipos, y conviene distinguirlos porque cambian cómo se identifica la entidad débil:</span>
-      <span data-i18n="en">We already saw that a weak entity depends on a strong one, but that dependency can be of two types, and it's worth telling them apart because they change how the weak entity is identified:</span>
-    </p>
-  </div>
-  <div class="grid cols-2" style="margin-top:20px;">
-    <div class="card">
-      <span class="tag"><span data-i18n="es">DEPENDENCIA EXISTENCIAL (E)</span><span data-i18n="en">EXISTENTIAL DEPENDENCY (E)</span></span>
-      <h4><span data-i18n="es">No puede existir sin la fuerte</span><span data-i18n="en">Can't exist without the strong entity</span></h4>
-      <p><span data-i18n="es">La entidad débil desaparece si desaparece su entidad fuerte asociada, pero conserva su propio identificador. Se marca con una <strong>E</strong> junto a la línea de unión. Su cardinalidad mínima hacia la fuerte es siempre 1.</span><span data-i18n="en">The weak entity disappears if its associated strong entity disappears, but it keeps its own identifier. Marked with an <strong>E</strong> next to the connecting line. Its minimum cardinality towards the strong entity is always 1.</span></p>
-    </div>
-    <div class="card">
-      <span class="tag"><span data-i18n="es">DEPENDENCIA DE IDENTIFICACIÓN (ID)</span><span data-i18n="en">IDENTIFICATION DEPENDENCY (ID)</span></span>
-      <h4><span data-i18n="es">Además, no puede identificarse sola</span><span data-i18n="en">It also can't identify itself alone</span></h4>
-      <p><span data-i18n="es">Implica siempre dependencia existencial, y además la débil no tiene atributos propios suficientes: su identificador se <strong>completa</strong> con el de la entidad fuerte. Se marca con <strong>ID</strong> o con un rombo doble.</span><span data-i18n="en">Always implies existential dependency, and on top of that the weak entity lacks enough attributes of its own: its identifier is <strong>completed</strong> with the strong entity's. Marked with <strong>ID</strong> or a double diamond.</span></p>
-    </div>
-  </div>
-  <div class="callout" style="margin-top:28px;">
-    <strong><span data-i18n="es">Ejemplo</span><span data-i18n="en">Example</span></strong> —
-    <span data-i18n="es">LINEA_PEDIDO (débil) depende de PEDIDO (fuerte) por identificación: una línea no puede existir sin su pedido, y tampoco puede identificarse sólo con su número de línea — "línea 1" no significa nada por sí sola. Su identificador real es <em>número de línea + código de pedido</em> ("línea 1 del pedido R2024A01"). Es habitual, además, que estos identificadores se <strong>reinicien</strong> con cada nuevo ejemplar fuerte: la línea 1 del pedido R2024A01 y la línea 1 del pedido R2024A02 son ejemplares distintos.</span>
-    <span data-i18n="en">ORDER_LINE (weak) depends on ORDER (strong) by identification: a line can't exist without its order, and it can't be identified just by its line number either — "line 1" means nothing on its own. Its real identifier is <em>line number + order code</em> ("line 1 of order R2024A01"). It's also common for these identifiers to <strong>reset</strong> with each new strong instance: line 1 of order R2024A01 and line 1 of order R2024A02 are different instances.</span>
-  </div>
-
-  <h3 style="margin-top:56px;"><span data-i18n="es">Exclusividad entre relaciones</span><span data-i18n="en">Exclusivity between relationships</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">No hay que confundirla con la exclusividad de las jerarquías ISA (sección 07): aquí lo que se excluye es la <strong>participación simultánea</strong> de un mismo ejemplar en dos relaciones distintas. Ocurre cuando la existencia de una relación, para un ejemplar concreto, impide la existencia de otra relación para ese mismo ejemplar. Se representa con un <strong>arco</strong> que atraviesa las dos relaciones implicadas.</span>
-      <span data-i18n="en">Not to be confused with the exclusivity used in ISA hierarchies (section 07): here what gets excluded is the <strong>simultaneous participation</strong> of the same instance in two different relationships. It happens when the existence of one relationship, for a specific instance, rules out the existence of another relationship for that same instance. It's shown with an <strong>arc</strong> crossing the two relationships involved.</span>
-    </p>
-  </div>
-  <figure class="diagram" style="margin-top:20px;">
-    <svg viewBox="0 0 380 220" role="img" aria-labelledby="exclrel-title">
-      <title id="exclrel-title">MONITOR imparte o recibe CURSO, nunca ambas cosas para el mismo curso</title>
-      <rect x="145" y="10" width="90" height="34" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="190" y="32" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">MONITOR</text>
-      <path d="M 118,72 A 92,26 0 0 1 262,72" style="fill:none;stroke:var(--ink);stroke-width:2"/>
-      <line x1="170" y1="44" x2="120" y2="86" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <line x1="210" y1="44" x2="260" y2="86" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <polygon points="100,90 130,116 100,142 70,116" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="100" y="119" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">imparte</text>
-      <polygon points="280,90 310,116 280,142 250,116" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="280" y="119" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">recibe</text>
-      <rect x="145" y="172" width="90" height="34" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="190" y="194" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);">CURSO</text>
-      <line x1="107" y1="138" x2="168" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <line x1="273" y1="138" x2="212" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-    </svg>
-    <figcaption>
-      <span data-i18n="es">Un mismo CURSO no puede ser impartido y recibido a la vez por el mismo MONITOR: si <em>imparte</em> existe para ese par, <em>recibe</em> no puede existir para el mismo par (y viceversa). El arco marca esa exclusividad entre ambas relaciones.</span>
-      <span data-i18n="en">The same COURSE can't be both taught and taken at once by the same INSTRUCTOR: if <em>teaches</em> exists for that pair, <em>takes</em> can't exist for the same pair (and vice-versa). The arc marks that exclusivity between the two relationships.</span>
-    </figcaption>
-  </figure>
-
-  <h3 style="margin-top:56px;"><span data-i18n="es">Cardinalidades exactas</span><span data-i18n="en">Exact cardinalities</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">Cuando el problema fija de antemano un mínimo o un máximo concreto, no hace falta conformarse con 0, 1 o N: se anota <strong>el número real</strong>. Por ejemplo, si un curso necesita un mínimo de 5 alumnos matriculados para abrirse y admite como máximo 24, la cardinalidad de CURSO en la relación con ALUMNO se anota <code>(5,24)</code> en lugar de <code>(1,N)</code>.</span>
-      <span data-i18n="en">When the problem sets a concrete minimum or maximum up front, there's no need to settle for 0, 1 or N: <strong>the real number</strong> is written instead. If a class needs a minimum of 5 enrolled students to run and admits a maximum of 24, for instance, CLASS's cardinality in its relationship with STUDENT is written as <code>(5,24)</code> rather than <code>(1,N)</code>.</span>
-    </p>
-  </div>
-
-  <h3 style="margin-top:56px;"><span data-i18n="es">Pérdida expresiva</span><span data-i18n="en">Semantic loss</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">A veces el modelo conceptual, con todas sus herramientas, sigue sin poder expresar una regla del negocio. A esa limitación se la llama <strong>pérdida expresiva</strong>, y no significa que el diagrama esté mal — significa que esa regla concreta hay que documentarla aparte, normalmente como una nota <strong>PE</strong> al pie del diagrama, para no perderla de cara a las siguientes fases del diseño.</span>
-      <span data-i18n="en">Sometimes the conceptual model, with all its tools, still can't express a business rule. That limitation is called <strong>semantic loss</strong>, and it doesn't mean the diagram is wrong — it means that specific rule needs to be documented separately, usually as a <strong>PE</strong> ("pérdida expresiva") note at the bottom of the diagram, so it isn't lost by the time later design stages come around.</span>
-    </p>
-  </div>
-  <div class="pills">
-    <span class="pill"><span data-i18n="es">PE: un empleado no puede dirigir su propio departamento</span><span data-i18n="en">PE: an employee cannot manage their own department</span></span>
-    <span class="pill"><span data-i18n="es">PE: un empleado sólo puede trabajar en proyectos de su departamento</span><span data-i18n="en">PE: an employee may only work on projects belonging to their department</span></span>
-    <span class="pill"><span data-i18n="es">PE: el nº de alumnos matriculados no puede superar la capacidad del aula</span><span data-i18n="en">PE: the number of enrolled students cannot exceed the classroom's capacity</span></span>
+  <div class="callout" style="margin-top:20px;">
+    <strong><span data-i18n="es">Más adelante</span><span data-i18n="en">Coming up</span></strong> —
+    <span data-i18n="es">las restricciones —dependencia existencial y de identificación en las entidades débiles, cardinalidades exactas, reglas de negocio que el diagrama no puede expresar por sí solo, etc.— se verán con más detalle al estudiar el <strong>modelo relacional</strong>.</span>
+    <span data-i18n="en">constraints —existential and identification dependency in weak entities, exact cardinalities, business rules the diagram can't express on its own, and so on— will be covered in more detail when we study the <strong>relational model</strong>.</span>
   </div>
 </section>
 
@@ -1372,7 +1171,7 @@
   <div class="sec-head">
     <div>
       <span class="sec-num">07</span>
-      <h2><span data-i18n="es">El modelo E/R extendido: herencia y agregación</span><span data-i18n="en">The extended E/R model: inheritance and aggregation</span></h2>
+      <h2><span data-i18n="es">El modelo E/R extendido: herencia</span><span data-i18n="en">The extended E/R model: inheritance</span></h2>
     </div>
   </div>
   <div class="prose">
@@ -1396,7 +1195,7 @@
     <div class="card">
       <span class="tag"><span data-i18n="es">OBLIGATORIEDAD</span><span data-i18n="en">MANDATORINESS</span></span>
       <h4><span data-i18n="es">Total vs. parcial</span><span data-i18n="en">Total vs. partial</span></h4>
-      <p><span data-i18n="es"><strong>Total:</strong> todo ejemplar de la superentidad pertenece obligatoriamente a alguna subentidad. <strong>Parcial</strong> (se marca con un círculo sobre el triángulo): puede haber ejemplares que no pertenezcan a ninguna.</span><span data-i18n="en"><strong>Total:</strong> every instance of the super-entity must belong to some sub-entity. <strong>Partial</strong> (marked with a circle over the triangle): there can be instances that belong to none.</span></p>
+      <p><span data-i18n="es"><strong>Total</strong> (se marca con un círculo sobre la línea): todo ejemplar de la superentidad pertenece obligatoriamente a alguna subentidad. <strong>Parcial</strong> (sin círculo): puede haber ejemplares que no pertenezcan a ninguna.</span><span data-i18n="en"><strong>Total</strong> (marked with a circle on the line): every instance of the super-entity must belong to some sub-entity. <strong>Partial</strong> (no circle): there can be instances that belong to none.</span></p>
     </div>
     <div class="card">
       <span class="tag"><span data-i18n="es">NÚMERO DE RELACIONES</span><span data-i18n="en">NUMBER OF RELATIONSHIPS</span></span>
@@ -1410,12 +1209,10 @@
       <title id="isa-title">Notación ISA con triángulo hacia abajo</title>
       <rect x="220" y="14" width="120" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
       <text x="280" y="39" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);"><tspan data-i18n="es">PERSONAL</tspan></text>
-      <line x1="280" y1="54" x2="280" y2="80" style="stroke:var(--ink-dim);stroke-width:2"/>
-      <circle cx="280" cy="88" r="9" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
-      <text x="280" y="92" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">P</text>
+      <line x1="280" y1="54" x2="280" y2="105" style="stroke:var(--ink-dim);stroke-width:2"/>
       <polygon points="245,105 315,105 280,140" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
       <text x="280" y="122" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">ISA</text>
-      <path d="M 200,150 A 90,26 0 0 1 360,150" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+      <path d="M 200,150 A 90,26 0 0 0 360,150" style="fill:none;stroke:var(--ink);stroke-width:2"/>
       <line x1="280" y1="140" x2="90" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
       <line x1="280" y1="140" x2="280" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
       <line x1="280" y1="140" x2="470" y2="185" style="stroke:var(--ink-dim);stroke-width:2"/>
@@ -1427,8 +1224,8 @@
       <text x="470" y="210" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">TÉCNICO</tspan></text>
     </svg>
     <figcaption>
-      <span data-i18n="es">El círculo <strong>P</strong> sobre el triángulo marca esta jerarquía como <strong>parcial</strong> (puede haber personal que no sea profesor, bedel ni técnico — por ejemplo, un cargo directivo); el <strong>arco</strong> bajo el triángulo la marca como <strong>exclusiva</strong> (nadie puede ser a la vez profesor y bedel). Sin círculo sería total; sin arco sería solapada.</span>
-      <span data-i18n="en">The circle marked <strong>P</strong> over the triangle marks this hierarchy as <strong>partial</strong> (there can be staff who are neither teacher, porter nor technician — a management role, say); the <strong>arc</strong> under the triangle marks it as <strong>exclusive</strong> (nobody can be both a teacher and a porter). No circle would mean total; no arc would mean overlapping.</span>
+      <span data-i18n="es">Sin círculo sobre la línea, esta jerarquía es <strong>parcial</strong> (puede haber personal que no sea profesor, bedel ni técnico — por ejemplo, un cargo directivo); el <strong>arco</strong> bajo el triángulo la marca como <strong>exclusiva</strong> (nadie puede ser a la vez profesor y bedel). Con un círculo sería total; sin arco sería solapada.</span>
+      <span data-i18n="en">With no circle on the line, this hierarchy is <strong>partial</strong> (there can be staff who are neither teacher, porter nor technician — a management role, say); the <strong>arc</strong> under the triangle marks it as <strong>exclusive</strong> (nobody can be both a teacher and a porter). A circle would mean total; no arc would mean overlapping.</span>
     </figcaption>
   </figure>
 
@@ -1465,57 +1262,101 @@
     </tbody>
   </table>
 
+  <div class="diagram-grid" style="grid-template-columns:repeat(2,1fr); margin-top:28px;">
+    <figure class="diagram">
+      <svg viewBox="0 0 260 205" role="img" aria-labelledby="isa-et-title">
+        <title id="isa-et-title">Exclusiva y total: EMPLEADO → técnico / científico / astronauta</title>
+        <rect x="90" y="8" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="29" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
+        <line x1="130" y1="42" x2="130" y2="58" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <circle cx="130" cy="64" r="7" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
+        <line x1="130" y1="71" x2="130" y2="90" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <polygon points="95,90 165,90 130,122" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="130" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8px;fill:var(--ink-dim);">ISA</text>
+        <path d="M 101,130 A 29,9 0 0 0 159,130" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+        <line x1="130" y1="122" x2="60" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="200" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="25" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="60" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">TÉCNICO</text>
+        <rect x="95" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;fill:var(--ink);">CIENTÍFICO</text>
+        <rect x="165" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="200" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ASTRONAUTA</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Exclusiva y total</span><span data-i18n="en">Exclusive &amp; total</span></strong> — <span data-i18n="es">círculo (total) y arco (exclusiva): todo empleado es exactamente uno de los tres.</span><span data-i18n="en">a circle (total) and an arc (exclusive): every employee is exactly one of the three.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 205" role="img" aria-labelledby="isa-ep-title">
+        <title id="isa-ep-title">Exclusiva y parcial: EMPLEADO → técnico / científico / astronauta</title>
+        <rect x="90" y="8" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="29" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
+        <line x1="130" y1="42" x2="130" y2="90" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <polygon points="95,90 165,90 130,122" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="130" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8px;fill:var(--ink-dim);">ISA</text>
+        <path d="M 101,130 A 29,9 0 0 0 159,130" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+        <line x1="130" y1="122" x2="60" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="200" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="25" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="60" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">TÉCNICO</text>
+        <rect x="95" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;fill:var(--ink);">CIENTÍFICO</text>
+        <rect x="165" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="200" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ASTRONAUTA</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Exclusiva y parcial</span><span data-i18n="en">Exclusive &amp; partial</span></strong> — <span data-i18n="es">sin círculo (parcial) y con arco (exclusiva): como mucho uno de los tres, o ninguno.</span><span data-i18n="en">no circle (partial) and an arc (exclusive): at most one of the three, or none.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 205" role="img" aria-labelledby="isa-st-title">
+        <title id="isa-st-title">Solapada y total: EMPLEADO → técnico / científico / astronauta</title>
+        <rect x="90" y="8" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="29" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
+        <line x1="130" y1="42" x2="130" y2="58" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <circle cx="130" cy="64" r="7" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/>
+        <line x1="130" y1="71" x2="130" y2="90" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <polygon points="95,90 165,90 130,122" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="130" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8px;fill:var(--ink-dim);">ISA</text>
+        <line x1="130" y1="122" x2="60" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="200" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="25" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="60" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">TÉCNICO</text>
+        <rect x="95" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;fill:var(--ink);">CIENTÍFICO</text>
+        <rect x="165" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="200" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ASTRONAUTA</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Solapada y total</span><span data-i18n="en">Overlapping &amp; total</span></strong> — <span data-i18n="es">círculo (total) y sin arco (solapada): todos pertenecen a alguna, y pueden pertenecer a varias.</span><span data-i18n="en">a circle (total) and no arc (overlapping): everyone belongs to at least one, and can belong to several.</span></figcaption>
+    </figure>
+    <figure class="diagram">
+      <svg viewBox="0 0 260 205" role="img" aria-labelledby="isa-sp-title">
+        <title id="isa-sp-title">Solapada y parcial: EMPLEADO → técnico / científico / astronauta</title>
+        <rect x="90" y="8" width="80" height="34" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="29" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">EMPLEADO</tspan></text>
+        <line x1="130" y1="42" x2="130" y2="90" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <polygon points="95,90 165,90 130,122" style="fill:var(--panel);stroke:var(--ink);stroke-width:2.5"/>
+        <text x="130" y="105" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8px;fill:var(--ink-dim);">ISA</text>
+        <line x1="130" y1="122" x2="60" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="130" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <line x1="130" y1="122" x2="200" y2="160" style="stroke:var(--ink-dim);stroke-width:2"/>
+        <rect x="25" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="60" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">TÉCNICO</text>
+        <rect x="95" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="130" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:8.5px;fill:var(--ink);">CIENTÍFICO</text>
+        <rect x="165" y="160" width="70" height="32" rx="3" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
+        <text x="200" y="181" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">ASTRONAUTA</text>
+      </svg>
+      <figcaption><strong><span data-i18n="es">Solapada y parcial</span><span data-i18n="en">Overlapping &amp; partial</span></strong> — <span data-i18n="es">sin círculo (parcial) y sin arco (solapada): puede pertenecer a varias, o a ninguna.</span><span data-i18n="en">no circle (partial) and no arc (overlapping): can belong to several, or to none.</span></figcaption>
+    </figure>
+  </div>
+
   <div class="callout" style="margin-top:36px;">
     <strong><span data-i18n="es">¿Cuándo usar relaciones ISA?</span><span data-i18n="en">When should you use ISA relationships?</span></strong>
     <span data-i18n="es">Los diseñadores principiantes tienden a abusar de ellas, y cada relación de herencia añade entidades y complejidad al diagrama. Úsalas sólo cuando las subentidades tengan <strong>atributos distintos</strong> o <strong>relaciones distintas</strong>; si sólo cambia una etiqueta, suele bastar con un simple atributo "tipo" en la entidad general.</span>
     <span data-i18n="en">Beginner designers tend to overuse them, and every inheritance relationship adds entities and complexity to the diagram. Use them only when the sub-entities have <strong>different attributes</strong> or <strong>different relationships</strong>; if only a label changes, a simple "type" attribute on the general entity is usually enough.</span>
   </div>
 
-  <h3 style="margin-top:64px;"><span data-i18n="es">Agregación: relacionar una relación</span><span data-i18n="en">Aggregation: relating a relationship</span></h3>
-  <div class="prose">
-    <p>
-      <span data-i18n="es">El modelo E/R básico tiene una limitación concreta: no permite que una relación se relacione, a su vez, con una tercera entidad. La <strong>agregación</strong> resuelve esto tratando una relación (junto con las entidades que une) como si fuera, ella misma, una entidad de nivel superior — con la que sí se puede construir una nueva relación.</span>
-      <span data-i18n="en">The basic E/R model has one specific limitation: it doesn't allow a relationship to, in turn, relate to a third entity. <strong>Aggregation</strong> solves this by treating a relationship (together with the entities it joins) as if it were itself a higher-level entity — one a new relationship can actually be built with.</span>
-    </p>
-    <p>
-      <span data-i18n="es">Un instituto quiere registrar las incidencias que ocurren durante las clases. Cada DOCENTE <em>imparte</em> clase en varias AULA, y cada AULA recibe clase de varios DOCENTE (N:M). El problema es que una incidencia no pertenece ni al docente ni al aula por separado, sino a la <strong>sesión concreta</strong> en la que ese docente estaba en esa aula. Sin agregación, tendríamos que recurrir a una relación ternaria DOCENTE–AULA–INCIDENCIA, forzando una asociación que en realidad no es directa entre las tres.</span>
-      <span data-i18n="en">A school wants to log incidents that happen during classes. Each TEACHER <em>teaches</em> in several CLASSROOMs, and each CLASSROOM is taught in by several TEACHERs (N:M). The problem is that an incident belongs neither to the teacher nor to the classroom on their own, but to the <strong>specific session</strong> in which that teacher was in that classroom. Without aggregation we'd have to resort to a ternary TEACHER–CLASSROOM–INCIDENT relationship, forcing an association that isn't really direct between all three.</span>
-    </p>
-  </div>
-  <figure class="diagram" style="margin-top:24px;">
-    <svg viewBox="0 0 640 230" role="img" aria-labelledby="agr-title">
-      <title id="agr-title">Agregación: DOCENTE-imparte-AULA como entidad agregada, relacionada con INCIDENCIA</title>
-      <rect x="16" y="16" width="330" height="120" rx="6" style="fill:none;stroke:var(--ink-dim);stroke-width:1.6;stroke-dasharray:5 4"/>
-      <rect x="30" y="46" width="120" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="90" y="71" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">DOCENTE</tspan></text>
-      <polygon points="230,44 268,74 230,104 192,74" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="230" y="78" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">imparte</tspan></text>
-      <rect x="270" y="46" width="60" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="300" y="71" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">AULA</tspan></text>
-      <line x1="150" y1="66" x2="192" y2="74" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <line x1="268" y1="74" x2="270" y2="66" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <text x="30" y="20" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);"><tspan data-i18n="es">agregado</tspan></text>
-
-      <line x1="180" y1="136" x2="180" y2="176" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <polygon points="285,145 330,175 285,205 240,175" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/>
-      <text x="285" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">registra</tspan></text>
-      <line x1="210" y1="176" x2="240" y2="175" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <rect x="480" y="155" width="140" height="40" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/>
-      <text x="550" y="180" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">INCIDENCIA</tspan></text>
-      <line x1="330" y1="175" x2="480" y2="175" style="stroke:var(--ink-dim);stroke-width:1.8"/>
-      <text x="222" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,N)</text>
-      <text x="415" y="166" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--accent-text);">(0,1)</text>
-    </svg>
-    <figcaption>
-      <span data-i18n="es">El recuadro punteado marca la <strong>agregación</strong>: DOCENTE + <em>imparte</em> + AULA pasa a comportarse como una única entidad de nivel superior (la "sesión" docente-aula), que es la que de verdad <em>registra</em> incidencias — no el docente ni el aula por separado.</span>
-      <span data-i18n="en">The dashed box marks the <strong>aggregation</strong>: TEACHER + <em>teaches</em> + CLASSROOM now behaves as a single higher-level entity (the teacher-classroom "session"), which is what actually <em>logs</em> incidents — not the teacher or the classroom on their own.</span>
-    </figcaption>
-  </figure>
-  <div class="callout" style="margin-top:28px;">
-    <strong><span data-i18n="es">Agregación vs. relación ternaria</span><span data-i18n="en">Aggregation vs. a ternary relationship</span></strong> —
-    <span data-i18n="es">una ternaria implica que las <strong>tres</strong> entidades participan a la vez en una única asociación real. La agregación, en cambio, dice algo distinto: la asociación entre las dos primeras entidades ya existe por sí sola (con su propia cardinalidad), y es <em>esa asociación completa</em> la que se relaciona con la tercera — sin forzar que las tres tengan que aparecer siempre juntas.</span>
-    <span data-i18n="en">a ternary relationship implies that all <strong>three</strong> entities take part at once in a single real association. Aggregation says something different: the association between the first two entities already exists on its own (with its own cardinality), and it's <em>that whole association</em> that relates to the third one — without forcing all three to always show up together.</span>
-  </div>
 </section>
 
 <!-- ============ 08 GUÍA Y EJEMPLO ============ -->
@@ -1630,13 +1471,13 @@
     </li>
     <li>
       <strong><span data-i18n="es">Las restricciones</span><span data-i18n="en">Constraints</span></strong>
-      <span data-i18n="es">precisan lo que el diagrama no dice del todo: dependencia existencial o de identificación en las entidades débiles, cardinalidades exactas, y notas de pérdida expresiva cuando ni así basta.</span>
-      <span data-i18n="en">sharpen what the diagram doesn't fully say: existential or identification dependency in weak entities, exact cardinalities, and semantic-loss notes when even that isn't enough.</span>
+      <span data-i18n="es">—dependencias de las entidades débiles, cardinalidades exactas, reglas que el diagrama no puede expresar por sí solo— se ven con más detalle en el modelo relacional.</span>
+      <span data-i18n="en">—weak-entity dependencies, exact cardinalities, rules the diagram can't express on its own— are covered in more detail in the relational model.</span>
     </li>
     <li>
       <strong><span data-i18n="es">Las relaciones ISA</span><span data-i18n="en">ISA relationships</span></strong>
-      <span data-i18n="es">expresan herencia entre entidades, combinando obligatoriedad (total/parcial) y número de relaciones (exclusiva/solapada) — cuatro combinaciones en total. La <strong>agregación</strong> resuelve el caso en que una relación necesita, a su vez, relacionarse con una tercera entidad.</span>
-      <span data-i18n="en">express inheritance between entities, combining mandatoriness (total/partial) and number of relationships (exclusive/overlapping) — four combinations in total. <strong>Aggregation</strong> solves the case where a relationship itself needs to relate to a third entity.</span>
+      <span data-i18n="es">expresan herencia entre entidades, combinando obligatoriedad (total/parcial) y número de relaciones (exclusiva/solapada) — cuatro combinaciones en total.</span>
+      <span data-i18n="en">express inheritance between entities, combining mandatoriness (total/partial) and number of relationships (exclusive/overlapping) — four combinations in total.</span>
     </li>
     <li>
       <strong><span data-i18n="es">Diseñar bien</span><span data-i18n="en">Designing well</span></strong>
