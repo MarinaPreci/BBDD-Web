@@ -431,7 +431,6 @@ a{color:inherit;}
         <a href="teoria.html">📖 Teoría</a>
         <a href="actividades.html">📝 Actividades</a>
         <a href="resumen.html" class="active">🎛️ Resumen</a>
-        <a href="diapositivas.html">🖥️ Diapositivas</a>
       </div></div><a class="pending" title="Próximamente">UT3 · próximamente</a><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
   </nav>
 </aside>
@@ -474,8 +473,8 @@ a{color:inherit;}
       <li><span class="ix-num">03</span><span class="ix-txt"><span data-i18n="es">Entidades fuertes y débiles</span><span data-i18n="en">Strong and weak entities</span></span></li>
       <li><span class="ix-num">04</span><span class="ix-txt"><span data-i18n="es">Atributos y sus tipos</span><span data-i18n="en">Attributes and their types</span></span></li>
       <li><span class="ix-num">05</span><span class="ix-txt"><span data-i18n="es">Relaciones: grado, cardinalidad, correspondencia</span><span data-i18n="en">Relationships: degree, cardinality, correspondence</span></span></li>
-      <li><span class="ix-num">06</span><span class="ix-txt"><span data-i18n="es">Claves candidatas y restricciones</span><span data-i18n="en">Candidate keys and constraints</span></span></li>
-      <li><span class="ix-num">07</span><span class="ix-txt"><span data-i18n="es">El modelo E/R extendido: herencia y agregación</span><span data-i18n="en">The extended E/R model: inheritance and aggregation</span></span></li>
+      <li><span class="ix-num">06</span><span class="ix-txt"><span data-i18n="es">Claves candidatas</span><span data-i18n="en">Candidate keys</span></span></li>
+      <li><span class="ix-num">07</span><span class="ix-txt"><span data-i18n="es">El modelo E/R extendido: herencia</span><span data-i18n="en">The extended E/R model: inheritance</span></span></li>
       <li><span class="ix-num">08</span><span class="ix-txt"><span data-i18n="es">Guía para construir un diagrama E/R</span><span data-i18n="en">Guide to building an E/R diagram</span></span></li>
     </ol>
   </div>
@@ -614,13 +613,13 @@ a{color:inherit;}
         <text x="515" y="99" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--ink);">FAMILIAR</text>
         <line x1="170" y1="95" x2="238" y2="95" style="stroke:var(--ink-dim);stroke-width:2"/>
         <line x1="342" y1="95" x2="440" y2="95" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <text x="204" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(1,1)</text>
-        <text x="391" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(0,N)</text>
+        <text x="204" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(0,N)</text>
+        <text x="391" y="85" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--blue-deep);">(1,1)</text>
         <text x="100" y="152" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:12px;fill:var(--ink-dim);"><tspan data-i18n="es">fuerte</tspan></text>
         <text x="515" y="152" text-anchor="middle" style="font-family:'Inter',sans-serif;font-size:12px;fill:var(--ink-dim);"><tspan data-i18n="es">débil (rect. doble)</tspan></text>
       </svg>
     </div>
-    <p class="note"><span data-i18n="es">FAMILIAR no tiene sentido sin EMPLEADO: si el empleado desaparece, sus familiares registrados desaparecen también. Cada familiar depende de <strong>un único</strong> empleado; un empleado puede tener 0 o varios familiares.</span><span data-i18n="en">FAMILY MEMBER makes no sense without EMPLOYEE: if the employee disappears, their registered family members disappear too. Each family member depends on <strong>exactly one</strong> employee; an employee can have 0 or several family members.</span></p>
+    <p class="note"><span data-i18n="es">FAMILIAR no tiene sentido sin EMPLEADO: si el empleado desaparece, sus familiares registrados desaparecen también. Cada familiar depende de <strong>un único</strong> empleado (1,1); un empleado puede tener 0 o varios familiares (0,N).</span><span data-i18n="en">FAMILY MEMBER makes no sense without EMPLOYEE: if the employee disappears, their registered family members disappear too. Each family member depends on <strong>exactly one</strong> employee (1,1); an employee can have 0 or several family members (0,N).</span></p>
   </div>
 </section>
 
@@ -697,8 +696,8 @@ a{color:inherit;}
         <text x="470" y="70" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);"><tspan data-i18n="es">EQUIPO</tspan></text>
         <line x1="145" y1="65" x2="220" y2="65" style="stroke:var(--ink-dim);stroke-width:2"/>
         <line x1="320" y1="65" x2="405" y2="65" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <text x="182" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(1,N)</text>
-        <text x="362" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(0,1)</text>
+        <text x="182" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(0,1)</text>
+        <text x="362" y="55" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:14px;fill:var(--blue-deep);">(1,N)</text>
       </svg>
     </div>
     <p class="note"><span data-i18n="es">Un jugador está en 0 o 1 equipo a la vez; un equipo tiene mínimo 1 y muchos jugadores.</span><span data-i18n="en">A player is on 0 or 1 team at a time; a team has a minimum of 1 and many players.</span></p>
@@ -914,43 +913,6 @@ a{color:inherit;}
   </div>
 </section>
 
-<section class="slide " data-deco="5">
-  <div class="deco-corner deco-a"></div>
-  <div class="deco-corner deco-b"></div>
-  <div class="slide-inner">
-    <span class="eyebrow">06 — <span data-i18n="es">Restricciones adicionales</span><span data-i18n="en">Additional constraints</span></span>
-    <h2><span data-i18n="es">Más allá de entidades y relaciones</span><span data-i18n="en">Beyond entities and relationships</span></h2>
-    <div class="two-col">
-      <div><span class="col-h"><span data-i18n="es">Dependencia existencial (E)</span><span data-i18n="en">Existential dependency (E)</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">La entidad débil desaparece si desaparece la fuerte, pero podría identificarse por sí misma.</span><span data-i18n="en">The weak entity disappears if the strong one does, but it could identify itself on its own.</span></p></div>
-      <div><span class="col-h"><span data-i18n="es">Dependencia de identificación (ID)</span><span data-i18n="en">Identifying dependency (ID)</span></span><p style="font-size:14.5px;color:var(--ink-soft);"><span data-i18n="es">Además necesita el identificador de la entidad fuerte para formar su propia clave.</span><span data-i18n="en">It also needs the strong entity's identifier to form its own key.</span></p></div>
-    </div>
-    <p class="note"><span data-i18n="es">Cuando el problema da límites exactos (un aula de entre 15 y 30 alumnos), se escribe la <strong>cardinalidad exacta</strong>: <code>(15,30)</code> en vez de <code>(0,N)</code>.</span><span data-i18n="en">When the problem states exact limits (a classroom of between 15 and 30 students), the <strong>exact cardinality</strong> is written: <code>(15,30)</code> instead of <code>(0,N)</code>.</span></p>
-  </div>
-</section>
-
-<section class="slide " data-deco="activity">
-  <div class="deco-corner deco-a deco-activity"></div>
-  <div class="slide-inner activity-inner">
-    <span class="activity-badge">?</span>
-    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
-    <h2><span data-i18n="es">¿Lo puede expresar el diagrama?</span><span data-i18n="en">Can the diagram express it?</span></h2>
-    <div class="scenario-card">
-      <p><span data-i18n="es">Un empleado no puede dirigir el departamento en el que él mismo trabaja.</span><span data-i18n="en">An employee cannot manage the department they themselves work in.</span></p>
-    </div>
-    <p class="lede-lg"><span data-i18n="es">¿Qué cardinalidad, atributo o símbolo del modelo E/R básico expresa esta regla?</span><span data-i18n="en">Which cardinality, attribute or symbol in the basic E/R model expresses this rule?</span></p>
-  </div>
-</section>
-
-<section class="slide " data-deco="solucion">
-  <div class="deco-corner deco-a deco-activity"></div>
-  <div class="slide-inner activity-inner">
-    <span class="solution-badge">✓</span>
-    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
-    <h2><span data-i18n="es">Ninguno — es pérdida expresiva</span><span data-i18n="en">None — it's semantic loss</span></h2>
-    <p class="note"><span data-i18n="es">Se documenta como una nota <strong>PE</strong> al pie del diagrama, porque ninguna cardinalidad puede prohibir que la misma persona ocupe dos papeles distintos en la misma relación.</span><span data-i18n="en">It's documented as a <strong>PE</strong> (semantic loss) note at the foot of the diagram, because no cardinality can forbid the same person from holding two different roles in the same relationship.</span></p>
-  </div>
-</section>
-
 <section class="slide " data-deco="3">
   <div class="deco-corner deco-a"></div>
   <div class="deco-corner deco-b"></div>
@@ -961,11 +923,9 @@ a{color:inherit;}
       <svg viewBox="0 0 520 190">
         <rect x="190" y="10" width="120" height="36" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
         <text x="250" y="33" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--ink);"><tspan data-i18n="es">PERSONAL</tspan></text>
-        <line x1="250" y1="46" x2="250" y2="66" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <circle cx="250" cy="73" r="8" style="fill:var(--paper);stroke:var(--ink);stroke-width:2"/>
-        <text x="250" y="77" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);">P</text>
+        <line x1="250" y1="46" x2="250" y2="86" style="stroke:var(--ink-dim);stroke-width:2"/>
         <polygon points="220,86 280,86 250,116" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
-        <path d="M 175,124 A 78,22 0 0 1 325,124" style="fill:none;stroke:var(--ink);stroke-width:2"/>
+        <path d="M 175,124 A 78,22 0 0 0 325,124" style="fill:none;stroke:var(--ink);stroke-width:2"/>
         <line x1="250" y1="116" x2="90" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
         <line x1="250" y1="116" x2="250" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
         <line x1="250" y1="116" x2="410" y2="150" style="stroke:var(--ink-dim);stroke-width:2"/>
@@ -977,7 +937,7 @@ a{color:inherit;}
         <text x="410" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">TÉCNICO</tspan></text>
       </svg>
     </div>
-    <p class="note"><span data-i18n="es">El círculo <strong>P</strong> = jerarquía <strong>parcial</strong>; el arco = jerarquía <strong>exclusiva</strong>. Sin círculo sería total; sin arco, solapada.</span><span data-i18n="en">The <strong>P</strong> circle = <strong>partial</strong> hierarchy; the arc = <strong>exclusive</strong> hierarchy. No circle would mean total; no arc, overlapping.</span></p>
+    <p class="note"><span data-i18n="es">Sin círculo sobre la línea, esta jerarquía es <strong>parcial</strong>; el arco bajo el triángulo la marca como <strong>exclusiva</strong>. Con un círculo sería total; sin arco, solapada.</span><span data-i18n="en">No circle on the line, so this hierarchy is <strong>partial</strong>; the arc under the triangle marks it as <strong>exclusive</strong>. With a circle it would be total; no arc, overlapping.</span></p>
   </div>
 </section>
 
@@ -1034,35 +994,7 @@ a{color:inherit;}
       <li><span class="check-icon">✓</span><span data-i18n="es">Total — "pertenece obligatoriamente" a una categoría</span><span data-i18n="en">Total — "must belong" to a category</span></li>
       <li><span class="check-icon">✓</span><span data-i18n="es">Exclusiva — "nunca a más de una a la vez"</span><span data-i18n="en">Exclusive — "never more than one at a time"</span></li>
     </ul>
-    <p class="note"><span data-i18n="es">Sin círculo sobre el triángulo (total) y con arco de exclusividad bajo él (exclusiva).</span><span data-i18n="en">No circle over the triangle (total) and an exclusivity arc under it (exclusive).</span></p>
-  </div>
-</section>
-
-<section class="slide " data-deco="6">
-  <div class="deco-corner deco-a"></div>
-  <div class="slide-inner">
-    <span class="eyebrow">07 — <span data-i18n="es">Agregación</span><span data-i18n="en">Aggregation</span></span>
-    <h2><span data-i18n="es">Relacionar una relación</span><span data-i18n="en">Relating a relationship</span></h2>
-    <div class="diagram-box">
-      <svg viewBox="0 0 700 170">
-        <rect x="18" y="10" width="330" height="80" rx="10" style="fill:none;stroke:var(--ink-dim);stroke-width:2;stroke-dasharray:6 5"/>
-        <rect x="35" y="34" width="120" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
-        <text x="95" y="56" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">DOCENTE</tspan></text>
-        <polygon points="210,32 244,51 210,70 176,51" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
-        <text x="210" y="54" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">imparte</tspan></text>
-        <rect x="270" y="34" width="110" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
-        <text x="325" y="56" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);"><tspan data-i18n="es">AULA</tspan></text>
-        <line x1="155" y1="51" x2="176" y2="51" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <line x1="244" y1="51" x2="270" y2="51" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <path d="M 183,90 L 183,125 L 470,125" style="fill:none;stroke:var(--ink-dim);stroke-width:2"/>
-        <polygon points="505,105 548,125 505,145 462,125" style="fill:var(--paper);stroke:var(--blue);stroke-width:2.5"/>
-        <text x="505" y="129" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:9px;fill:var(--ink);"><tspan data-i18n="es">registra</tspan></text>
-        <line x1="548" y1="125" x2="578" y2="125" style="stroke:var(--ink-dim);stroke-width:2"/>
-        <rect x="578" y="107" width="105" height="34" rx="4" style="fill:var(--paper);stroke:var(--ink);stroke-width:2.5"/>
-        <text x="630" y="129" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink);"><tspan data-i18n="es">INCIDENCIA</tspan></text>
-      </svg>
-    </div>
-    <p class="note"><span data-i18n="es">Cuando una relación ya formada (DOCENTE <em>imparte</em> AULA) necesita participar en otra relación, se <strong>agrega</strong>: el conjunto entidad+relación+entidad se trata como una entidad de orden superior. No es lo mismo que una <strong>ternaria</strong>: ésta une tres entidades en un único hecho simultáneo; la agregación conecta un hecho ya existente con una tercera entidad.</span><span data-i18n="en">When an already-formed relationship (TEACHER <em>teaches</em> in ROOM) needs to take part in another relationship, it's <strong>aggregated</strong>: the entity+relationship+entity set is treated as a higher-level entity. Not the same as a <strong>ternary</strong> relationship: that joins three entities in one simultaneous fact; aggregation connects an already-existing fact with a separate third entity.</span></p>
+    <p class="note"><span data-i18n="es">Con círculo sobre la línea (total) y con arco de exclusividad bajo el triángulo (exclusiva).</span><span data-i18n="en">With a circle on the line (total) and an exclusivity arc under the triangle (exclusive).</span></p>
   </div>
 </section>
 
