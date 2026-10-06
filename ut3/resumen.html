@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT3 · Resumen — El diseño lógico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15171c;
+  --ink-soft:#4b4f58;
+  --ink-dim:#767c8a;
+  --paper:#ffffff;
+  --stage-bg:#f0ede6;
+  --line:#e7e3da;
+  --blue:#1b39e6;
+  --blue-deep:#0d1a7a;
+  --lilac:#e9c3ef;
+  --mint:#8ed0aa;
+  --mint-deep:#3f9468;
+  --yellow:#ffd23f;
+  --orange:#ff5a2e;
+  --shadow: 0 30px 70px -30px rgba(20,20,30,.35);
+  --tint-blue: color-mix(in srgb, var(--blue) 10%, var(--paper));
+  --tint-mint: color-mix(in srgb, var(--mint-deep) 14%, var(--paper));
+  --tint-ink: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  --tint-yellow: color-mix(in srgb, var(--yellow) 22%, var(--paper));
+}
+html[data-theme="dark"]{
+  --ink:#f1f0ec;
+  --ink-soft:#c7c8d2;
+  --ink-dim:#9296a8;
+  --paper:#22242c;
+  --stage-bg:#15161b;
+  --line:#3a3d48;
+  --blue-deep:#93a8ff;
+  --mint-deep:#7fd9a8;
+  --shadow: 0 30px 70px -30px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--stage-bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:28px 16px;
+}
+h1,h2,h3,h4{font-family:'Baloo 2','Poppins',system-ui,sans-serif;margin:0;letter-spacing:-0.01em;text-wrap:balance;}
+p{margin:0;}
+a{color:inherit;}
+
+#deck-app{width:100%;max-width:1200px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+/* ============ toolbar ============ */
+.toolbar{
+  width:100%;
+  max-width:1160px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-family:'Inter',sans-serif;
+}
+.toolbar-group{display:flex;align-items:center;gap:8px;}
+.toolbar-title{
+  font-family:'Baloo 2',sans-serif;
+  font-weight:700;
+  font-size:16px;
+  color:var(--ink-soft);
+}
+.tb-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;
+  padding:8px 14px;border-radius:999px;cursor:pointer;line-height:1;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.tb-btn:hover{transform:translateY(-2px);}
+.tb-btn.active{background:var(--ink);color:var(--paper);}
+.tb-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.lang-group{display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;}
+.lang-group .tb-btn{border:none;border-radius:0;padding:8px 16px;}
+.lang-group .tb-btn+.tb-btn{border-left:2px solid var(--ink);}
+
+/* ============ stage ============ */
+.stage-wrap{
+  width:100%;
+  max-width:1160px;
+  aspect-ratio:16/9;
+  position:relative;
+}
+.stage{
+  position:absolute;inset:0;
+  background:var(--paper);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.stage:fullscreen{border-radius:0;max-width:none;}
+.stage:fullscreen .slide{padding:5vw 6vw;}
+
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  padding:56px 64px;
+  overflow:hidden;
+}
+.slide.is-active{display:block;}
+.slide-inner{
+  position:relative;z-index:2;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+  max-width:980px;
+}
+.eyebrow{
+  font-family:'Baloo 2',sans-serif;font-weight:700;
+  font-size:clamp(14px,1.6vw,18px);
+  color:var(--blue-deep);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.slide h2{font-size:clamp(26px,3.6vw,44px);line-height:1.08;font-weight:800;max-width:16ch;}
+.slide .mega{font-size:clamp(34px,6vw,72px);line-height:1.02;font-weight:800;}
+.lede-lg{font-size:clamp(16px,1.9vw,22px);color:var(--ink-soft);max-width:62ch;line-height:1.5;}
+.note{font-size:clamp(15px,1.6vw,18px);color:var(--ink-soft);max-width:66ch;line-height:1.55;}
+.byline{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(16px,1.8vw,20px);color:var(--ink-soft);}
+
+/* ============ deco shapes ============ */
+.deco-corner{position:absolute;z-index:1;pointer-events:none;}
+.deco-a{width:230px;height:230px;top:-70px;right:-70px;border-radius:50%;background:var(--blue);}
+.deco-b{width:160px;height:160px;bottom:-50px;left:-50px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+
+.slide[data-deco="2"] .deco-a{background:var(--yellow);top:-90px;left:-90px;right:auto;border-radius:50%;}
+.slide[data-deco="2"] .deco-b{display:none;}
+
+.slide[data-deco="3"] .deco-a{width:210px;height:210px;top:-60px;right:-60px;border-radius:50%;border:38px solid var(--blue);background:transparent;}
+.slide[data-deco="3"] .deco-b{width:130px;height:130px;bottom:-40px;left:-40px;background:var(--mint);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="4"] .deco-a{width:200px;height:200px;bottom:-70px;right:-70px;top:auto;border-radius:50%;background:var(--orange);}
+.slide[data-deco="4"] .deco-b{width:150px;height:150px;top:-50px;left:-50px;bottom:auto;background:var(--lilac);clip-path:polygon(100% 0,0 0,100% 100%);}
+
+.slide[data-deco="5"] .deco-a{width:220px;height:220px;top:-80px;left:-80px;right:auto;border-radius:50%;background:var(--mint);}
+.slide[data-deco="5"] .deco-b{width:120px;height:120px;bottom:-40px;right:-40px;left:auto;background:var(--yellow);clip-path:polygon(0 0,100% 0,100% 100%);}
+
+.slide[data-deco="6"] .deco-a{width:200px;height:200px;top:-70px;right:-70px;border-radius:50%;background:var(--lilac);}
+.slide[data-deco="6"] .deco-b{width:170px;height:170px;bottom:-60px;left:-60px;background:var(--blue);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="title"] .deco-a{width:340px;height:340px;top:-110px;right:-110px;border-radius:50%;background:var(--blue);}
+.slide[data-deco="title"] .deco-b{width:230px;height:230px;bottom:-70px;left:-70px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+.slide.slide-title .slide-inner{gap:22px;}
+
+.slide[data-deco="activity"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--orange);opacity:.16;}
+.activity-inner{align-items:flex-start;gap:12px;}
+.activity-inner .lede-lg{max-width:70ch;}
+.slide[data-deco="activity"],.slide[data-deco="solucion"]{overflow-y:auto;}
+.activity-badge.team{background:var(--blue);box-shadow:0 14px 30px -10px rgba(27,57,230,.55);}
+.quiz-cards .card{display:flex;flex-direction:column;gap:8px;}
+.quiz-cards .card p{font-size:14.5px;font-weight:600;line-height:1.4;}
+.scenario-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:18px 22px;margin-top:4px;}
+.scenario-card p{font-size:16px;font-weight:600;line-height:1.5;}
+.activity-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--orange);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(255,90,46,.55);
+  flex:none;
+}
+
+.activity-prompts{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;}
+.activity-prompt{
+  display:flex;align-items:center;gap:10px;border:2px solid var(--ink);border-radius:999px;
+  padding:9px 18px 9px 9px;background:var(--paper);font-size:14.5px;font-weight:600;
+}
+.activity-prompt .num{
+  width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:13px;
+}
+.activity-prompt.p-campo .num{background:var(--blue);}
+.activity-prompt.p-registro .num{background:var(--mint-deep);}
+.activity-prompt.p-clave .num{background:var(--orange);}
+
+.solution-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--mint-deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(63,148,104,.55);
+  flex:none;
+}
+.slide[data-deco="solucion"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--mint);opacity:.22;}
+
+/* ============ content components ============ */
+.index-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 34px;}
+.index-list li{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);}
+.ix-num{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--blue);}
+.ix-txt{font-size:16px;color:var(--ink-soft);}
+
+.chain{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
+.chain-step{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 14px;min-width:135px;flex:1;}
+.chain-tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--blue-deep);margin-bottom:6px;}
+.chain-step p{font-size:14.5px;font-weight:600;}
+.chain-arrow{align-self:center;font-size:22px;color:var(--ink-dim);}
+
+.pillbox{display:flex;flex-wrap:wrap;gap:10px;}
+.pill,.pill-lg{
+  display:inline-flex;align-items:center;
+  border:2px solid var(--ink);border-radius:999px;
+  font-family:'Baloo 2',sans-serif;font-weight:600;
+  background:var(--paper);
+}
+.pill{padding:8px 16px;font-size:14px;}
+.pill-lg{padding:12px 20px;font-size:16px;}
+.pill.ghost{border-style:dashed;color:var(--ink-dim);border-color:var(--ink-dim);font-weight:500;}
+
+.tl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tl-row-4{grid-template-columns:repeat(4,1fr);}
+.tl-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.tl-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--tint-blue);margin-bottom:12px;}
+.tl-icon svg{display:block;}
+.tl-year{display:inline-block;font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:13px;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.tl-card h4{font-size:17px;margin-bottom:6px;line-height:1.2;}
+.tl-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.4;}
+
+.cards{display:grid;gap:14px;}
+.cards-2{grid-template-columns:repeat(2,1fr);}
+.cards-3{grid-template-columns:repeat(3,1fr);}
+.cards-4{grid-template-columns:repeat(4,1fr);}
+.cards-5{grid-template-columns:repeat(5,1fr);}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.card.small{padding:14px 16px;}
+.card .tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.card h4{font-size:16px;margin-bottom:6px;line-height:1.2;}
+.card p{font-size:13.5px;color:var(--ink-soft);line-height:1.42;}
+
+.gloss-grid .card, .gloss-grid .gloss-item{background:var(--paper);}
+.gloss-item{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.gloss-item h4{font-size:15.5px;margin-bottom:6px;}
+.gloss-item p{font-size:13px;color:var(--ink-soft);line-height:1.4;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:34px;}
+.col-h{display:block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);margin-bottom:10px;}
+.col-h-good{color:var(--mint-deep);}
+.col-h-bad{color:var(--orange);}
+.check-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.check-list li{display:flex;align-items:flex-start;gap:8px;font-size:14.5px;color:var(--ink-soft);}
+.check-icon{color:var(--mint-deep);font-weight:800;}
+.x-icon{color:var(--orange);font-weight:800;}
+.col-badge{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;flex:none;vertical-align:middle;}
+.col-badge.good{background:var(--mint-deep);}
+.col-badge.bad{background:var(--orange);}
+.problem-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;}
+.problem-list li{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;}
+
+.diagram-box{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 16px;}
+.diagram-box svg{display:block;width:100%;height:auto;}
+
+.gloss-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px;flex:none;}
+
+.chart-grid{border:2px solid var(--ink);border-radius:14px;overflow:hidden;}
+.chart-row{display:grid;grid-template-columns:1.1fr repeat(4,1fr);}
+.chart-row+.chart-row{border-top:2px solid var(--ink);}
+.chart-cell{padding:4px 10px;display:flex;align-items:center;justify-content:center;font-size:12.5px;line-height:1.05;border-left:2px solid var(--ink);}
+.chart-cell:first-child{border-left:none;justify-content:flex-start;font-family:'Spline Sans Mono',monospace;font-weight:600;background:var(--stage-bg);}
+.chart-row.head{background:#15171c;color:#e9ecf7;}
+.chart-row.head .chart-cell{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;border-left-color:#3a3d48;padding:4px 10px;}
+.chart-row.head .chart-cell:first-child{background:#15171c;}
+.chart-row.winner{background:var(--tint-mint);}
+.ok{color:var(--mint-deep);font-weight:800;font-size:14px;}
+.no{color:var(--orange);font-weight:800;font-size:14px;}
+
+.arch{display:flex;flex-direction:column;gap:10px;}
+.arch-layer{border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;color:#fff;}
+.arch-layer .lbl{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;}
+.arch-layer span:last-child{font-size:14px;opacity:.92;}
+.arch-layer.ext{background:var(--blue);}
+.arch-layer.con{background:var(--blue-deep);}
+.arch-layer.int{background:var(--ink);color:var(--paper);}
+
+.code{
+  font-family:'Spline Sans Mono',monospace;font-size:13.5px;line-height:1.7;
+  background:#15171c;color:#e9ecf7;border-radius:14px;padding:16px 20px;
+  white-space:pre-wrap;margin-top:10px;
+}
+.code .kw{color:#8fd0aa;font-weight:600;}
+.code .cm{color:#9aa1b8;}
+
+.final-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;counter-reset:fin;}
+.final-list li{counter-increment:fin;position:relative;padding-left:30px;font-size:15.5px;color:var(--ink-soft);line-height:1.4;}
+.final-list li::before{content:counter(fin);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.credits{margin-top:8px;font-size:11.5px;color:var(--ink-dim);max-width:70ch;line-height:1.5;}
+
+/* ============ bilingual toggle (self-contained wrapper, not <html>) ============ */
+[data-i18n]{display:none;}
+#deck-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+#deck-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+#deck-app[data-lang="es"] span[data-i18n="es"],
+#deck-app[data-lang="en"] span[data-i18n="en"]{display:inline;}
+
+/* ============ nav row ============ */
+.nav-row{
+  width:100%;max-width:1160px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.nav-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.nav-btn:hover{background:var(--ink);color:#fff;transform:translateY(-2px);}
+.nav-btn:disabled{opacity:.3;cursor:default;transform:none;background:var(--paper);color:var(--ink);}
+.nav-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.progress-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.progress-track{width:100%;height:6px;border-radius:999px;background:var(--line);overflow:hidden;}
+.progress-fill{height:100%;background:var(--blue);border-radius:999px;transition:width .25s ease;}
+.slide-counter{font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--ink-dim);}
+.hint{font-size:12px;color:var(--ink-dim);text-align:center;}
+
+@media (max-width:760px){
+  .slide{padding:34px 26px;}
+  .cards-3,.cards-4,.cards-5{grid-template-columns:repeat(2,1fr);}
+  .tl-row,.tl-row-4{grid-template-columns:1fr;}
+  .index-list{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .problem-list{grid-template-columns:1fr;}
+  .chart-cell{padding:7px 5px;font-size:10.5px;}
+}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+</style>
+
+<style>
+#deck-app{--panel:var(--paper);--clay:var(--ink);--teal:var(--blue);--accent-text:var(--blue-deep);}
+.slide h2{max-width:24ch;}
+.slide-inner{gap:14px;}
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;align-items:center;}
+.split-l,.split-r{min-width:0;}
+.split .diagram-box{padding:8px 10px;}
+.schema-box{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:6px;}
+.sl{font-family:'Spline Sans Mono',monospace;font-size:13.5px;line-height:1.55;color:var(--ink);overflow-wrap:anywhere;}
+.sl u{text-underline-offset:3px;text-decoration-thickness:1.5px;}
+.sl i.fk{font-style:italic;color:var(--blue-deep);}
+.sl .ak{text-decoration:underline dashed;text-underline-offset:3px;}
+.sleg{font-size:11.5px;color:var(--ink-dim);margin-top:4px;}
+.sleg .ak{text-decoration:underline dashed;}
+.sleg i.fk{color:var(--blue-deep);}
+.tables-row{display:none;gap:14px;flex-wrap:wrap;}
+#deck-app[data-lang="es"] .tables-row[data-i18n="es"],#deck-app[data-lang="en"] .tables-row[data-i18n="en"]{display:flex;}
+.reltab{background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:8px 10px;}
+.reltab .tname{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px;}
+table.rel{border-collapse:collapse;font-family:'Spline Sans Mono',monospace;font-size:12px;}
+table.rel th,table.rel td{border:1px solid var(--line);padding:2px 9px;text-align:left;white-space:nowrap;}
+table.rel th{background:var(--tint-blue);font-weight:600;}
+table.rel th u{text-underline-offset:3px;}
+table.rel th i.fk{font-style:italic;color:var(--blue-deep);}
+table.rel th .ak{text-decoration:underline dashed;}
+.null{color:var(--ink-dim);font-style:italic;}
+.prompts{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:3px;font-size:15px;font-weight:600;color:var(--ink-soft);}
+.prompts li[data-i18n]{display:none;}
+#deck-app[data-lang="es"] .prompts li[data-i18n="es"],#deck-app[data-lang="en"] .prompts li[data-i18n="en"]{display:list-item;}
+ul.bul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:15px;color:var(--ink-soft);line-height:1.42;}
+ul.bul li[data-i18n]{display:none;}
+#deck-app[data-lang="es"] ul.bul li[data-i18n="es"],#deck-app[data-lang="en"] ul.bul li[data-i18n="en"]{display:list-item;}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px;}
+.kv-row{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);}
+.kv-k{font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:12.5px;color:var(--blue-deep);flex:0 0 150px;}
+.kv-v{font-size:13.5px;color:var(--ink-soft);line-height:1.35;}
+pre.code{font-family:'Spline Sans Mono',monospace;font-size:13px;line-height:1.55;background:#15171c;color:#e9ecf7;border-radius:14px;padding:14px 18px;white-space:pre;margin:0;overflow-x:auto;}
+.quiz-cards .tag{font-size:11.5px;}
+.slide-title .lede-lg{margin-top:-4px;}
+.chain-step.on{background:var(--tint-blue);}
+.slide[data-deco="activity"] .slide-inner,.slide[data-deco="solucion"] .slide-inner{justify-content:flex-start;padding-top:2px;}
+.activity-badge,.solution-badge{width:48px;height:48px;font-size:22px;}
+.activity-inner h2{max-width:none;}
+code{font-family:'Spline Sans Mono',monospace;font-size:.92em;background:var(--tint-ink);border-radius:4px;padding:0 4px;}
+.note code,.card code,.kv-v code{background:var(--tint-ink);}
+@media(max-width:760px){.split{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}}
+
+.card p{font-size:15.5px;}.card h4{font-size:18px;}.card .tag{font-size:13px;}
+.tl-card p{font-size:15px;}
+.gloss-item h4{font-size:17px;}.gloss-item p{font-size:14.5px;}
+.sl{font-size:16.5px;line-height:1.6;}
+.sleg{font-size:12.5px;}
+table.rel{font-size:14.5px;}table.rel th,table.rel td{padding:4px 13px;}
+.reltab .tname{font-size:15px;}
+.kv-k{font-size:14px;flex-basis:170px;}.kv-v{font-size:15.5px;}
+ul.bul{font-size:17px;gap:9px;}
+.prompts{font-size:18px;gap:5px;}
+.scenario-card p{font-size:17px;}
+pre.code{font-size:15px;}
+.final-list li{font-size:18px;padding-left:34px;}.final-list li::before{width:25px;height:25px;font-size:13px;}
+.final-list{gap:12px;}
+.chain-step p{font-size:16.5px;}
+.slide-final .credits{font-size:12.5px;}
+.quiz-cards .card p{font-size:16px;}
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut2/teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="../ut2/teoria.html">📖 Teoría</a>
+        <a href="../ut2/actividades.html">📝 Actividades</a>
+        <a href="../ut2/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut3/teoria.html">UT3</a>
+      <div class="ut-children">
+        <a href="../ut3/teoria.html">📖 Teoría</a>
+        <a href="../ut3/actividades.html">📝 Actividades</a>
+        <a href="../ut3/resumen.html" class="active">🎛️ Resumen</a>
+      </div></div><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+  <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
+</aside>
+
+<div id="deck-app" data-lang="es">
+
+  <div class="toolbar">
+    <span class="toolbar-title">UT3 · <span data-i18n="es">Resumen de apoyo</span><span data-i18n="en">Teaching support summary</span></span>
+    <div class="toolbar-group">
+      <div class="lang-group" role="group" aria-label="Idioma / Language">
+        <button type="button" class="tb-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button type="button" class="tb-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="tb-btn" id="btn-theme" onclick="toggleTheme()"><span id="theme-icon">🌙</span> <span id="theme-label"><span data-i18n="es">Modo oscuro</span><span data-i18n="en">Dark mode</span></span></button>
+      <button type="button" class="tb-btn" id="btn-fs" onclick="toggleFullscreen()">⛶ <span data-i18n="es">Pantalla completa</span><span data-i18n="en">Fullscreen</span></button>
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+
+<section class="slide slide-title" data-deco="title">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner title-slide">
+    <span class="eyebrow"><span data-i18n="es">UT3 · Base de datos · 1º DAM bilingüe</span><span data-i18n="en">Unit 3 · Databases · 1st year DAM bilingual programme</span></span>
+    <h1 class="mega"><span data-i18n="es">El diseño<br>lógico</span><span data-i18n="en">Logical<br>design</span></h1>
+    <p class="lede-lg"><span data-i18n="es">Modelo relacional, paso a tablas y normalización</span><span data-i18n="en">Relational model, mapping to tables and normalisation</span></p>
+    <p class="byline">Marina Preciados Agapito</p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">Índice</span><span data-i18n="en">Contents</span></span>
+    <h2><span data-i18n="es">Lo que vamos a ver</span><span data-i18n="en">What we'll cover</span></h2>
+    <ol class="index-list"><li><span class="ix-num">01</span><span class="ix-txt"><span data-i18n="es">El modelo relacional</span><span data-i18n="en">The relational model</span></span></li><li><span class="ix-num">02</span><span class="ix-txt"><span data-i18n="es">Claves</span><span data-i18n="en">Keys</span></span></li><li><span class="ix-num">03</span><span class="ix-txt"><span data-i18n="es">Restricciones e integridad referencial</span><span data-i18n="en">Constraints and referential integrity</span></span></li><li><span class="ix-num">04</span><span class="ix-txt"><span data-i18n="es">Paso a tablas: reglas básicas</span><span data-i18n="en">Mapping to tables: the basic rules</span></span></li><li><span class="ix-num">05</span><span class="ix-txt"><span data-i18n="es">Reflexivas, ternarias y jerarquías</span><span data-i18n="en">Reflexive, ternary and hierarchies</span></span></li><li><span class="ix-num">06</span><span class="ix-txt"><span data-i18n="es">Dependencias funcionales</span><span data-i18n="en">Functional dependencies</span></span></li><li><span class="ix-num">07</span><span class="ix-txt"><span data-i18n="es">Formas normales: 1FN a FNBC</span><span data-i18n="en">Normal forms: 1NF to BCNF</span></span></li><li><span class="ix-num">08</span><span class="ix-txt"><span data-i18n="es">Ejemplo completo: StarVoice</span><span data-i18n="en">Complete example: StarVoice</span></span></li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — El modelo relacional</span><span data-i18n="en">01 — The relational model</span></span>
+    <h2><span data-i18n="es">De los diagramas a las tablas</span><span data-i18n="en">From diagrams to tables</span></h2>
+    <div class="chain"><div class="chain-step"><span class="chain-tag"><span data-i18n="es">1 · conceptual</span><span data-i18n="en">1 · conceptual</span></span><p><span data-i18n="es">Modelo E/R</span><span data-i18n="en">E/R model</span></p></div><div class="chain-arrow">→</div><div class="chain-step on"><span class="chain-tag"><span data-i18n="es">2 · lógico</span><span data-i18n="en">2 · logical</span></span><p><span data-i18n="es">Modelo relacional</span><span data-i18n="en">Relational model</span></p></div><div class="chain-arrow">→</div><div class="chain-step on"><span class="chain-tag"><span data-i18n="es">3</span><span data-i18n="en">3</span></span><p><span data-i18n="es">Normalización</span><span data-i18n="en">Normalisation</span></p></div><div class="chain-arrow">→</div><div class="chain-step"><span class="chain-tag"><span data-i18n="es">4 · físico</span><span data-i18n="en">4 · physical</span></span><p><span data-i18n="es">SQL en un SGBD</span><span data-i18n="en">SQL in a DBMS</span></p></div></div>
+    <p class="note"><span data-i18n="es">En la UT2 dibujamos el problema; ahora lo traducimos a tablas que un SGBD relacional entiende, y comprobamos que esas tablas no guardan los datos de forma torpe. Esta unidad es el puente entre el dibujo y el SQL.</span><span data-i18n="en">In Unit 2 we drew the problem; now we translate it into tables a relational DBMS understands, and check those tables don't store data clumsily. This unit is the bridge between the drawing and SQL.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — El modelo relacional</span><span data-i18n="en">01 — The relational model</span></span>
+    <h2><span data-i18n="es">Tres vocabularios para lo mismo</span><span data-i18n="en">Three vocabularies for the same thing</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">RELACIONAL</span><span data-i18n="en">RELATIONAL</span></span><h4><span data-i18n="es">Relación · tupla · atributo</span><span data-i18n="en">Relation · tuple · attribute</span></h4><p><span data-i18n="es">El lenguaje formal de Codd: una relación es un conjunto de tuplas; cada atributo toma valores de un dominio.</span><span data-i18n="en">Codd's formal language: a relation is a set of tuples; each attribute takes values from a domain.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">TABLA</span><span data-i18n="en">TABLE</span></span><h4><span data-i18n="es">Tabla · fila · columna</span><span data-i18n="en">Table · row · column</span></h4><p><span data-i18n="es">El vocabulario del SQL y del día a día: es el que usaremos casi siempre.</span><span data-i18n="en">The vocabulary of SQL and everyday work: the one we'll mostly use.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">FICHERO</span><span data-i18n="en">FILE</span></span><h4><span data-i18n="es">Fichero · registro · campo</span><span data-i18n="en">File · record · field</span></h4><p><span data-i18n="es">El vocabulario del nivel físico, heredado de los ficheros: aparece al hablar de almacenamiento.</span><span data-i18n="en">The vocabulary of the physical level, inherited from files: it appears when we talk about storage.</span></p></div></div>
+    <p class="note"><span data-i18n="es"><strong>Grado</strong> = número de atributos (columnas). <strong>Cardinalidad</strong> = número de tuplas (filas). <strong>Dominio</strong> = tipo de dato y rango permitido de un atributo.</span><span data-i18n="en"><strong>Degree</strong> = number of attributes (columns). <strong>Cardinality</strong> = number of tuples (rows). <strong>Domain</strong> = a data type and the range of values allowed for an attribute.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Grado, cardinalidad y dominio</span><span data-i18n="en">Degree, cardinality and domain</span></h2>
+    
+    <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">LIBRO</div><table class="rel"><thead><tr><th>isbn</th><th>titulo</th><th>anio</th><th>precio</th></tr></thead><tbody><tr><td>A-101</td><td>Don Quijote</td><td>1605</td><td>12.5</td></tr><tr><td>A-102</td><td>La Regenta</td><td>1885</td><td>14.0</td></tr><tr><td>B-201</td><td>Rayuela</td><td>1963</td><td>11.9</td></tr><tr><td>B-202</td><td>Pedro Páramo</td><td>1955</td><td>9.5</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">BOOK</div><table class="rel"><thead><tr><th>isbn</th><th>title</th><th>year</th><th>price</th></tr></thead><tbody><tr><td>A-101</td><td>Don Quijote</td><td>1605</td><td>12.5</td></tr><tr><td>A-102</td><td>La Regenta</td><td>1885</td><td>14.0</td></tr><tr><td>B-201</td><td>Rayuela</td><td>1963</td><td>11.9</td></tr><tr><td>B-202</td><td>Pedro Páramo</td><td>1955</td><td>9.5</td></tr></tbody></table></div></div><ol class="prompts"><li data-i18n="es">¿Grado y cardinalidad de la relación?</li><li data-i18n="en">Degree and cardinality of the relation?</li><li data-i18n="es">¿Qué dominio razonable darías a <code>anio</code> y a <code>precio</code>?</li><li data-i18n="en">What reasonable domain would you give <code>anio</code> and <code>precio</code>?</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Cuatro y cuatro (por casualidad)</span><span data-i18n="en">Four and four (by chance)</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">GRADO</span><span data-i18n="en">DEGREE</span></span><p><span data-i18n="es"><strong>4</strong> — isbn, titulo, anio, precio.</span><span data-i18n="en"><strong>4</strong> — isbn, titulo, anio, precio.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">CARDINALIDAD</span><span data-i18n="en">CARDINALITY</span></span><p><span data-i18n="es"><strong>4</strong> tuplas. Coincide por casualidad: nada que ver con el grado.</span><span data-i18n="en"><strong>4</strong> tuples. They match by chance: nothing to do with the degree.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">DOMINIOS</span><span data-i18n="en">DOMAINS</span></span><p><span data-i18n="es"><code>anio</code>: entero entre 1400 y el año actual. <code>precio</code>: decimal ≥ 0 con dos decimales.</span><span data-i18n="en"><code>anio</code>: integer between 1400 and the current year. <code>precio</code>: decimal ≥ 0 with two decimals.</span></p></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — El modelo relacional</span><span data-i18n="en">01 — The relational model</span></span>
+    <h2><span data-i18n="es">Seis propiedades de toda tabla</span><span data-i18n="en">Six properties of every table</span></h2>
+    <div class="cards cards-3 gloss-grid"><div class="gloss-item"><h4>1. <span data-i18n="es">Nombre único</span><span data-i18n="en">Unique name</span></h4><p><span data-i18n="es">Cada tabla tiene un nombre distinto.</span><span data-i18n="en">Every table has a distinct name.</span></p></div><div class="gloss-item"><h4>2. <span data-i18n="es">Un valor por celda</span><span data-i18n="en">One value per cell</span></h4><p><span data-i18n="es">Nada de listas dentro de una celda.</span><span data-i18n="en">No lists inside a cell.</span></p></div><div class="gloss-item"><h4>3. <span data-i18n="es">Atributos distintos</span><span data-i18n="en">Distinct attributes</span></h4><p><span data-i18n="es">No se repite un nombre de columna en la misma tabla.</span><span data-i18n="en">A column name isn't repeated within a table.</span></p></div><div class="gloss-item"><h4>4. <span data-i18n="es">Sin tuplas duplicadas</span><span data-i18n="en">No duplicate tuples</span></h4><p><span data-i18n="es">Cada fila es única: por eso toda tabla necesita una clave.</span><span data-i18n="en">Every row is unique: that's why every table needs a key.</span></p></div><div class="gloss-item"><h4>5. <span data-i18n="es">Orden de columnas libre</span><span data-i18n="en">Column order is free</span></h4><p><span data-i18n="es">Se accede por nombre, no por posición.</span><span data-i18n="en">You access by name, not by position.</span></p></div><div class="gloss-item"><h4>6. <span data-i18n="es">Orden de filas libre</span><span data-i18n="en">Row order is free</span></h4><p><span data-i18n="es">No hay «primera» fila con significado; se ordena al consultar.</span><span data-i18n="en">There's no meaningful “first” row; you sort when querying.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Si una tabla rompe alguna de las seis, no es una relación en sentido estricto.</span><span data-i18n="en">If a table breaks any of the six, it isn't a relation in the strict sense.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">02 — Claves</span><span data-i18n="en">02 — Keys</span></span>
+    <h2><span data-i18n="es">Cuatro tipos de clave</span><span data-i18n="en">Four kinds of key</span></h2>
+    <div class="cards cards-4"><div class="card"><span class="tag"><span data-i18n="es">CANDIDATA</span><span data-i18n="en">CANDIDATE</span></span><p><span data-i18n="es">Atributo o conjunto que identifica cada fila sin ambigüedad. Toda tabla tiene al menos una.</span><span data-i18n="en">Attribute or set that identifies each row unambiguously. Every table has at least one.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">PRIMARIA</span><span data-i18n="en">PRIMARY</span></span><p><span data-i18n="es">La candidata elegida. Única y <strong>nunca nula</strong>. Solo una por tabla.</span><span data-i18n="en">The chosen candidate. Unique and <strong>never null</strong>. Only one per table.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">ALTERNATIVA</span><span data-i18n="en">ALTERNATE</span></span><p><span data-i18n="es">Las candidatas no elegidas. En SQL: <code>UNIQUE NOT NULL</code>.</span><span data-i18n="en">The candidates not chosen. In SQL: <code>UNIQUE NOT NULL</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">FORÁNEA</span><span data-i18n="en">FOREIGN</span></span><p><span data-i18n="es">Atributo que apunta a la clave primaria de otra tabla (o de la misma). Puede ser nula.</span><span data-i18n="en">Attribute pointing to another table's primary key (or the same table's). It can be null.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Elegir la primaria depende del contexto: corta, estable y siempre con valor. Si ninguna candidata sirve, se crea una artificial (<code>id</code>).</span><span data-i18n="en">Choosing the primary key depends on context: short, stable and always present. If no candidate fits, an artificial one (<code>id</code>) is created.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">02 — Claves</span><span data-i18n="en">02 — Keys</span></span>
+    <h2><span data-i18n="es">La clave foránea en acción</span><span data-i18n="en">The foreign key in action</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 170" role="img"><title>grafo relacional</title><defs><marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent-text)"/></marker></defs><rect x="20" y="14" width="210" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="20" y="14" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="125.0" y="36.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">EQUIPO</text><text x="32" y="65.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">num_equipo</text><text x="220" y="65.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="20" y1="74" x2="230" y2="74" style="stroke:var(--line);stroke-width:1"/><text x="32" y="91.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">nombre</text><line x1="20" y1="100" x2="230" y2="100" style="stroke:var(--line);stroke-width:1"/><text x="32" y="117.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">ciudad</text><rect x="330" y="14" width="210" height="138" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="330" y="14" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="435.0" y="36.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">JUGADOR</text><text x="342" y="65.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">num_jugador</text><text x="530" y="65.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="330" y1="74" x2="540" y2="74" style="stroke:var(--line);stroke-width:1"/><text x="342" y="91.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">nombre</text><line x1="330" y1="100" x2="540" y2="100" style="stroke:var(--line);stroke-width:1"/><text x="342" y="117.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">edad</text><line x1="330" y1="126" x2="540" y2="126" style="stroke:var(--line);stroke-width:1"/><text x="342" y="143.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);font-style:italic;">num_equipo</text><text x="530" y="143.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">FK</text><path d="M 330,139.0 C 280.0,139.0 280.0,61.0 230,61.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr1)"/></svg></div><div data-i18n="en"><svg viewBox="0 0 560 170" role="img"><title>relational graph</title><defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent-text)"/></marker></defs><rect x="20" y="14" width="210" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="20" y="14" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="125.0" y="36.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">TEAM</text><text x="32" y="65.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">team_no</text><text x="220" y="65.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="20" y1="74" x2="230" y2="74" style="stroke:var(--line);stroke-width:1"/><text x="32" y="91.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">name</text><line x1="20" y1="100" x2="230" y2="100" style="stroke:var(--line);stroke-width:1"/><text x="32" y="117.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">city</text><rect x="330" y="14" width="210" height="138" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="330" y="14" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="435.0" y="36.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">PLAYER</text><text x="342" y="65.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">player_no</text><text x="530" y="65.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="330" y1="74" x2="540" y2="74" style="stroke:var(--line);stroke-width:1"/><text x="342" y="91.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">name</text><line x1="330" y1="100" x2="540" y2="100" style="stroke:var(--line);stroke-width:1"/><text x="342" y="117.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">age</text><line x1="330" y1="126" x2="540" y2="126" style="stroke:var(--line);stroke-width:1"/><text x="342" y="143.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);font-style:italic;">team_no</text><text x="530" y="143.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">FK</text><path d="M 330,139.0 C 280.0,139.0 280.0,61.0 230,61.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr2)"/></svg></div></div></div><div class="split-r"><ul class="bul"><li data-i18n="es">Cada jugador guarda <strong>solo el número</strong> de su equipo: el nombre y la ciudad no se repiten.</li><li data-i18n="en">Each player stores <strong>only the number</strong> of their team: the name and city aren't repeated.</li><li data-i18n="es">La flecha va de la foránea a la primaria a la que apunta.</li><li data-i18n="en">The arrow goes from the foreign key to the primary key it points to.</li><li data-i18n="es"><code>NULL</code> no es 0 ni vacío: es <em>ausencia de valor</em>. Una foránea nula significa «todavía sin equipo».</li><li data-i18n="en"><code>NULL</code> is neither 0 nor empty: it's the <em>absence of a value</em>. A null foreign key means “no team yet”.</li></ul></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">03 — Restricciones</span><span data-i18n="en">03 — Constraints</span></span>
+    <h2><span data-i18n="es">Reglas que impone el modelo</span><span data-i18n="en">Rules the model imposes</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">PRIMARY KEY</span><span class="kv-v"><span data-i18n="es">Identifica la fila: valores únicos y nunca nulos.</span><span data-i18n="en">Identifies the row: unique, never-null values.</span></span></div><div class="kv-row"><span class="kv-k">UNIQUE</span><span class="kv-v"><span data-i18n="es">No se repite entre filas (sí puede quedar vacío).</span><span data-i18n="en">Doesn't repeat across rows (it may be empty).</span></span></div><div class="kv-row"><span class="kv-k">NOT NULL</span><span class="kv-v"><span data-i18n="es">El atributo no puede quedar vacío.</span><span data-i18n="en">The attribute can't be left empty.</span></span></div><div class="kv-row"><span class="kv-k">UNIQUE + NOT NULL</span><span class="kv-v"><span data-i18n="es">Clave alternativa: no hay marca propia en la mayoría de SGBD.</span><span data-i18n="en">Alternate key: most DBMS have no dedicated marker.</span></span></div><div class="kv-row"><span class="kv-k">FOREIGN KEY</span><span class="kv-v"><span data-i18n="es">Solo admite valores que existan como primaria en la tabla destino (o nulo).</span><span data-i18n="en">Only admits values that exist as a primary key in the target table (or null).</span></span></div><div class="kv-row"><span class="kv-k">CHECK</span><span class="kv-v"><span data-i18n="es">Condición lógica: <code>sueldo &gt; 1000</code>, <code>fecha_inicio &lt; fecha_fin</code>.</span><span data-i18n="en">Logical condition: <code>salary &gt; 1000</code>, <code>start_date &lt; end_date</code>.</span></span></div><div class="kv-row"><span class="kv-k">TRIGGER</span><span class="kv-v"><span data-i18n="es">Código que se ejecuta ante un evento: la restricción más potente (y más cara).</span><span data-i18n="en">Code that runs on an event: the most powerful constraint (and the costliest).</span></span></div></div>
+    <p class="note"><span data-i18n="es">Lo que el esquema no puede expresar —por ejemplo, un mínimo (2,N)— se controla con un disparador o desde la aplicación.</span><span data-i18n="en">What the schema can't express —for example a (2,N) minimum— is enforced with a trigger or from the application.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">03 — Restricciones</span><span data-i18n="en">03 — Constraints</span></span>
+    <h2><span data-i18n="es">Integridad referencial: borrar y modificar</span><span data-i18n="en">Referential integrity: deleting and updating</span></h2>
+    <div class="cards cards-4"><div class="card"><span class="tag">NO ACTION / RESTRICT</span><p><span data-i18n="es">Rechaza la operación si hay filas que dependen de la clave afectada. Es la política por defecto.</span><span data-i18n="en">Rejects the operation if rows depend on the affected key. The default policy.</span></p></div><div class="card"><span class="tag">CASCADE</span><p><span data-i18n="es">Propaga el cambio: al borrar la principal, se borran las dependientes; al cambiar la clave, se actualizan.</span><span data-i18n="en">Propagates the change: deleting the main row deletes the dependents; changing the key updates them.</span></p></div><div class="card"><span class="tag">SET NULL</span><p><span data-i18n="es">Las dependientes siguen existiendo con la foránea a <code>NULL</code>. Solo si admite nulos.</span><span data-i18n="en">Dependents survive with the foreign key set to <code>NULL</code>. Only if it allows nulls.</span></p></div><div class="card"><span class="tag">SET DEFAULT</span><p><span data-i18n="es">Las dependientes pasan a un valor por defecto (que debe existir en la principal).</span><span data-i18n="en">Dependents switch to a default value (which must exist in the main table).</span></p></div></div>
+    <p class="note"><span data-i18n="es">Regla práctica: lo débil depende de lo fuerte, así que un hijo de empleado usa <code>CASCADE</code>; un alquiler no debería desaparecer con su cliente.</span><span data-i18n="en">Rule of thumb: the weak depends on the strong, so an employee's child uses <code>CASCADE</code>; a rental shouldn't vanish with its customer.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Qué acepta el SGBD?</span><span data-i18n="en">What does the DBMS accept?</span></h2>
+    
+    <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">CLIENTE</div><table class="rel"><thead><tr><th><u>cod_cliente</u></th><th>nombre</th></tr></thead><tbody><tr><td>1</td><td>Josu</td></tr><tr><td>2</td><td>Ana</td></tr></tbody></table></div><div class="reltab"><div class="tname">ALQUILER</div><table class="rel"><thead><tr><th><u>cod_alquiler</u></th><th>fecha</th><th><i class="fk">cod_cliente</i></th></tr></thead><tbody><tr><td>1</td><td>03/05</td><td>1</td></tr><tr><td>2</td><td>10/06</td><td>1</td></tr><tr><td>3</td><td>22/06</td><td>2</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">CUSTOMER</div><table class="rel"><thead><tr><th><u>customer_code</u></th><th>name</th></tr></thead><tbody><tr><td>1</td><td>Josu</td></tr><tr><td>2</td><td>Ana</td></tr></tbody></table></div><div class="reltab"><div class="tname">RENTAL</div><table class="rel"><thead><tr><th><u>rental_code</u></th><th>date</th><th><i class="fk">customer_code</i></th></tr></thead><tbody><tr><td>1</td><td>03/05</td><td>1</td></tr><tr><td>2</td><td>10/06</td><td>1</td></tr><tr><td>3</td><td>22/06</td><td>2</td></tr></tbody></table></div></div><p class="note"><span data-i18n="es"><code>ALQUILER.cod_cliente</code> es foránea hacia <code>CLIENTE</code> con <code>NO ACTION</code> y admite nulos.</span><span data-i18n="en"><code>ALQUILER.cod_cliente</code> is a foreign key to <code>CLIENTE</code> with <code>NO ACTION</code> and allows nulls.</span></p><ol class="prompts"><li data-i18n="es">Borrar el cliente 2.</li><li data-i18n="en">Delete customer 2.</li><li data-i18n="es">Insertar el alquiler 4 del cliente 7.</li><li data-i18n="en">Insert rental 4 for customer 7.</li><li data-i18n="es">Insertar el alquiler 4 con <code>cod_cliente</code> nulo.</li><li data-i18n="en">Insert rental 4 with a null <code>cod_cliente</code>.</li><li data-i18n="es">Cambiar el código del cliente 1 a 10.</li><li data-i18n="en">Change customer 1's code to 10.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Rechazada, rechazada, aceptada, rechazada</span><span data-i18n="en">Rejected, rejected, accepted, rejected</span></h2>
+    <div class="cards cards-2 quiz-cards"><div class="card" style="border-color:var(--orange)"><span class="tag" style="color:var(--orange)">1 · <span data-i18n="es">RECHAZADA</span><span data-i18n="en">REJECTED</span></span><p><span data-i18n="es">El cliente 2 tiene el alquiler 3: con <code>NO ACTION</code> no se borra una primaria referenciada.</span><span data-i18n="en">Customer 2 has rental 3: with <code>NO ACTION</code> a referenced primary key can't be deleted.</span></p></div><div class="card" style="border-color:var(--orange)"><span class="tag" style="color:var(--orange)">2 · <span data-i18n="es">RECHAZADA</span><span data-i18n="en">REJECTED</span></span><p><span data-i18n="es">El cliente 7 no existe: una foránea solo admite valores que existan.</span><span data-i18n="en">Customer 7 doesn't exist: a foreign key only admits existing values.</span></p></div><div class="card" style="border-color:var(--mint-deep)"><span class="tag" style="color:var(--mint-deep)">3 · <span data-i18n="es">ACEPTADA</span><span data-i18n="en">ACCEPTED</span></span><p><span data-i18n="es">Una foránea puede ser nula (alquiler aún sin cliente), salvo <code>NOT NULL</code>.</span><span data-i18n="en">A foreign key may be null (rental not linked yet), unless <code>NOT NULL</code>.</span></p></div><div class="card" style="border-color:var(--orange)"><span class="tag" style="color:var(--orange)">4 · <span data-i18n="es">RECHAZADA</span><span data-i18n="en">REJECTED</span></span><p><span data-i18n="es">Los alquileres 1 y 2 quedarían apuntando a un cliente inexistente.</span><span data-i18n="en">Rentals 1 and 2 would be left pointing at a non-existent customer.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Con <code>CASCADE</code>, borrar al cliente 1 borraría los alquileres 1 y 2; con <code>SET NULL</code>, quedarían con <code>cod_cliente = NULL</code>.</span><span data-i18n="en">With <code>CASCADE</code>, deleting customer 1 would delete rentals 1 and 2; with <code>SET NULL</code>, they'd keep existing with <code>cod_cliente = NULL</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">Claves de PERSONA</span><span data-i18n="en">Keys of PERSON</span></h2>
+    
+    <div class="scenario-card"><p><span data-i18n="es"><code>PERSONA(dni, nss, email, nombre, telefono)</code>. El <code>dni</code> y el <code>nss</code> son únicos; el <code>email</code> también es único y todo usuario tiene uno; el <code>nombre</code> puede repetirse; el <code>telefono</code> es opcional.</span><span data-i18n="en"><code>PERSON(dni, nss, email, nombre, telefono)</code>. The <code>dni</code> and <code>nss</code> are unique; the <code>email</code> is also unique and every user has one; the <code>nombre</code> may repeat; the <code>telefono</code> is optional.</span></p></div><ol class="prompts"><li data-i18n="es">¿Cuáles son las claves candidatas?</li><li data-i18n="en">Which are the candidate keys?</li><li data-i18n="es">Elige la primaria; ¿qué son las demás?</li><li data-i18n="en">Choose the primary; what are the others?</li><li data-i18n="es">Escribe el <code>CREATE TABLE</code>.</li><li data-i18n="en">Write the <code>CREATE TABLE</code>.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Tres candidatas, una primaria</span><span data-i18n="en">Three candidates, one primary</span></h2>
+    <div class="split "><div class="split-l"><ul class="bul"><li data-i18n="es"><strong>Candidatas:</strong> dni, nss y email (únicos y siempre con valor).</li><li data-i18n="en"><strong>Candidates:</strong> dni, nss and email (unique, always present).</li><li data-i18n="es"><strong>Primaria:</strong> <code>dni</code> (corto y estable). <code>nss</code> y <code>email</code> son alternativas.</li><li data-i18n="en"><strong>Primary:</strong> <code>dni</code> (short, stable). <code>nss</code> and <code>email</code> are alternates.</li><li data-i18n="es">El teléfono es opcional: sin <code>NOT NULL</code>.</li><li data-i18n="en">The phone is optional: no <code>NOT NULL</code>.</li></ul></div><div class="split-r"><pre class="code" data-i18n="es">CREATE TABLE persona (
+  dni      CHAR(9)      PRIMARY KEY,
+  nss      CHAR(12)     NOT NULL UNIQUE,
+  email    VARCHAR(100) NOT NULL UNIQUE,
+  nombre   VARCHAR(80)  NOT NULL,
+  telefono VARCHAR(15)
+);</pre><pre class="code" data-i18n="en">CREATE TABLE person (
+  dni      CHAR(9)      PRIMARY KEY,
+  nss      CHAR(12)     NOT NULL UNIQUE,
+  email    VARCHAR(100) NOT NULL UNIQUE,
+  nombre   VARCHAR(80)  NOT NULL,
+  telefono VARCHAR(15)
+);</pre></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Paso a tablas</span><span data-i18n="en">04 — Mapping to tables</span></span>
+    <h2><span data-i18n="es">Primero, limpiar el E/R</span><span data-i18n="en">First, clean up the E/R</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">COMPUESTOS</span><span data-i18n="en">COMPOSITE</span></span><h4><span data-i18n="es">Se descomponen</span><span data-i18n="en">They're split</span></h4><p><span data-i18n="es"><code>nombre_completo</code> pasa a <code>nombre</code>, <code>apellido1</code> y <code>apellido2</code>.</span><span data-i18n="en"><code>nombre_completo</code> becomes <code>nombre</code>, <code>apellido1</code> and <code>apellido2</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">MULTIVALUADOS</span><span data-i18n="en">MULTI-VALUED</span></span><h4><span data-i18n="es">Se convierten en entidad</span><span data-i18n="en">They become an entity</span></h4><p><span data-i18n="es">Si <code>email</code> admite varios valores: entidad EMAIL relacionada 1:N con EMPLEADO.</span><span data-i18n="en">If <code>email</code> takes several values: an EMAIL entity related 1:N to EMPLOYEE.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">DERIVADOS</span><span data-i18n="en">DERIVED</span></span><h4><span data-i18n="es">No se almacenan</span><span data-i18n="en">They aren't stored</span></h4><p><span data-i18n="es"><code>edad</code> se calcula al consultar; guardarla es pedir inconsistencias.</span><span data-i18n="en"><code>age</code> is calculated when querying; storing it invites inconsistencies.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Después, una pregunta lo resuelve casi todo: mira el <strong>máximo</strong> y el <strong>mínimo</strong> de cada entidad en la relación.</span><span data-i18n="en">Then one question solves almost everything: look at the <strong>maximum</strong> and the <strong>minimum</strong> of each entity in the relationship.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Paso a tablas</span><span data-i18n="en">04 — Mapping to tables</span></span>
+    <h2><span data-i18n="es">Reglas 1 y 2: entidades</span><span data-i18n="en">Rules 1 and 2: entities</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 150" role="img"><title>EMPLEADO tiene HIJO</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLEADO</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="411" y="45" width="130" height="34" rx="2" style="fill:none;stroke:var(--clay);stroke-width:1.6"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">HIJO</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">tiene</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 150" role="img"><title>EMPLOYEE has CHILD</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLOYEE</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="411" y="45" width="130" height="34" rx="2" style="fill:none;stroke:var(--clay);stroke-width:1.6"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">CHILD</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">has</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>nif</u>, nombre)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>tax_id</u>, name)</div><div class="sl" data-i18n="es"><b>HIJO</b>(<u><i class="fk">nif_empleado</i></u>, <u>nombre_hijo</u>, fecha_nac)</div><div class="sl" data-i18n="en"><b>CHILD</b>(<u><i class="fk">employee_tax_id</i></u>, <u>child_name</u>, birth_date)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es"><strong>Fuerte</strong> → una tabla; su identificador es la clave primaria. <strong>Débil</strong> → una tabla con todos sus atributos más la clave de la fuerte (foránea), que forma parte de su clave junto al identificador parcial. Normalmente con <code>ON DELETE CASCADE</code>.</span><span data-i18n="en"><strong>Strong</strong> → one table; its identifier is the primary key. <strong>Weak</strong> → a table with all its attributes plus the strong entity's key (foreign), which becomes part of its key together with the partial identifier. Usually with <code>ON DELETE CASCADE</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Paso a tablas</span><span data-i18n="en">04 — Mapping to tables</span></span>
+    <h2><span data-i18n="es">Regla 3: N:M siempre es una tabla</span><span data-i18n="en">Rule 3: N:M is always a table</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 205" role="img"><title>ALUMNO cursa ASIGNATURA</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">ALUMNO</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">ASIGNATURA</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">cursa</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">N:M</text><line x1="280" y1="91" x2="280.0" y2="150" style="stroke:var(--ink-dim);stroke-width:1.8"/><ellipse cx="280.0" cy="168" rx="52" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/><text x="280.0" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">nota</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 205" role="img"><title>STUDENT takes SUBJECT</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">STUDENT</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">SUBJECT</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">takes</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">N:M</text><line x1="280" y1="91" x2="280.0" y2="150" style="stroke:var(--ink-dim);stroke-width:1.8"/><ellipse cx="280.0" cy="168" rx="52" ry="20" style="fill:var(--panel);stroke:var(--ink-dim);stroke-width:1.6"/><text x="280.0" y="172" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">grade</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>ALUMNO</b>(<u>dni</u>, nombre)</div><div class="sl" data-i18n="en"><b>STUDENT</b>(<u>dni</u>, name)</div><div class="sl" data-i18n="es"><b>ASIGNATURA</b>(<u>cod_asignatura</u>, nombre)</div><div class="sl" data-i18n="en"><b>SUBJECT</b>(<u>subject_code</u>, name)</div><div class="sl" data-i18n="es"><b>CURSA</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">cod_asignatura</i></u>, nota)</div><div class="sl" data-i18n="en"><b>TAKES</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">subject_code</i></u>, grade)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">La clave primaria es la <strong>unión de las dos foráneas</strong>. Si hay que guardar un histórico (repetir la pareja en fechas distintas), la fecha entra en la clave.</span><span data-i18n="en">The primary key is the <strong>union of the two foreign keys</strong>. If history must be kept (the same pair repeating on different dates), the date joins the key.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Paso a tablas</span><span data-i18n="en">04 — Mapping to tables</span></span>
+    <h2><span data-i18n="es">Regla 4: 1:N, la clave viaja al lado «muchos»</span><span data-i18n="en">Rule 4: 1:N, the key travels to the “many” side</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 150" role="img"><title>EMPLEADO pertenece DEPARTAMENTO</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLEADO</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">DEPARTAMENTO</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">pertenece</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 150" role="img"><title>EMPLOYEE belongs DEPARTMENT</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLOYEE</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">DEPARTMENT</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">belongs</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>DEPARTAMENTO</b>(<u>cod_dep</u>, nombre)</div><div class="sl" data-i18n="en"><b>DEPARTMENT</b>(<u>dept_code</u>, name)</div><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>dni</u>, nombre, <i class="fk">cod_dep</i>)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>dni</u>, name, <i class="fk">dept_code</i>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">Cada empleado guarda su departamento. Como el mínimo es 1, <code>cod_dep</code> lleva <code>NOT NULL</code>; con (0,1) admitiría nulos. Tabla propia solo si hay muchos nulos, si puede acabar siendo N:M o si la relación tiene atributos.</span><span data-i18n="en">Each employee stores their department. Since the minimum is 1, <code>cod_dep</code> is <code>NOT NULL</code>; with (0,1) it would allow nulls. A table of its own only for many nulls, a likely future N:M, or relationship attributes.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Paso a tablas</span><span data-i18n="en">04 — Mapping to tables</span></span>
+    <h2><span data-i18n="es">Regla 5: 1:1, la clave va a quien siempre participa</span><span data-i18n="en">Rule 5: 1:1, the key goes to whoever always participates</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 150" role="img"><title>EMPLEADO dirige DEPARTAMENTO</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLEADO</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">DEPARTAMENTO</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">dirige</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,1)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:1</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 150" role="img"><title>EMPLOYEE directs DEPARTMENT</title><rect x="14" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="84.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLOYEE</text><rect x="406" y="40" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="476.0" y="67.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">DEPARTMENT</text><line x1="154" y1="62" x2="238" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="322" y1="62" x2="406" y2="62" style="stroke:var(--ink-dim);stroke-width:1.8"/><polygon points="280,33.2 325.0,62 280,90.8 235.0,62" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="66" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">directs</text><text x="196" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,1)</text><text x="364" y="52" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(1,1)</text><text x="280" y="24" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:1</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>nif</u>, nombre)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>tax_id</u>, name)</div><div class="sl" data-i18n="es"><b>DEPARTAMENTO</b>(<u>cod_dep</u>, nombre, <span class="ak"><i class="fk">dni_director</i></span>)</div><div class="sl" data-i18n="en"><b>DEPARTMENT</b>(<u>dept_code</u>, name, <span class="ak"><i class="fk">director_dni</i></span>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">Todo departamento tiene director (1,1), pero no todo empleado dirige (0,1): la foránea va en DEPARTAMENTO, con <code>NOT NULL</code> y <code>UNIQUE</code> (subrayado discontinuo). Si ninguna entidad participa siempre, (0,1):(0,1), tabla propia.</span><span data-i18n="en">Every department has a director (1,1), but not every employee directs (0,1): the foreign key goes in DEPARTMENT, <code>NOT NULL</code> and <code>UNIQUE</code> (dashed underline). If neither entity always participates, (0,1):(0,1), a table of its own.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">Dormitorios a medida</span><span data-i18n="en">Custom bedrooms</span></h2>
+    
+    <div class="scenario-card"><p><span data-i18n="es">De cada <strong>modelo</strong> interesa su código; de cada <strong>montador</strong>, NIF, nombre, dirección y teléfono. Cada modelo debe ser montado por <strong>al menos dos</strong> montadores y un montador puede montar varios modelos, incluso el mismo en fechas distintas (importa la fecha y la cantidad montada). De cada <strong>cliente</strong>: NIF, nombre, dirección y teléfono; compra varios modelos, con fecha de compra.</span><span data-i18n="en">For each <strong>model</strong> we need its code; for each <strong>fitter</strong>, tax ID, name, address and phone. Each model must be fitted by <strong>at least two</strong> fitters, and a fitter can fit several models, even the same one on different dates (date and quantity fitted matter). For each <strong>customer</strong>: tax ID, name, address and phone; they buy several models, with a purchase date.</span></p></div><p class="lede-lg" data-i18n="es">Pasa a tablas. ¿Hay alguna regla del enunciado que el esquema no pueda expresar?</p><p class="lede-lg" data-i18n="en">Convert to tables. Is there any rule in the statement the schema can't express?</p>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Dos N:M... y una regla que se escapa</span><span data-i18n="en">Two N:M... and a rule that slips away</span></h2>
+    <div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>MODELO</b>(<u>cod_modelo</u>)</div><div class="sl" data-i18n="en"><b>MODEL</b>(<u>model_code</u>)</div><div class="sl" data-i18n="es"><b>MONTADOR</b>(<u>nif</u>, nombre, direccion, telefono)</div><div class="sl" data-i18n="en"><b>FITTER</b>(<u>tax_id</u>, name, address, phone)</div><div class="sl" data-i18n="es"><b>CLIENTE</b>(<u>nif</u>, nombre, direccion, telefono)</div><div class="sl" data-i18n="en"><b>CUSTOMER</b>(<u>tax_id</u>, name, address, phone)</div><div class="sl" data-i18n="es"><b>MONTA</b>(<u><i class="fk">nif_montador</i></u>, <u><i class="fk">cod_modelo</i></u>, <u>fecha</u>, cantidad)</div><div class="sl" data-i18n="en"><b>FITS</b>(<u><i class="fk">fitter_tax_id</i></u>, <u><i class="fk">model_code</i></u>, <u>date</u>, quantity)</div><div class="sl" data-i18n="es"><b>COMPRA</b>(<u><i class="fk">nif_cliente</i></u>, <u><i class="fk">cod_modelo</i></u>, <u>fecha_compra</u>)</div><div class="sl" data-i18n="en"><b>PURCHASE</b>(<u><i class="fk">customer_tax_id</i></u>, <u><i class="fk">model_code</i></u>, <u>purchase_date</u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+    <p class="note"><span data-i18n="es"><strong>(2,N)</strong> —«al menos dos montadores por modelo»— no se puede expresar con tablas y claves: se comprueba con un disparador o desde la aplicación.</span><span data-i18n="en"><strong>(2,N)</strong> —“at least two fitters per model”— can't be expressed with tables and keys: it's checked with a trigger or from the application.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Casos especiales</span><span data-i18n="en">05 — Special cases</span></span>
+    <h2><span data-i18n="es">Reflexivas: la clave se repite con otro nombre</span><span data-i18n="en">Reflexive: the key repeats under another name</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 190" role="img"><title>EMPLEADO dirige</title><rect x="210" y="120" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="280.0" y="147.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLEADO</text><polygon points="280,7.199999999999999 325.0,36 280,64.8 235.0,36" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="40" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">dirige</text><path d="M 210,134 C 120,120 150,50 244,40" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/><path d="M 350,134 C 440,120 410,50 316,40" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/><text x="150" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,1)</text><text x="410" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="12" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 190" role="img"><title>EMPLOYEE manages</title><rect x="210" y="120" width="140" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="280.0" y="147.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">EMPLOYEE</text><polygon points="280,7.199999999999999 325.0,36 280,64.8 235.0,36" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="40" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">manages</text><path d="M 210,134 C 120,120 150,50 244,40" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/><path d="M 350,134 C 440,120 410,50 316,40" style="fill:none;stroke:var(--ink-dim);stroke-width:1.8"/><text x="150" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,1)</text><text x="410" y="112" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="280" y="12" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink-dim);">1:N</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>dni</u>, nombre, <i class="fk">dni_jefe</i>)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>dni</u>, name, <i class="fk">boss_dni</i>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">Se trata como una binaria: un empleado tiene como mucho un jefe, así que la foránea <code>dni_jefe</code> apunta a la propia tabla y admite nulos (el director no tiene jefe).</span><span data-i18n="en">It's treated like a binary one: an employee has at most one boss, so the foreign key <code>dni_jefe</code> points to the same table and allows nulls (the director has no boss).</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Casos especiales</span><span data-i18n="en">05 — Special cases</span></span>
+    <h2><span data-i18n="es">Ternarias: tres claves foráneas</span><span data-i18n="en">Ternary: three foreign keys</span></h2>
+    <div class="split "><div class="split-l"><div class="diagram-box" style=""><div data-i18n="es"><svg viewBox="0 0 560 250" role="img"><title>atiende</title><rect x="14" y="20" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="89.0" y="47.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">MEDICO</text><rect x="396" y="20" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="471.0" y="47.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">PACIENTE</text><rect x="205" y="190" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="280.0" y="217.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">CONSULTA</text><polygon points="280,73.0 330.0,105 280,137.0 230.0,105" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="109" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">atiende</text><line x1="164" y1="42" x2="247" y2="92" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="396" y1="42" x2="313" y2="92" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="280" y1="130" x2="280" y2="190" style="stroke:var(--ink-dim);stroke-width:1.8"/><text x="200" y="62" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="360" y="62" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="310" y="168" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text></svg></div><div data-i18n="en"><svg viewBox="0 0 560 250" role="img"><title>sees</title><rect x="14" y="20" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="89.0" y="47.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">DOCTOR</text><rect x="396" y="20" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="471.0" y="47.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">PATIENT</text><rect x="205" y="190" width="150" height="44" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><text x="280.0" y="217.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;fill:var(--ink);">ROOM</text><polygon points="280,73.0 330.0,105 280,137.0 230.0,105" style="fill:var(--panel);stroke:var(--teal);stroke-width:2.5"/><text x="280" y="109" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:11px;fill:var(--ink);">sees</text><line x1="164" y1="42" x2="247" y2="92" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="396" y1="42" x2="313" y2="92" style="stroke:var(--ink-dim);stroke-width:1.8"/><line x1="280" y1="130" x2="280" y2="190" style="stroke:var(--ink-dim);stroke-width:1.8"/><text x="200" y="62" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="360" y="62" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text><text x="310" y="168" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:12px;fill:var(--accent-text);">(0,N)</text></svg></div></div></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>ATIENDE</b>(<u><i class="fk">cod_medico</i></u>, <u><i class="fk">cod_paciente</i></u>, <u><i class="fk">cod_consulta</i></u>)</div><div class="sl" data-i18n="en"><b>SEES</b>(<u><i class="fk">doctor_code</i></u>, <u><i class="fk">patient_code</i></u>, <u><i class="fk">room_code</i></u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">La relación pasa a ser una tabla con las tres claves. La primaria son las claves de las entidades con máximo N: con N:N:N, las tres; con 1:N:N se quita la del lado 1; con 1:1:N, la del N más otra cualquiera.</span><span data-i18n="en">The relationship becomes a table with the three keys. The primary key is made of the keys of the entities with maximum N: with N:N:N, all three; with 1:N:N the 1-side key is dropped; with 1:1:N, the N key plus any one other.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Casos especiales</span><span data-i18n="en">05 — Special cases</span></span>
+    <h2><span data-i18n="es">Jerarquías ISA: tres opciones</span><span data-i18n="en">ISA hierarchies: three options</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">OPCIÓN 1</span><span data-i18n="en">OPTION 1</span></span><h4><span data-i18n="es">Una sola tabla</span><span data-i18n="en">A single table</span></h4><p><span data-i18n="es">Todos los atributos juntos, más un tipo. Simple, pero llena de nulos. Va bien si los subtipos casi no difieren.</span><span data-i18n="en">All attributes together plus a type column. Simple but full of nulls. Fine if subtypes barely differ.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">OPCIÓN 2</span><span data-i18n="en">OPTION 2</span></span><h4><span data-i18n="es">Una tabla por entidad</span><span data-i18n="en">A table per entity</span></h4><p><span data-i18n="es">Supertipo + una tabla por subtipo con la clave del supertipo (PK y FK). Es la más general: sirve también si es solapada.</span><span data-i18n="en">Supertype + one table per subtype holding the supertype's key (PK and FK). The most general: also works if overlapping.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">OPCIÓN 3</span><span data-i18n="en">OPTION 3</span></span><h4><span data-i18n="es">Solo los subtipos</span><span data-i18n="en">Subtypes only</span></h4><p><span data-i18n="es">Cada subtipo hereda los atributos del padre; el supertipo desaparece. Solo si es total y exclusiva y no tiene relaciones propias.</span><span data-i18n="en">Each subtype inherits the parent's attributes; the supertype disappears. Only if total and exclusive and it has no relationships of its own.</span></p></div></div>
+    <p class="note"><span data-i18n="es">La parte <em>total</em> de una jerarquía («todo empleado es programador o comercial») no la garantiza ninguna clave: se vigila con un disparador.</span><span data-i18n="en">The <em>total</em> part of a hierarchy (“every employee is a programmer or salesperson”) isn't guaranteed by any key: it's watched with a trigger.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Casos especiales</span><span data-i18n="en">05 — Special cases</span></span>
+    <h2><span data-i18n="es">Chuleta: qué se convierte en qué</span><span data-i18n="en">Cheat sheet: what becomes what</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k"><span data-i18n="es">Entidad fuerte</span><span data-i18n="en">Strong entity</span></span><span class="kv-v"><span data-i18n="es">Tabla; identificador → clave primaria.</span><span data-i18n="en">Table; identifier → primary key.</span></span></div><div class="kv-row"><span class="kv-k"><span data-i18n="es">Entidad débil</span><span data-i18n="en">Weak entity</span></span><span class="kv-v"><span data-i18n="es">Tabla con la clave de la fuerte (foránea) + identificador parcial.</span><span data-i18n="en">Table with the strong entity's key (foreign) + partial identifier.</span></span></div><div class="kv-row"><span class="kv-k"><span data-i18n="es">Compuesto / multivaluado / derivado</span><span data-i18n="en">Composite / multi-valued / derived</span></span><span class="kv-v"><span data-i18n="es">Se descompone / nueva entidad / no se almacena.</span><span data-i18n="en">Split / new entity / not stored.</span></span></div><div class="kv-row"><span class="kv-k">N:M</span><span class="kv-v"><span data-i18n="es">Tabla nueva; clave = unión de las dos foráneas.</span><span data-i18n="en">New table; key = union of the two foreign keys.</span></span></div><div class="kv-row"><span class="kv-k">1:N</span><span class="kv-v"><span data-i18n="es">Clave del «uno» como foránea en el «muchos».</span><span data-i18n="en">The “one” key as a foreign key in the “many”.</span></span></div><div class="kv-row"><span class="kv-k">1:1</span><span class="kv-v"><span data-i18n="es">Foránea en quien participa siempre; tabla propia si ninguna.</span><span data-i18n="en">Foreign key in whoever always participates; own table if neither.</span></span></div><div class="kv-row"><span class="kv-k"><span data-i18n="es">Reflexiva</span><span data-i18n="en">Reflexive</span></span><span class="kv-v"><span data-i18n="es">Como la binaria, con la clave repetida con otro nombre.</span><span data-i18n="en">Like the binary, with the key repeated under another name.</span></span></div><div class="kv-row"><span class="kv-k"><span data-i18n="es">Ternaria</span><span data-i18n="en">Ternary</span></span><span class="kv-v"><span data-i18n="es">Tabla con tres foráneas; primaria según los máximos N.</span><span data-i18n="en">Table with three foreign keys; primary key by the maximum N's.</span></span></div><div class="kv-row"><span class="kv-k">ISA</span><span class="kv-v"><span data-i18n="es">Una tabla, una por entidad, o solo subtipos.</span><span data-i18n="en">One table, one per entity, or subtypes only.</span></span></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">06 — Normalización</span><span data-i18n="en">06 — Normalisation</span></span>
+    <h2><span data-i18n="es">Una tabla mal diseñada, en acción</span><span data-i18n="en">A badly designed table, in action</span></h2>
+    <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">PEDIDO</div><table class="rel"><thead><tr><th><u>id_pedido</u></th><th>cliente</th><th>ciudad</th><th>producto</th><th>precio</th></tr></thead><tbody><tr><td>1</td><td>Marta</td><td>Cáceres</td><td>Teclado</td><td>25</td></tr><tr><td>2</td><td>Marta</td><td>Cáceres</td><td>Ratón</td><td>12</td></tr><tr><td>3</td><td>Iván</td><td>Mérida</td><td>Teclado</td><td>25</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">ORDER</div><table class="rel"><thead><tr><th><u>order_id</u></th><th>customer</th><th>city</th><th>product</th><th>price</th></tr></thead><tbody><tr><td>1</td><td>Marta</td><td>Cáceres</td><td>Teclado</td><td>25</td></tr><tr><td>2</td><td>Marta</td><td>Cáceres</td><td>Ratón</td><td>12</td></tr><tr><td>3</td><td>Iván</td><td>Mérida</td><td>Teclado</td><td>25</td></tr></tbody></table></div></div><div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">MODIFICACIÓN</span><span data-i18n="en">UPDATE</span></span><p><span data-i18n="es">Marta se muda: hay que tocar dos filas. Si falla una, vive en dos ciudades.</span><span data-i18n="en">Marta moves: two rows to change. Miss one and she lives in two cities.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">INSERCIÓN</span><span data-i18n="en">INSERT</span></span><p><span data-i18n="es">No se puede dar de alta una clienta sin pedido: la clave es <code>id_pedido</code>.</span><span data-i18n="en">A customer with no order can't be added: the key is <code>id_pedido</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">BORRADO</span><span data-i18n="en">DELETE</span></span><p><span data-i18n="es">Anular el pedido 3 borra para siempre que Iván existe y vive en Mérida.</span><span data-i18n="en">Cancelling order 3 erases forever that Iván exists and lives in Mérida.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Misma raíz: la tabla mezcla hechos distintos (cliente, producto, pedido). Repartirlos en tablas separadas es, exactamente, normalizar.</span><span data-i18n="en">Same root: the table mixes distinct facts (customer, product, order). Splitting them into separate tables is, exactly, normalising.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">06 — Normalización</span><span data-i18n="en">06 — Normalisation</span></span>
+    <h2><span data-i18n="es">Dependencias funcionales</span><span data-i18n="en">Functional dependencies</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag">X → Y</span><h4><span data-i18n="es">Dependencia funcional</span><span data-i18n="en">Functional dependency</span></h4><p><span data-i18n="es">Si conoces X, sabes Y: <code>dni → nombre</code>, <code>matricula → modelo</code>. <code>nombre → dni</code> no, dos personas pueden llamarse igual.</span><span data-i18n="en">If you know X, you know Y: <code>dni → name</code>, <code>plate → model</code>. <code>name → dni</code> doesn't hold: two people can share a name.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">COMPLETA / PARCIAL</span><span data-i18n="en">FULL / PARTIAL</span></span><h4><span data-i18n="es">Con clave compuesta</span><span data-i18n="en">With a composite key</span></h4><p><span data-i18n="es">Completa: depende de toda la clave. Parcial: depende solo de una parte. En <code>PRESTAMO(idUsuario, idLibro, …)</code>, <code>nombreUsuario</code> solo depende de <code>idUsuario</code>.</span><span data-i18n="en">Full: depends on the whole key. Partial: only on part of it. In <code>LOAN(userId, bookId, …)</code>, <code>userName</code> depends only on <code>userId</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">TRANSITIVA</span><span data-i18n="en">TRANSITIVE</span></span><h4><span data-i18n="es">A → B → C</span><span data-i18n="en">A → B → C</span></h4><p><span data-i18n="es"><code>dni → ciudad → provincia</code>: la provincia depende del DNI solo «pasando por» la ciudad.</span><span data-i18n="en"><code>dni → city → province</code>: the province depends on the DNI only “through” the city.</span></p></div></div>
+    <p class="note"><span data-i18n="es"><strong>Determinante</strong> = lo que está a la izquierda de la flecha. <strong>Clave</strong> = determinante que determina todos los demás atributos.</span><span data-i18n="en"><strong>Determinant</strong> = what's on the left of the arrow. <strong>Key</strong> = a determinant that determines all the other attributes.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Analiza las dependencias</span><span data-i18n="en">Analyse the dependencies</span></h2>
+    
+    <div class="scenario-card"><p><span data-i18n="es"><code>LINEA(id_pedido, id_producto, nombre_producto, cantidad, id_cliente, ciudad_cliente)</code>, clave <code>(id_pedido, id_producto)</code>. Cada pedido es de un único cliente; cada cliente vive en una ciudad; cada producto tiene un nombre.</span><span data-i18n="en"><code>LINEA(id_pedido, id_producto, nombre_producto, cantidad, id_cliente, ciudad_cliente)</code>, key <code>(id_pedido, id_producto)</code>. Each order belongs to one customer; each customer lives in one city; each product has a name.</span></p></div><ol class="prompts"><li data-i18n="es">Escribe las dependencias funcionales.</li><li data-i18n="en">Write the functional dependencies.</li><li data-i18n="es">Clasifícalas: completa, parcial o transitiva.</li><li data-i18n="en">Classify them: full, partial or transitive.</li><li data-i18n="es">¿En qué forma normal está?</li><li data-i18n="en">Which normal form is it in?</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Está en 1FN, pero no en 2FN</span><span data-i18n="en">It's in 1NF, but not in 2NF</span></h2>
+    <ul class="bul"><li data-i18n="es"><code>(id_pedido, id_producto) → cantidad</code>: <strong>completa</strong>.</li><li data-i18n="en"><code>(id_pedido, id_producto) → cantidad</code>: <strong>full</strong>.</li><li data-i18n="es"><code>id_producto → nombre_producto</code>: <strong>parcial</strong>.</li><li data-i18n="en"><code>id_producto → nombre_producto</code>: <strong>partial</strong>.</li><li data-i18n="es"><code>id_pedido → id_cliente</code>: <strong>parcial</strong>.</li><li data-i18n="en"><code>id_pedido → id_cliente</code>: <strong>partial</strong>.</li><li data-i18n="es"><code>id_cliente → ciudad_cliente</code>: con la anterior, <code>ciudad_cliente</code> depende de <code>id_pedido</code> de forma <strong>transitiva</strong> (y parcial).</li><li data-i18n="en"><code>id_cliente → ciudad_cliente</code>: with the previous one, <code>ciudad_cliente</code> depends on <code>id_pedido</code> <strong>transitively</strong> (and partially).</li></ul>
+    <p class="note"><span data-i18n="es">Valores atómicos → 1FN. Las dependencias parciales impiden la 2FN.</span><span data-i18n="en">Atomic values → 1NF. The partial dependencies rule out 2NF.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">07 — Formas normales</span><span data-i18n="en">07 — Normal forms</span></span>
+    <h2><span data-i18n="es">Cada forma contiene a la anterior</span><span data-i18n="en">Each form contains the previous one</span></h2>
+    <div class="cards cards-4"><div class="card"><span class="tag"><span data-i18n="es">1FN</span><span data-i18n="en">1NF</span></span><p><span data-i18n="es">Valores <strong>atómicos</strong>: sin listas en una celda ni grupos repetitivos.</span><span data-i18n="en"><strong>Atomic</strong> values: no lists in a cell, no repeating groups.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">2FN</span><span data-i18n="en">2NF</span></span><p><span data-i18n="es">1FN + ningún atributo depende solo de <strong>parte</strong> de la clave. (Solo importa con clave compuesta.)</span><span data-i18n="en">1NF + no attribute depends on just <strong>part</strong> of the key. (Only matters with composite keys.)</span></p></div><div class="card"><span class="tag"><span data-i18n="es">3FN</span><span data-i18n="en">3NF</span></span><p><span data-i18n="es">2FN + ninguna dependencia <strong>transitiva</strong> entre atributos no clave.</span><span data-i18n="en">2NF + no <strong>transitive</strong> dependency among non-key attributes.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">FNBC</span><span data-i18n="en">BCNF</span></span><p><span data-i18n="es">Todo determinante es clave candidata. Detecta lo que la 3FN deja pasar.</span><span data-i18n="en">Every determinant is a candidate key. Catches what 3NF lets through.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Objetivo mínimo: llegar a <strong>3FN</strong>. Más allá existen 4FN, 5FN y DKNF, que rara vez hacen falta.</span><span data-i18n="en">Minimum goal: reach <strong>3NF</strong>. Beyond that there are 4NF, 5NF and DKNF, rarely needed.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">07 — Formas normales</span><span data-i18n="en">07 — Normal forms</span></span>
+    <h2><span data-i18n="es">El método: dos partes y repetir</span><span data-i18n="en">The method: two parts, then repeat</span></h2>
+    <div class="chain"><div class="chain-step"><span class="chain-tag"><span data-i18n="es">1</span><span data-i18n="en">1</span></span><p><span data-i18n="es">Lo que cumple: tabla con la clave original</span><span data-i18n="en">What complies: a table with the original key</span></p></div><div class="chain-arrow">→</div><div class="chain-step on"><span class="chain-tag"><span data-i18n="es">2</span><span data-i18n="en">2</span></span><p><span data-i18n="es">Lo que se escapa: tabla nueva con su determinante como clave</span><span data-i18n="en">What escapes: a new table with its determinant as key</span></p></div><div class="chain-arrow">→</div><div class="chain-step"><span class="chain-tag"><span data-i18n="es">3</span><span data-i18n="en">3</span></span><p><span data-i18n="es">Comprobar la nueva y repetir si hace falta</span><span data-i18n="en">Check the new one and repeat if needed</span></p></div><div class="chain-arrow">→</div><div class="chain-step"><span class="chain-tag"><span data-i18n="es">4</span><span data-i18n="en">4</span></span><p><span data-i18n="es">Renombrar con nombres con sentido</span><span data-i18n="en">Rename with meaningful names</span></p></div></div>
+    <p class="note"><span data-i18n="es">Sirve igual para 1FN, 2FN y 3FN: cada vez, lo que incumple sale a una tabla propia junto con su determinante.</span><span data-i18n="en">It works the same for 1NF, 2NF and 3NF: each time, what breaks the rule moves to a table of its own together with its determinant.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">Alumnos y asignaturas</span><span data-i18n="en">Students and subjects</span></h2>
+    
+    <div class="scenario-card"><p><span data-i18n="es"><code>ALUMNOS(dni, apellidos, nombre, direccion, ciudad, provincia, com_aut, codigo, asignatura, nota)</code>, clave <code>(dni, codigo)</code>. Cada ciudad es de una provincia y cada provincia de una comunidad; cada código de asignatura tiene un nombre; la nota es de un alumno en una asignatura.</span><span data-i18n="en"><code>ALUMNOS(dni, apellidos, nombre, direccion, ciudad, provincia, com_aut, codigo, asignatura, nota)</code>, key <code>(dni, codigo)</code>. Each city is in one province and each province in one community; each subject code has one name; the grade belongs to one student in one subject.</span></p></div><p class="lede-lg" data-i18n="es">Normaliza hasta 3FN, explicando cada paso.</p><p class="lede-lg" data-i18n="en">Normalise up to 3NF, explaining each step.</p>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">1FN → 2FN → 3FN</span><span data-i18n="en">1NF → 2NF → 3NF</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">1FN</span><span data-i18n="en">1NF</span></span><p><span data-i18n="es">Los datos del alumno se repetirían por asignatura: se separa <code>ALUMNOS_ASIGNATURAS(dni, codigo, asignatura, nota)</code>.</span><span data-i18n="en">The student's data would repeat per subject: split out <code>ALUMNOS_ASIGNATURAS(dni, codigo, asignatura, nota)</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">2FN</span><span data-i18n="en">2NF</span></span><p><span data-i18n="es"><code>asignatura</code> depende solo de <code>codigo</code> (parcial): sale <code>ASIGNATURAS(codigo, asignatura)</code>.</span><span data-i18n="en"><code>asignatura</code> depends only on <code>codigo</code> (partial): out goes <code>ASIGNATURAS(codigo, asignatura)</code>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">3FN</span><span data-i18n="en">3NF</span></span><p><span data-i18n="es"><code>dni → ciudad → provincia → com_aut</code>: sale <code>CIUDAD</code>, y de nuevo <code>PROVINCIA</code>.</span><span data-i18n="en"><code>dni → city → province → community</code>: out goes <code>CIUDAD</code>, and again <code>PROVINCIA</code>.</span></p></div></div><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>PROVINCIA</b>(<u>provincia</u>, com_aut)</div><div class="sl" data-i18n="en"><b>PROVINCE</b>(<u>province</u>, aut_community)</div><div class="sl" data-i18n="es"><b>CIUDAD</b>(<u>ciudad</u>, <i class="fk">provincia</i>)</div><div class="sl" data-i18n="en"><b>CITY</b>(<u>city</u>, <i class="fk">province</i>)</div><div class="sl" data-i18n="es"><b>ALUMNOS</b>(<u>dni</u>, apellidos, nombre, direccion, <i class="fk">ciudad</i>)</div><div class="sl" data-i18n="en"><b>STUDENTS</b>(<u>dni</u>, surnames, name, address, <i class="fk">city</i>)</div><div class="sl" data-i18n="es"><b>ASIGNATURAS</b>(<u>codigo</u>, asignatura)</div><div class="sl" data-i18n="en"><b>SUBJECTS</b>(<u>code</u>, subject)</div><div class="sl" data-i18n="es"><b>ALUMNOS_ASIGNATURAS</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">codigo</i></u>, nota)</div><div class="sl" data-i18n="en"><b>STUDENT_SUBJECTS</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">code</i></u>, grade)</div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Un caso que 3FN no detecta</span><span data-i18n="en">A case 3NF doesn't detect</span></h2>
+    
+    <div class="scenario-card"><p><span data-i18n="es"><code>REPARACION(cliente, tipo, mecanico)</code>. Cada mecánico está especializado en <strong>un solo tipo</strong> de reparación y, para cada tipo, cada cliente es atendido siempre por el mismo mecánico.</span><span data-i18n="en"><code>REPAIR(cliente, tipo, mecanico)</code>. Each mechanic specialises in <strong>a single type</strong> of repair and, for each type, each customer is always attended by the same mechanic.</span></p></div><div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">REPARACION</div><table class="rel"><thead><tr><th><u>cliente</u></th><th><u>tipo</u></th><th>mecanico</th></tr></thead><tbody><tr><td>Marta</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Iván</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Marta</td><td>motor</td><td>Soto</td></tr><tr><td>Lucía</td><td>motor</td><td>Soto</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">REPAIR</div><table class="rel"><thead><tr><th><u>customer</u></th><th><u>type</u></th><th>mechanic</th></tr></thead><tbody><tr><td>Marta</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Iván</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Marta</td><td>motor</td><td>Soto</td></tr><tr><td>Lucía</td><td>motor</td><td>Soto</td></tr></tbody></table></div></div><ol class="prompts"><li data-i18n="es">DF y claves candidatas.</li><li data-i18n="en">FDs and candidate keys.</li><li data-i18n="es">¿3FN? ¿FNBC?</li><li data-i18n="en">3NF? BCNF?</li><li data-i18n="es">Descomponla si hace falta.</li><li data-i18n="en">Decompose it if needed.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">En 3FN sí, en FNBC no</span><span data-i18n="en">In 3NF yes, in BCNF no</span></h2>
+    <div class="split "><div class="split-l"><ul class="bul"><li data-i18n="es"><code>(cliente, tipo) → mecanico</code> y <code>mecanico → tipo</code>. Candidatas: <code>(cliente, tipo)</code> y <code>(cliente, mecanico)</code>.</li><li data-i18n="en"><code>(cliente, tipo) → mecanico</code> and <code>mecanico → tipo</code>. Candidates: <code>(cliente, tipo)</code> and <code>(cliente, mecanico)</code>.</li><li data-i18n="es"><strong>3FN:</strong> todos los atributos forman parte de alguna clave. <strong>No FNBC:</strong> <code>mecanico</code> determina el tipo y no es clave.</li><li data-i18n="en"><strong>3NF:</strong> every attribute is part of some key. <strong>Not BCNF:</strong> <code>mecanico</code> determines the type and isn't a key.</li></ul></div><div class="split-r"><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>MECANICO</b>(<u>mecanico</u>, tipo)</div><div class="sl" data-i18n="en"><b>MECHANIC</b>(<u>mechanic</u>, type)</div><div class="sl" data-i18n="es"><b>CLIENTE_MECANICO</b>(<u><i class="fk">cliente</i></u>, <u><i class="fk">mecanico</i></u>)</div><div class="sl" data-i18n="en"><b>CUSTOMER_MECHANIC</b>(<u><i class="fk">customer</i></u>, <u><i class="fk">mechanic</i></u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div></div></div>
+    <p class="note"><span data-i18n="es">Unir las dos tablas por <code>mecanico</code> recupera exactamente las filas originales: no se pierde información.</span><span data-i18n="en">Joining both tables on <code>mecanico</code> gets back exactly the original rows: no information is lost.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">08 — Ejemplo completo</span><span data-i18n="en">08 — Complete example</span></span>
+    <h2><span data-i18n="es">StarVoice en siete tablas</span><span data-i18n="en">StarVoice in seven tables</span></h2>
+    <div class="diagram-box" style="padding:6px 10px;max-width:860px;"><svg viewBox="0 0 1010 372" role="img"><title>StarVoice: grafo relacional</title><defs><marker id="arr8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent-text)"/></marker></defs><rect x="76" y="10" width="210" height="86" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="76" y="10" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="181.0" y="32.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">COACH</text><text x="88" y="61.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">coach_id</text><text x="276" y="61.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="76" y1="70" x2="286" y2="70" style="stroke:var(--line);stroke-width:1"/><text x="88" y="87.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">name</text><rect x="76" y="210" width="210" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="76" y="210" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="181.0" y="232.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">COMMENTS</text><text x="88" y="261.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);text-decoration:underline;font-style:italic;">coach_id</text><text x="276" y="261.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK·FK</text><line x1="76" y1="270" x2="286" y2="270" style="stroke:var(--line);stroke-width:1"/><text x="88" y="287.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);text-decoration:underline;font-style:italic;">performance_id</text><text x="276" y="287.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK·FK</text><line x1="76" y1="296" x2="286" y2="296" style="stroke:var(--line);stroke-width:1"/><text x="88" y="313.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">comment</text><rect x="416" y="10" width="230" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="416" y="10" width="230" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="531.0" y="32.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">CONTESTANT</text><text x="428" y="61.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">contestant_id</text><text x="636" y="61.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="416" y1="70" x2="646" y2="70" style="stroke:var(--line);stroke-width:1"/><text x="428" y="87.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">stage_name</text><line x1="416" y1="96" x2="646" y2="96" style="stroke:var(--line);stroke-width:1"/><text x="428" y="113.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);font-style:italic;">coach_id</text><text x="636" y="113.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">FK</text><rect x="416" y="210" width="230" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="416" y="210" width="230" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="531.0" y="232.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">PERFORMANCE</text><text x="428" y="261.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">performance_id</text><text x="636" y="261.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="416" y1="270" x2="646" y2="270" style="stroke:var(--line);stroke-width:1"/><text x="428" y="287.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">song_title</text><line x1="416" y1="296" x2="646" y2="296" style="stroke:var(--line);stroke-width:1"/><text x="428" y="313.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);font-style:italic;">contestant_id</text><text x="636" y="313.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">FK</text><rect x="776" y="10" width="210" height="112" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="776" y="10" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="881.0" y="32.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">FINAL</text><text x="788" y="61.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);text-decoration:underline;">final_id</text><text x="976" y="61.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK</text><line x1="776" y1="70" x2="986" y2="70" style="stroke:var(--line);stroke-width:1"/><text x="788" y="87.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--ink);">name</text><line x1="776" y1="96" x2="986" y2="96" style="stroke:var(--line);stroke-width:1"/><text x="788" y="113.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);font-style:italic;">winner_id</text><text x="976" y="113.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">FK</text><rect x="776" y="190" width="210" height="60" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="776" y="190" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="881.0" y="212.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">SOLOIST</text><text x="788" y="241.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);text-decoration:underline;font-style:italic;">contestant_id</text><text x="976" y="241.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK·FK</text><rect x="776" y="290" width="210" height="60" rx="4" style="fill:var(--panel);stroke:var(--clay);stroke-width:2.5"/><rect x="776" y="290" width="210" height="34" rx="4" style="fill:rgba(58,207,186,.2);stroke:var(--clay);stroke-width:2.5"/><text x="881.0" y="312.0" text-anchor="middle" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;fill:var(--ink);">DUO</text><text x="788" y="341.0" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;fill:var(--accent-text);text-decoration:underline;font-style:italic;">contestant_id</text><text x="976" y="341.0" text-anchor="end" style="font-family:'Spline Sans Mono',monospace;font-size:10px;fill:var(--ink-dim);">PK·FK</text><path d="M 416,109.0 C 351.0,109.0 351.0,57.0 286,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 76,257.0 C 30,257.0 30,57.0 72,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 286,283.0 C 351.0,283.0 351.0,257.0 416,257.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 416,309.0 C 370,309.0 370,57.0 412,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 776,109.0 C 711.0,109.0 711.0,57.0 646,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 776,237.0 C 711.0,237.0 711.0,57.0 646,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/><path d="M 776,337.0 C 711.0,337.0 711.0,57.0 646,57.0" style="fill:none;stroke:var(--accent-text);stroke-width:1.8" marker-end="url(#arr8)"/></svg></div>
+    <p class="note"><span data-i18n="es">Tres 1:N (la clave viaja), una N:M (<code>COMMENTS</code>) y la jerarquía en opción 2. Todo en 3FN, de hecho en FNBC. Lo que no se garantiza: que todo concursante esté en <code>SOLOIST</code> o <code>DUO</code>.</span><span data-i18n="en">Three 1:N (the key travels), one N:M (<code>COMMENTS</code>) and the hierarchy as option 2. All in 3NF, in fact BCNF. What isn't guaranteed: that every contestant is in <code>SOLOIST</code> or <code>DUO</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide slide-final" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">En resumen</span><span data-i18n="en">In summary</span></span>
+    <h2><span data-i18n="es">Cinco ideas para llevarse</span><span data-i18n="en">Five ideas to take away</span></h2>
+    <ol class="final-list"><li><strong><span data-i18n="es">El modelo relacional</span><span data-i18n="en">The relational model</span></strong> <span data-i18n="es">organiza los datos en tablas de filas (tuplas) y columnas (atributos), cada una con su dominio.</span><span data-i18n="en">organises data into tables of rows (tuples) and columns (attributes), each with its domain.</span></li><li><strong><span data-i18n="es">Las claves</span><span data-i18n="en">Keys</span></strong> <span data-i18n="es">identifican filas (candidata, primaria, alternativa) y enlazan tablas (foránea, que puede ser nula).</span><span data-i18n="en">identify rows (candidate, primary, alternate) and link tables (foreign, which can be null).</span></li><li><strong><span data-i18n="es">Paso a tablas</span><span data-i18n="en">Mapping to tables</span></strong> <span data-i18n="es">N:M → tabla nueva; 1:N → la clave viaja al «muchos»; 1:1 → a quien siempre participa.</span><span data-i18n="en">N:M → new table; 1:N → the key travels to the “many”; 1:1 → to whoever always participates.</span></li><li><strong><span data-i18n="es">Normalizar</span><span data-i18n="en">Normalising</span></strong> <span data-i18n="es">es repartir hechos distintos en tablas distintas: 1FN atómico, 2FN sin parciales, 3FN sin transitivas, FNBC todo determinante es clave.</span><span data-i18n="en">means splitting distinct facts into distinct tables: 1NF atomic, 2NF no partials, 3NF no transitives, BCNF every determinant is a key.</span></li><li><strong><span data-i18n="es">El esquema no lo dice todo</span><span data-i18n="en">A schema doesn't say it all</span></strong> <span data-i18n="es">mínimos como (2,N) o «total» en una ISA se controlan con disparadores o desde la aplicación.</span><span data-i18n="en">minimums like (2,N) or “total” in an ISA are enforced with triggers or from the application.</span></li></ol><p class="credits"><span data-i18n="es">Resumen elaborado a partir de UT3 · Diseño lógico — Base de datos, 1º DAM — Marina Preciados Agapito.</span><span data-i18n="en">Summary built from Unit 3 · Logical design — Databases, 1st year DAM — Marina Preciados Agapito.</span></p>
+    
+  </div>
+</section>
+
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button type="button" class="nav-btn" id="btn-prev" onclick="go(-1)" aria-label="Previous slide">‹</button>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="slide-counter" id="slide-counter">1 / 38</span>
+    </div>
+    <button type="button" class="nav-btn" id="btn-next" onclick="go(1)" aria-label="Next slide">›</button>
+  </div>
+  <p class="hint"><span data-i18n="es">Usa las flechas del teclado, haz clic en ‹ › o pulsa pantalla completa para proyectar en clase.</span><span data-i18n="en">Use the arrow keys, click ‹ ›, or hit fullscreen to project in class.</span></p>
+
+</div><!-- /#deck-app -->
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var idx = 0;
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('is-active', i===idx); });
+    document.getElementById('slide-counter').textContent = (idx+1) + ' / ' + total;
+    document.getElementById('progress-fill').style.width = ((idx+1)/total*100) + '%';
+    document.getElementById('btn-prev').disabled = idx===0;
+    document.getElementById('btn-next').disabled = idx===total-1;
+  }
+
+  window.go = function(delta){
+    idx = Math.max(0, Math.min(total-1, idx+delta));
+    render();
+  };
+
+  document.addEventListener('keydown', function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); go(1); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); go(-1); }
+    else if(e.key==='Home'){ idx=0; render(); }
+    else if(e.key==='End'){ idx=total-1; render(); }
+  });
+
+  window.setLang = function(lang){
+    var app = document.getElementById('deck-app');
+    if(app) app.setAttribute('data-lang', lang);
+    document.getElementById('btn-es').classList.toggle('active', lang==='es');
+    document.getElementById('btn-en').classList.toggle('active', lang==='en');
+    try{ localStorage.setItem('ut3-resumen-lang', lang); }catch(e){}
+  };
+
+  window.toggleFullscreen = function(){
+    var stage = document.getElementById('stage');
+    if(!document.fullscreenElement){
+      if(stage.requestFullscreen) stage.requestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+    }
+  };
+
+  window.setTheme = function(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    var icon = document.getElementById('theme-icon');
+    var labelEs = document.querySelector('#theme-label [data-i18n="es"]');
+    var labelEn = document.querySelector('#theme-label [data-i18n="en"]');
+    if(theme === 'dark'){
+      if(icon) icon.textContent = '☀️';
+      if(labelEs) labelEs.textContent = 'Modo claro';
+      if(labelEn) labelEn.textContent = 'Light mode';
+    } else {
+      if(icon) icon.textContent = '🌙';
+      if(labelEs) labelEs.textContent = 'Modo oscuro';
+      if(labelEn) labelEn.textContent = 'Dark mode';
+    }
+    try{ localStorage.setItem('ut3-resumen-theme', theme); }catch(e){}
+  };
+  window.toggleTheme = function(){
+    var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  try{
+    var savedTheme = localStorage.getItem('ut3-resumen-theme');
+    if(savedTheme) setTheme(savedTheme);
+  }catch(e){}
+
+  try{
+    var saved = localStorage.getItem('ut3-resumen-lang');
+    if(saved) setLang(saved);
+  }catch(e){}
+
+  render();
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividades UT3 · Activities Unit 3 — El modelo relacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #262626;
+    --bg-alt: #2e2e2e;
+    --panel: #333333;
+    --line: #4a4a4a;
+    --ink: #ece9e0;
+    --ink-soft: #a6acc4;
+    --ink-dim: #8a90ac;
+    --clay: #3acfba;
+    --clay-soft: #a9ecdf;
+    --teal: #49a89c;
+    --teal-soft: #bfe3dd;
+    --ok: #6fbf8b;
+    --link: var(--teal-soft);
+    --accent-text: var(--clay-soft);
+    --nav-bg: rgba(18,20,28,.9);
+    --max: min(90vw, 1400px);
+    --maxw: min(96vw, 1800px);
+    --radius: 3px;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f4ec; --bg-alt:#efe9d8; --panel:#ffffff; --line:#ded5bd;
+    --ink:#221f18; --ink-soft:#55503f; --ink-dim:#837c65;
+    --link:#166f64; --accent-text:#0e8a76; --nav-bg: rgba(247,244,236,.9);
+    --ok:#1f8a5c;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; font-size:18px;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;font-size:1.25rem;}
+  ::selection{background:var(--clay);color:#12211e;}
+  h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:700;line-height:1.15;margin:0 0 .5em;letter-spacing:-0.01em;}
+  p{margin:0 0 1em;}
+  a{color:var(--link);}
+  a:hover{color:var(--accent-text);}
+  code{font-family:'Spline Sans Mono',monospace;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:3px;font-size:1em;}
+
+  [data-i18n]{display:none;}
+  #ut3-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+  #ut3-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+
+  .langbar{position:fixed;top:0;right:0;z-index:60;display:flex;gap:0;margin:16px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:0 6px 20px rgba(0,0,0,.35);}
+  .langbar button{font-family:'Spline Sans Mono',monospace;font-size:16px;letter-spacing:.03em;background:none;border:none;color:var(--ink-dim);padding:7px 14px;border-radius:999px;cursor:pointer;transition:background .2s ease,color .2s ease;}
+  .langbar button.active{background:var(--clay);color:#0d211c;}
+
+  nav.toc{position:sticky;top:0;z-index:50;background:var(--nav-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  nav.toc .inner{max-width:var(--maxw);margin:0 auto;padding:16px 150px 16px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+  nav.toc .brand{font-family:'Fraunces',serif;font-weight:700;color:var(--ink);font-size:16px;}
+  nav.toc .back{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--ink-soft);text-decoration:none;}
+
+  header.hero{padding:110px 24px 70px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse 900px 500px at 10% -10%, rgba(207,139,58,.16), transparent 60%),radial-gradient(ellipse 700px 500px at 100% 0%, rgba(73,168,156,.13), transparent 55%);}
+  .hero-inner{max-width:var(--maxw);margin:0 auto;}
+  .kicker{font-family:'Spline Sans Mono',monospace;font-size:19px;color:var(--accent-text);letter-spacing:.04em;margin-bottom:14px;display:block;}
+  .hero h1{font-size:clamp(2rem,5vw,3.4rem);max-width:100%;}
+  .hero .lede{font-size:1.25rem;color:var(--ink-soft);max-width:100%;margin-top:16px;}
+
+  .instructions{max-width:var(--maxw);margin:40px auto 0;padding:0 24px;}
+  .instructions .box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:var(--radius);padding:20px 24px;color:var(--ink-soft);font-size:1rem;}
+  .instructions .box strong{color:var(--ink);}
+
+  main{max-width:var(--maxw);margin:0 auto;padding:60px 24px 100px;}
+
+  .q-block{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:26px;background:var(--panel);overflow:hidden;}
+  .q-head{display:flex;align-items:flex-start;gap:16px;padding:24px 26px 18px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:700;font-size:1.5rem;color:var(--accent-text);flex-shrink:0;line-height:1;}
+  .q-body{flex:1;min-width:0;}
+  .q-tag{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--link);letter-spacing:.04em;display:block;margin-bottom:8px;}
+  .q-body h3{font-size:1.08rem;margin-bottom:10px;color:var(--ink);font-family:'Inter',sans-serif;font-weight:600;}
+  .q-body p{color:var(--ink-soft);font-size:1rem;}
+  .q-body ul,.q-body ol{color:var(--ink-soft);font-size:1rem;padding-left:22px;margin:0 0 10px;}
+  .q-body ul li, .q-body ol li{margin-bottom:5px;}
+
+  details.answer{border-top:1px solid var(--line);}
+  details.answer summary{cursor:pointer;list-style:none;padding:14px 26px;font-family:'Spline Sans Mono',monospace;font-size:16px;letter-spacing:.03em;color:var(--ok);display:flex;align-items:center;gap:8px;user-select:none;}
+  details.answer summary::-webkit-details-marker{display:none;}
+  details.answer summary::before{content:"▸";display:inline-block;transition:transform .18s ease;color:var(--ok);}
+  details.answer[open] summary::before{transform:rotate(90deg);}
+  details.answer .answer-body{padding:0 26px 24px;color:var(--ink-soft);font-size:1rem;background:rgba(111,191,139,.05);}
+  details.answer .answer-body strong{color:var(--ink);}
+  details.answer .answer-body table{width:100%;border-collapse:collapse;margin-top:10px;font-size:1rem;}
+  details.answer .answer-body td,details.answer .answer-body th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;}
+  details.answer .answer-body code{background:rgba(255,255,255,.08);}
+
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px;}
+  .pillrow .pill{font-family:'Spline Sans Mono',monospace;font-size:16px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:4px 12px;}
+
+  .section-title{display:flex;align-items:center;gap:14px;margin:64px 0 26px;}
+  .section-title:first-of-type{margin-top:0;}
+  .section-title .n{font-family:'Spline Sans Mono',monospace;color:var(--ink-dim);font-size:16px;}
+  .section-title h2{font-size:1.5rem;margin:0;}
+  .section-title .line{flex:1;height:1px;background:var(--line);}
+
+  .er-scenario{background:rgba(58,207,186,.06);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:var(--radius);padding:16px 20px;margin:10px 0 14px;font-size:1rem;color:var(--ink-soft);}
+  .er-scenario strong{color:var(--ink);}
+
+  footer{padding:50px 24px 80px;border-top:1px solid var(--line);}
+  footer .inner{max-width:var(--maxw);margin:0 auto;}
+  footer p{color:var(--ink-dim);font-size:1.25rem;max-width:100%;}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+  .theme-toggle{
+    display:flex; align-items:center; gap:8px; width:100%; margin-top:18px;
+    background:#292929; border:1px solid #3d3d3d; border-radius:6px;
+    color:#a6acc4; font-family:'Spline Sans Mono',monospace; font-size:13px;
+    padding:9px 12px; cursor:pointer; text-align:left;
+  }
+  .theme-toggle:hover{background:#333; color:#ece9e0;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+
+</style>
+
+<style>
+  html[data-theme="light"] .card .tag{color:var(--link);}
+  /* ---------- UT3: esquemas relacionales ---------- */
+  .schema-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;display:flex;flex-direction:column;gap:10px;justify-content:center;}
+  .schema-box .scap{font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--accent-text);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;}
+  .sl{font-family:'Spline Sans Mono',monospace;font-size:.95rem;color:var(--ink-soft);line-height:1.5;word-break:break-word;}
+  .sl b{color:var(--ink);font-weight:600;}
+  .sl u{text-decoration:underline;text-underline-offset:3px;color:var(--ink);}
+  .sl i.fk,.fk{font-style:italic;color:var(--accent-text);}
+  .sl .ak,.ak{text-decoration:underline dashed;text-underline-offset:3px;}
+  .sleg{margin-top:6px;font-size:.85rem;color:var(--ink-dim);font-family:'Inter',sans-serif;border-top:1px solid var(--line);padding-top:10px;}
+  .pair{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;margin-top:28px;align-items:stretch;}
+  @media(max-width:900px){.pair{grid-template-columns:1fr;}}
+  .tables-row{display:flex;flex-wrap:wrap;gap:22px;margin-top:26px;align-items:flex-start;}
+  .reltab{flex:0 1 auto;min-width:0;}
+  .reltab .tname{font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--accent-text);letter-spacing:.04em;margin-bottom:6px;text-transform:uppercase;}
+  table.rel{margin-top:0;width:auto;font-size:.95rem;background:var(--panel);border:1px solid var(--line);}
+  table.rel thead th{font-size:14px;padding:8px 14px;border-bottom:2px solid var(--clay);color:var(--ink);background:rgba(58,207,186,.10);}
+  table.rel tbody td{padding:7px 14px;font-family:'Spline Sans Mono',monospace;font-size:.9rem;color:var(--ink-soft);border-bottom:1px solid var(--line);}
+  table.rel u{text-underline-offset:3px;}
+  .null{color:var(--ink-dim);font-style:italic;}
+  .tnote{font-size:.85rem;color:var(--ink-dim);margin-top:6px;max-width:34em;}
+  .bad{color:#e2877c;} .good{color:#6fbf8b;}
+  html[data-theme="light"] .bad{color:#b4402f;} html[data-theme="light"] .good{color:#1f7a45;}
+  td.bad,td.good{font-weight:600;}
+  .scroll-x{overflow-x:auto;}
+  .formula{font-family:'Spline Sans Mono',monospace;font-size:1.05rem;color:var(--ink);background:rgba(58,207,186,.07);border:1px solid var(--line);border-radius:var(--radius);padding:12px 18px;margin:16px 0;display:block;overflow-x:auto;}
+  .tables-row[data-i18n]{display:none;}
+  #ut3-app[data-lang="es"] .tables-row[data-i18n="es"], #ut3-app[data-lang="en"] .tables-row[data-i18n="en"]{display:flex;}
+  pre.code{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin:10px 0;overflow-x:auto;font-size:.95rem;line-height:1.5;}
+  pre.code code{background:none;padding:0;font-family:'Spline Sans Mono',monospace;color:var(--ink);}
+  html[data-theme="light"] details.answer .answer-body code{background:rgba(0,0,0,.06);}
+  .q-body table.rel, .q-body .reltab{max-width:100%;}
+  .answer-body .schema-box{background:var(--panel);}
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut2/teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="../ut2/teoria.html">📖 Teoría</a>
+        <a href="../ut2/actividades.html">📝 Actividades</a>
+        <a href="../ut2/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut3/teoria.html">UT3</a>
+      <div class="ut-children">
+        <a href="../ut3/teoria.html">📖 Teoría</a>
+        <a href="../ut3/actividades.html" class="active">📝 Actividades</a>
+        <a href="../ut3/resumen.html">🎛️ Resumen</a>
+      </div></div><a class="pending" title="Próximamente">UT4 · próximamente</a><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+  <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
+</aside>
+
+<div id="ut3-app" data-lang="es">
+<div class="langbar" role="group" aria-label="language selector">
+  <button id="btn-es" class="active" onclick="setLang('es')">ES</button>
+  <button id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+
+<nav class="toc">
+  <div class="inner">
+    <span class="brand">UT3 · <span data-i18n="es">Actividades</span><span data-i18n="en">Activities</span></span>
+    <a class="back" href="teoria.html">
+      <span data-i18n="es">← Volver al tema</span><span data-i18n="en">← Back to the unit</span>
+    </a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="kicker">
+      <span data-i18n="es">UT3 · Base de datos · 1º DAM — Marina Preciados Agapito — con soluciones</span>
+      <span data-i18n="en">Unit 3 · Databases · 1st year DAM — Marina Preciados Agapito — with solutions</span>
+    </span>
+    <h1>
+      <span data-i18n="es">Actividades: el modelo relacional</span>
+      <span data-i18n="en">Activities: the relational model</span>
+    </h1>
+    <p class="lede">
+      <span data-i18n="es">17 ejercicios que recorren los conceptos del modelo relacional y las claves, el paso de E/R a tablas (entidades, relaciones 1:1, 1:N y N:M, reflexivas, ternarias, entidades débiles y jerarquías) y la normalización hasta FNBC. Cada pregunta tiene su solución oculta — haz clic en "Ver solución" para comprobar tu respuesta. Antes de mirarla, dibuja tú el diagrama E/R en papel y escribe tus tablas: es lo que se pide en el examen.</span>
+      <span data-i18n="en">17 exercises covering relational model concepts and keys, converting E/R to tables (entities, 1:1, 1:N and N:M relationships, reflexive, ternary, weak entities and hierarchies) and normalisation up to BCNF. Each question has a hidden solution — click "Show solution" to check your answer. Before looking at it, sketch the E/R diagram on paper and write your tables: that's what the exam asks for.</span>
+    </p>
+  </div>
+</header>
+
+<div class="instructions">
+  <div class="box">
+    <strong><span data-i18n="es">Cómo usar esta hoja de actividades: </span><span data-i18n="en">How to use this activity sheet: </span></strong>
+    <span data-i18n="es">en los esquemas relacionales, la clave primaria va <u>subrayada</u> y la clave foránea en <i>cursiva</i>. Las soluciones muestran una respuesta válida: en diseño puede haber varias correctas, siempre que estén justificadas y respeten las cardinalidades del enunciado.</span>
+    <span data-i18n="en">in relational schemas, the primary key is <u>underlined</u> and the foreign key is in <i>italics</i>. Solutions show one valid answer: in design there can be several correct ones, as long as they're justified and respect the statement's cardinalities.</span>
+  </div>
+</div>
+
+<main>
+
+  <div class="section-title">
+    <span class="n">01</span>
+    <h2><span data-i18n="es">El modelo relacional y las claves</span><span data-i18n="en">The relational model and keys</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">1</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">GRADO, CARDINALIDAD Y DOMINIO</span><span data-i18n="en">DEGREE, CARDINALITY AND DOMAIN</span></span>
+        <h3><span data-i18n="es">Observa la siguiente relación.</span><span data-i18n="en">Look at the following relation.</span></h3>
+        <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">LIBRO</div><table class="rel"><thead><tr><th>isbn</th><th>titulo</th><th>anio</th><th>precio</th></tr></thead><tbody><tr><td>A-101</td><td>Don Quijote</td><td>1605</td><td>12.5</td></tr><tr><td>A-102</td><td>La Regenta</td><td>1885</td><td>14.0</td></tr><tr><td>B-201</td><td>Rayuela</td><td>1963</td><td>11.9</td></tr><tr><td>B-202</td><td>Pedro Páramo</td><td>1955</td><td>9.5</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">BOOK</div><table class="rel"><thead><tr><th>isbn</th><th>title</th><th>year</th><th>price</th></tr></thead><tbody><tr><td>A-101</td><td>Don Quijote</td><td>1605</td><td>12.5</td></tr><tr><td>A-102</td><td>La Regenta</td><td>1885</td><td>14.0</td></tr><tr><td>B-201</td><td>Rayuela</td><td>1963</td><td>11.9</td></tr><tr><td>B-202</td><td>Pedro Páramo</td><td>1955</td><td>9.5</td></tr></tbody></table></div></div><p><span data-i18n="es">a) ¿Cuál es el <strong>grado</strong> y cuál la <strong>cardinalidad</strong> de la relación? b) ¿Qué dominio razonable le darías a <code>anio</code> y a <code>precio</code>? c) ¿Cuántas tuplas y cuántos atributos tiene?</span><span data-i18n="en">a) What is the <strong>degree</strong> and what is the <strong>cardinality</strong> of the relation? b) What reasonable domain would you give <code>year</code> and <code>price</code>? c) How many tuples and how many attributes does it have?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><span data-i18n="es">a) Grado = <strong>4</strong> (cuatro columnas: isbn, titulo, anio, precio). Cardinalidad = <strong>4</strong> (cuatro filas). Coincide por casualidad: no tienen nada que ver entre sí.</span><span data-i18n="en">a) Degree = <strong>4</strong> (four columns: isbn, title, year, price). Cardinality = <strong>4</strong> (four rows). They coincide by chance: they have nothing to do with each other.</span></p><p><span data-i18n="es">b) <code>anio</code>: número entero, por ejemplo entre 1400 y el año actual (no tiene sentido un año 2500 ni «hola»). <code>precio</code>: número decimal positivo con dos decimales, por ejemplo mayor o igual que 0.</span><span data-i18n="en">b) <code>year</code>: a whole number, for example between 1400 and the current year (a year 2500 makes no sense, nor does “hello”). <code>price</code>: a positive decimal number with two decimals, for example greater than or equal to 0.</span></p><p><span data-i18n="es">c) 4 tuplas (filas) y 4 atributos (columnas).</span><span data-i18n="en">c) 4 tuples (rows) and 4 attributes (columns).</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">2</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CLAVES</span><span data-i18n="en">KEYS</span></span>
+        <h3><span data-i18n="es">Identifica y declara las claves de una tabla.</span><span data-i18n="en">Identify and declare a table's keys.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Una aplicación guarda a sus usuarios en una tabla <code>PERSONA(dni, nss, email, nombre, telefono)</code>. El <code>dni</code> y el número de la Seguridad Social (<code>nss</code>) son únicos; el <code>email</code> también es único y todo usuario tiene uno; el <code>nombre</code> puede repetirse; el <code>telefono</code> es opcional.</span><span data-i18n="en">An application stores its users in a table <code>PERSON(dni, nss, email, name, phone)</code>. The <code>dni</code> and the social security number (<code>nss</code>) are unique; the <code>email</code> is also unique and every user has one; the <code>name</code> may repeat; the <code>phone</code> is optional.</span></div><p><span data-i18n="es">a) ¿Cuáles son las claves candidatas? b) Elige una clave primaria y justifícalo; ¿qué son las demás? c) Escribe la sentencia <code>CREATE TABLE</code> con las restricciones necesarias.</span><span data-i18n="en">a) Which are the candidate keys? b) Choose a primary key and justify it; what are the others? c) Write the <code>CREATE TABLE</code> statement with the necessary constraints.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><span data-i18n="es">a) <code>dni</code>, <code>nss</code> y <code>email</code>: los tres son únicos y siempre tienen valor. <code>nombre</code> (se repite) y <code>telefono</code> (puede ser nulo) no lo son.</span><span data-i18n="en">a) <code>dni</code>, <code>nss</code> and <code>email</code>: all three are unique and always have a value. <code>name</code> (it repeats) and <code>phone</code> (it can be null) are not.</span></p><p><span data-i18n="es">b) Una buena opción es <code>dni</code>: es corto, de longitud fija y estable. <code>nss</code> y <code>email</code> serían las <strong>claves alternativas</strong> (el email, además, puede cambiar, así que es peor candidata a primaria). Si el DNI se considera un dato sensible, podría crearse un <code>id</code> artificial y dejar los tres como alternativas.</span><span data-i18n="en">b) A good option is <code>dni</code>: it's short, fixed-length and stable. <code>nss</code> and <code>email</code> would be the <strong>alternate keys</strong> (the email can also change, so it's a worse primary candidate). If the ID number is considered sensitive data, an artificial <code>id</code> could be created and all three left as alternates.</span></p><pre class="code" data-i18n="es"><code>CREATE TABLE persona (
+  dni      CHAR(9)      PRIMARY KEY,
+  nss      CHAR(12)     NOT NULL UNIQUE,
+  email    VARCHAR(100) NOT NULL UNIQUE,
+  nombre   VARCHAR(80)  NOT NULL,
+  telefono VARCHAR(15)
+);</code></pre><pre class="code" data-i18n="en"><code>CREATE TABLE person (
+  dni      CHAR(9)      PRIMARY KEY,
+  nss      CHAR(12)     NOT NULL UNIQUE,
+  email    VARCHAR(100) NOT NULL UNIQUE,
+  name   VARCHAR(80)  NOT NULL,
+  phone VARCHAR(15)
+);</code></pre><p><span data-i18n="es">Las claves alternativas se marcan con <code>UNIQUE</code> + <code>NOT NULL</code>; el teléfono, al ser opcional, no lleva <code>NOT NULL</code>.</span><span data-i18n="en">Alternate keys are marked with <code>UNIQUE</code> + <code>NOT NULL</code>; the phone, being optional, gets no <code>NOT NULL</code>.</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">3</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">INTEGRIDAD REFERENCIAL</span><span data-i18n="en">REFERENTIAL INTEGRITY</span></span>
+        <h3><span data-i18n="es">¿Qué operaciones acepta el SGBD?</span><span data-i18n="en">Which operations does the DBMS accept?</span></h3>
+        <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">CLIENTE</div><table class="rel"><thead><tr><th><u>cod_cliente</u></th><th>nombre</th></tr></thead><tbody><tr><td>1</td><td>Josu</td></tr><tr><td>2</td><td>Ana</td></tr></tbody></table></div><div class="reltab"><div class="tname">ALQUILER</div><table class="rel"><thead><tr><th><u>cod_alquiler</u></th><th>fecha</th><th><i class="fk">cod_cliente</i></th></tr></thead><tbody><tr><td>1</td><td>03/05</td><td>1</td></tr><tr><td>2</td><td>10/06</td><td>1</td></tr><tr><td>3</td><td>22/06</td><td>2</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">CUSTOMER</div><table class="rel"><thead><tr><th><u>customer_code</u></th><th>name</th></tr></thead><tbody><tr><td>1</td><td>Josu</td></tr><tr><td>2</td><td>Ana</td></tr></tbody></table></div><div class="reltab"><div class="tname">RENTAL</div><table class="rel"><thead><tr><th><u>rental_code</u></th><th>date</th><th><i class="fk">customer_code</i></th></tr></thead><tbody><tr><td>1</td><td>03/05</td><td>1</td></tr><tr><td>2</td><td>10/06</td><td>1</td></tr><tr><td>3</td><td>22/06</td><td>2</td></tr></tbody></table></div></div><p><span data-i18n="es"><code>ALQUILER.cod_cliente</code> es clave foránea hacia <code>CLIENTE</code> con la política <code>NO ACTION</code> y admite nulos. Indica si el SGBD acepta o rechaza cada operación: (1) borrar el cliente 2; (2) insertar el alquiler 4 del cliente 7; (3) insertar el alquiler 4 con <code>cod_cliente</code> nulo; (4) cambiar el código del cliente 1 a 10. Después: ¿qué pasaría al borrar el cliente 1 si la política fuese <code>CASCADE</code>? ¿Y <code>SET NULL</code>?</span><span data-i18n="en"><code>RENTAL.customer_code</code> is a foreign key to <code>CUSTOMER</code> with the <code>NO ACTION</code> policy and allows nulls. State whether the DBMS accepts or rejects each operation: (1) delete customer 2; (2) insert rental 4 for customer 7; (3) insert rental 4 with a null <code>customer_code</code>; (4) change customer 1's code to 10. Then: what would happen when deleting customer 1 if the policy were <code>CASCADE</code>? And <code>SET NULL</code>?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>(1) Rechazada</strong>: el cliente 2 tiene el alquiler 3; con <code>NO ACTION</code> no se puede borrar una clave principal referenciada.</li><li data-i18n="en"><strong>(1) Rejected</strong>: customer 2 has rental 3; with <code>NO ACTION</code> a referenced primary key can't be deleted.</li><li data-i18n="es"><strong>(2) Rechazada</strong>: no existe el cliente 7; la clave foránea solo admite valores que existan en la tabla principal.</li><li data-i18n="en"><strong>(2) Rejected</strong>: customer 7 doesn't exist; the foreign key only admits values that exist in the main table.</li><li data-i18n="es"><strong>(3) Aceptada</strong>: una clave foránea puede ser nula (el alquiler aún no está asociado a nadie), salvo que se declare <code>NOT NULL</code>.</li><li data-i18n="en"><strong>(3) Accepted</strong>: a foreign key may be null (the rental isn't linked to anyone yet), unless declared <code>NOT NULL</code>.</li><li data-i18n="es"><strong>(4) Rechazada</strong>: los alquileres 1 y 2 quedarían apuntando al cliente 1, que ya no existiría; con <code>NO ACTION</code> no se permite.</li><li data-i18n="en"><strong>(4) Rejected</strong>: rentals 1 and 2 would be left pointing at customer 1, who would no longer exist; <code>NO ACTION</code> forbids it.</li></ul><p><span data-i18n="es">Con <code>CASCADE</code>, al borrar al cliente 1 se borrarían también los alquileres 1 y 2. Con <code>SET NULL</code>, los alquileres 1 y 2 seguirían existiendo pero con <code>cod_cliente = NULL</code>.</span><span data-i18n="en">With <code>CASCADE</code>, deleting customer 1 would also delete rentals 1 and 2. With <code>SET NULL</code>, rentals 1 and 2 would still exist but with <code>customer_code = NULL</code>.</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">4</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">VERDADERO / FALSO</span><span data-i18n="en">TRUE / FALSE</span></span>
+        <h3><span data-i18n="es">Indica si cada afirmación es verdadera o falsa.</span><span data-i18n="en">State whether each statement is true or false.</span></h3>
+        <ol><li data-i18n="es">Una tabla puede tener varias claves candidatas, pero solo una clave primaria.</li><li data-i18n="en">A table can have several candidate keys, but only one primary key.</li><li data-i18n="es">Una clave foránea nunca puede ser nula.</li><li data-i18n="en">A foreign key can never be null.</li><li data-i18n="es">En una relación 1:N, la clave foránea se coloca en la tabla del lado «uno».</li><li data-i18n="en">In a 1:N relationship, the foreign key goes in the “one” side's table.</li><li data-i18n="es">Un atributo derivado (como la edad) se guarda como una columna más.</li><li data-i18n="en">A derived attribute (like age) is stored as one more column.</li><li data-i18n="es">Una relación N:M siempre genera una tabla nueva.</li><li data-i18n="en">An N:M relationship always generates a new table.</li><li data-i18n="es">Una tabla en 1FN cuya clave primaria es un único atributo ya está en 2FN.</li><li data-i18n="en">A 1NF table whose primary key is a single attribute is already in 2NF.</li></ol>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ol><li data-i18n="es"><strong>Verdadero.</strong> Las candidatas que no se eligen como primaria son las claves alternativas.</li><li data-i18n="en"><strong>True.</strong> The candidates not chosen as primary are the alternate keys.</li><li data-i18n="es"><strong>Falso.</strong> Sí puede serlo (significa «sin relacionar todavía»), salvo que se declare NOT NULL. La que nunca puede ser nula es la clave primaria.</li><li data-i18n="en"><strong>False.</strong> It can be (it means “not related yet”), unless declared NOT NULL. The one that can never be null is the primary key.</li><li data-i18n="es"><strong>Falso.</strong> Va en la tabla del lado «muchos»: cada empleado guarda el departamento al que pertenece, no al revés.</li><li data-i18n="en"><strong>False.</strong> It goes in the “many” side's table: each employee stores the department they belong to, not the other way round.</li><li data-i18n="es"><strong>Falso.</strong> No se almacena: se calcula al consultar, para evitar inconsistencias (la edad cambiaría cada cumpleaños).</li><li data-i18n="en"><strong>False.</strong> It isn't stored: it's calculated when querying, to avoid inconsistencies (age would change on every birthday).</li><li data-i18n="es"><strong>Verdadero.</strong> Con las claves de las dos entidades (foráneas) y los atributos de la relación.</li><li data-i18n="en"><strong>True.</strong> With the keys of both entities (foreign) and the relationship's attributes.</li><li data-i18n="es"><strong>Verdadero.</strong> Las dependencias parciales solo pueden aparecer con claves compuestas.</li><li data-i18n="en"><strong>True.</strong> Partial dependencies can only appear with composite keys.</li></ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="section-title">
+    <span class="n">02</span>
+    <h2><span data-i18n="es">Del modelo E/R al modelo relacional (paso a tablas)</span><span data-i18n="en">From the E/R model to the relational model (converting to tables)</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">5</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">RESOLVER FRAGMENTOS</span><span data-i18n="en">SOLVE THE FRAGMENTS</span></span>
+        <h3><span data-i18n="es">Cinco fragmentos de diagramas E/R, cinco reglas distintas.</span><span data-i18n="en">Five E/R diagram fragments, five different rules.</span></h3>
+        <p><span data-i18n="es">Cada entidad tiene un identificador (<code>cod_…</code> o <code>dni</code>, según corresponda) y al menos un atributo <code>nombre</code>. Pasa a tablas cada fragmento e indica dónde va la clave foránea (o qué tabla nueva aparece).</span><span data-i18n="en">Each entity has an identifier (<code>cod_…</code> or <code>dni</code>, as appropriate) and at least a <code>name</code> attribute. Convert each fragment to tables and say where the foreign key goes (or which new table appears).</span></p><ul><li data-i18n="es">a) CLIENTE (0,N) — <em>hace</em> — PEDIDO (1,1)</li><li data-i18n="en">a) CUSTOMER (0,N) — <em>places</em> — ORDER (1,1)</li><li data-i18n="es">b) ALUMNO (0,N) — <em>cursa</em> — ASIGNATURA (0,N), con el atributo <code>nota</code></li><li data-i18n="en">b) STUDENT (0,N) — <em>takes</em> — SUBJECT (0,N), with the attribute <code>grade</code></li><li data-i18n="es">c) PERSONA (0,1) — <em>tiene</em> — PASAPORTE (1,1)</li><li data-i18n="en">c) PERSON (0,1) — <em>holds</em> — PASSPORT (1,1)</li><li data-i18n="es">d) EMPLEADO (0,1) — <em>tiene jefe / es jefe de</em> — EMPLEADO (0,N) (reflexiva)</li><li data-i18n="en">d) EMPLOYEE (0,1) — <em>has boss / is boss of</em> — EMPLOYEE (0,N) (reflexive)</li><li data-i18n="es">e) MEDICO (0,N) — <em>receta</em> — PACIENTE (0,N) — MEDICAMENTO (0,N), con el atributo <code>dosis</code></li><li data-i18n="en">e) DOCTOR (0,N) — <em>prescribes</em> — PATIENT (0,N) — DRUG (0,N), with the attribute <code>dose</code></li></ul>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>a) 1:N.</strong> La clave de CLIENTE viaja a PEDIDO, y no puede ser nula (cada pedido tiene exactamente un cliente).</li><li data-i18n="en"><strong>a) 1:N.</strong> CUSTOMER's key travels to ORDER, and can't be null (every order has exactly one customer).</li><li data-i18n="es"><strong>b) N:M.</strong> Tabla nueva con las dos claves como clave primaria compuesta y el atributo de la relación.</li><li data-i18n="en"><strong>b) N:M.</strong> New table with both keys as a composite primary key plus the relationship's attribute.</li><li data-i18n="es"><strong>c) 1:1.</strong> PASAPORTE participa siempre (1,1): la clave foránea va en PASAPORTE, <code>NOT NULL</code> y <code>UNIQUE</code>.</li><li data-i18n="en"><strong>c) 1:1.</strong> PASSPORT always participates (1,1): the foreign key goes in PASSPORT, <code>NOT NULL</code> and <code>UNIQUE</code>.</li><li data-i18n="es"><strong>d) Reflexiva 1:N.</strong> La clave se repite en la misma tabla con otro nombre; es nula para quien no tiene jefe.</li><li data-i18n="en"><strong>d) Reflexive 1:N.</strong> The key repeats in the same table under another name; it's null for whoever has no boss.</li><li data-i18n="es"><strong>e) Ternaria N:M:P.</strong> Tabla nueva con las tres claves foráneas; la clave primaria son las tres (si el mismo médico puede recetar lo mismo al mismo paciente en fechas distintas, habría que añadir la fecha).</li><li data-i18n="en"><strong>e) Ternary N:M:P.</strong> New table with the three foreign keys; the primary key is all three (if the same doctor can prescribe the same drug to the same patient on different dates, the date would have to be added).</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>PEDIDO</b>(<u>cod_pedido</u>, <i class="fk">cod_cliente</i>)</div><div class="sl" data-i18n="en"><b>ORDER</b>(<u>order_code</u>, <i class="fk">customer_code</i>)</div><div class="sl" data-i18n="es"><b>CURSA</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">cod_asignatura</i></u>, nota)</div><div class="sl" data-i18n="en"><b>TAKES</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">subject_code</i></u>, grade)</div><div class="sl" data-i18n="es"><b>PASAPORTE</b>(<u>num_pasaporte</u>, <span class="ak"><i class="fk">dni</i></span>)</div><div class="sl" data-i18n="en"><b>PASSPORT</b>(<u>passport_no</u>, <span class="ak"><i class="fk">dni</i></span>)</div><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>dni</u>, nombre, <i class="fk">dni_jefe</i>)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>dni</u>, name, <i class="fk">boss_dni</i>)</div><div class="sl" data-i18n="es"><b>RECETA</b>(<u><i class="fk">cod_medico</i></u>, <u><i class="fk">cod_paciente</i></u>, <u><i class="fk">cod_medicamento</i></u>, dosis)</div><div class="sl" data-i18n="en"><b>PRESCRIPTION</b>(<u><i class="fk">doctor_code</i></u>, <u><i class="fk">patient_code</i></u>, <u><i class="fk">drug_code</i></u>, dose)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">6</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO</span><span data-i18n="en">CASE STUDY</span></span>
+        <h3><span data-i18n="es">Empresa de transportes.</span><span data-i18n="en">Transport company.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Se desea informatizar la gestión de una empresa de transportes que reparte paquetes por toda España. Los encargados de llevar los paquetes son los <strong>camioneros</strong>, de los que se quiere guardar el DNI, nombre, teléfono, dirección, salario y población en la que viven. De los <strong>paquetes</strong> interesa conocer el código, la descripción, el destinatario y la dirección del destinatario. Un camionero distribuye muchos paquetes, y un paquete solo puede ser distribuido por un camionero. De las <strong>provincias</strong> a las que llegan los paquetes interesa guardar el código y el nombre; un paquete solo llega a una provincia, pero a una provincia pueden llegar varios paquetes. De los <strong>camiones</strong> interesa la matrícula, el modelo, el tipo y la potencia. Un camionero puede conducir diferentes camiones en fechas diferentes, y un camión puede ser conducido por varios camioneros.</span><span data-i18n="en">A transport company delivers parcels all over Spain. The people in charge of carrying them are the <strong>drivers</strong>, for whom we want to store ID number, name, phone, address, salary and town of residence. For the <strong>parcels</strong> we need the code, description, recipient and recipient's address. A driver delivers many parcels, and a parcel can only be delivered by one driver. For the <strong>provinces</strong> the parcels arrive in we store the code and name; a parcel arrives in just one province, but several parcels can arrive in a province. For the <strong>lorries</strong> we need the plate number, model, type and power. A driver can drive different lorries on different dates, and a lorry can be driven by several drivers.</span></div><p><span data-i18n="es">Diseña el diagrama E/R y obtén el esquema relacional.</span><span data-i18n="en">Design the E/R diagram and obtain the relational schema.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>Entidades:</strong> CAMIONERO, PAQUETE, PROVINCIA, CAMION.</li><li data-i18n="en"><strong>Entities:</strong> DRIVER, PARCEL, PROVINCE, LORRY.</li><li data-i18n="es"><strong>distribuye:</strong> CAMIONERO (0,N) — PAQUETE (1,1) → 1:N, clave de CAMIONERO en PAQUETE (<code>NOT NULL</code>).</li><li data-i18n="en"><strong>distribuye:</strong> DRIVER (0,N) — PARCEL (1,1) → 1:N, DRIVER's key in PARCEL (<code>NOT NULL</code>).</li><li data-i18n="es"><strong>llega:</strong> PROVINCIA (0,N) — PAQUETE (1,1) → 1:N, clave de PROVINCIA en PAQUETE (<code>NOT NULL</code>).</li><li data-i18n="en"><strong>llega:</strong> PROVINCE (0,N) — PARCEL (1,1) → 1:N, PROVINCE's key in PARCEL (<code>NOT NULL</code>).</li><li data-i18n="es"><strong>conduce:</strong> CAMIONERO (0,N) — CAMION (0,N), con atributo <code>fecha</code> → N:M. Como el mismo camionero puede conducir el mismo camión en fechas distintas, la <strong>fecha entra en la clave</strong>.</li><li data-i18n="en"><strong>conduce:</strong> DRIVER (0,N) — LORRY (0,N), with attribute <code>date</code> → N:M. Since the same driver can drive the same lorry on different dates, the <strong>date becomes part of the key</strong>.</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>CAMIONERO</b>(<u>dni</u>, nombre, telefono, direccion, salario, poblacion)</div><div class="sl" data-i18n="en"><b>DRIVER</b>(<u>dni</u>, name, phone, address, salary, town)</div><div class="sl" data-i18n="es"><b>PROVINCIA</b>(<u>cod_provincia</u>, nombre)</div><div class="sl" data-i18n="en"><b>PROVINCE</b>(<u>province_code</u>, name)</div><div class="sl" data-i18n="es"><b>PAQUETE</b>(<u>cod_paquete</u>, descripcion, destinatario, dir_destinatario, <i class="fk">dni_camionero</i>, <i class="fk">cod_provincia</i>)</div><div class="sl" data-i18n="en"><b>PARCEL</b>(<u>parcel_code</u>, description, recipient, recipient_address, <i class="fk">driver_dni</i>, <i class="fk">province_code</i>)</div><div class="sl" data-i18n="es"><b>CAMION</b>(<u>matricula</u>, modelo, tipo, potencia)</div><div class="sl" data-i18n="en"><b>LORRY</b>(<u>plate_no</u>, model, type, power)</div><div class="sl" data-i18n="es"><b>CONDUCE</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">matricula</i></u>, <u>fecha</u>)</div><div class="sl" data-i18n="en"><b>DRIVES</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">plate_no</i></u>, <u>date</u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">7</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO</span><span data-i18n="en">CASE STUDY</span></span>
+        <h3><span data-i18n="es">Instituto.</span><span data-i18n="en">Secondary school.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Se desea diseñar la base de datos de un instituto. De los <strong>profesores</strong> se guarda DNI, nombre, dirección y teléfono. Los profesores imparten <strong>módulos</strong>, y cada módulo tiene un código y un nombre; un profesor puede impartir varios módulos, pero un módulo solo puede ser impartido por un profesor. Cada <strong>alumno</strong> está matriculado en uno o varios módulos; de cada alumno se guarda el nº de expediente, nombre, apellidos, fecha de nacimiento y edad. Un alumno es delegado de un conjunto de alumnos, mientras que cada alumno puede tener o no tener delegado.</span><span data-i18n="en">A secondary school database is needed. For <strong>teachers</strong> we store ID number, name, address and phone. Teachers teach <strong>modules</strong>, and each module has a code and a name; a teacher can teach several modules, but a module can only be taught by one teacher. Each <strong>student</strong> is enrolled in one or more modules; for each student we store the file number, name, surnames, date of birth and age. A student is class representative for a group of students, while each student may or may not have a representative.</span></div><p><span data-i18n="es">Pasa el enunciado a tablas. ¿Qué haces con la edad?</span><span data-i18n="en">Convert the statement to tables. What do you do with the age?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>edad</strong> es un atributo <strong>derivado</strong> (se calcula a partir de la fecha de nacimiento): no se guarda.</li><li data-i18n="en"><strong>edad</strong> is a <strong>derived</strong> attribute (calculated from the date of birth): it isn't stored.</li><li data-i18n="es"><strong>imparte:</strong> PROFESOR (0,N) — MODULO (1,1) → 1:N, clave de PROFESOR en MODULO, <code>NOT NULL</code>.</li><li data-i18n="en"><strong>imparte:</strong> TEACHER (0,N) — MODULE (1,1) → 1:N, TEACHER's key in MODULE, <code>NOT NULL</code>.</li><li data-i18n="es"><strong>matricula:</strong> ALUMNO (1,N) — MODULO (0,N) → N:M, tabla nueva MATRICULA.</li><li data-i18n="en"><strong>plate_no:</strong> STUDENT (1,N) — MODULE (0,N) → N:M, new table ENROLMENT.</li><li data-i18n="es"><strong>es delegado de:</strong> reflexiva 1:N sobre ALUMNO. La clave del delegado se repite en ALUMNO y <strong>puede ser nula</strong> (hay alumnos sin delegado).</li><li data-i18n="en"><strong>es delegado de:</strong> reflexive 1:N on STUDENT. The representative's key repeats in STUDENT and <strong>may be null</strong> (some students have no representative).</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>PROFESOR</b>(<u>dni</u>, nombre, direccion, telefono)</div><div class="sl" data-i18n="en"><b>TEACHER</b>(<u>dni</u>, name, address, phone)</div><div class="sl" data-i18n="es"><b>MODULO</b>(<u>cod_modulo</u>, nombre, <i class="fk">dni_profesor</i>)</div><div class="sl" data-i18n="en"><b>MODULE</b>(<u>module_code</u>, name, <i class="fk">teacher_dni</i>)</div><div class="sl" data-i18n="es"><b>ALUMNO</b>(<u>expediente</u>, nombre, apellidos, fecha_nacimiento, <i class="fk">expediente_delegado</i>)</div><div class="sl" data-i18n="en"><b>STUDENT</b>(<u>file_no</u>, name, surnames, birth_date, <i class="fk">rep_file_no</i>)</div><div class="sl" data-i18n="es"><b>MATRICULA</b>(<u><i class="fk">expediente</i></u>, <u><i class="fk">cod_modulo</i></u>)</div><div class="sl" data-i18n="en"><b>ENROLMENT</b>(<u><i class="fk">file_no</i></u>, <u><i class="fk">module_code</i></u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">8</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO</span><span data-i18n="en">CASE STUDY</span></span>
+        <h3><span data-i18n="es">Concesionario de coches.</span><span data-i18n="en">Car dealership.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Un concesionario de automóviles quiere gestionar sus <strong>coches</strong> (matrícula, marca, modelo, color y precio de venta), sus <strong>clientes</strong> (NIF, nombre, dirección, ciudad y teléfono; además, cada cliente se distingue por un código interno que se incrementa automáticamente al darlo de alta) y las <strong>revisiones</strong> (cada una tiene un código autoincremental y se anota si se ha hecho cambio de filtro, de aceite, de frenos u otros). Un cliente puede comprar tantos coches como desee, pero un coche solo puede ser comprado por un único cliente (los coches en exposición todavía no tienen comprador). Los coches pueden pasar varias revisiones; toda revisión es de un coche.</span><span data-i18n="en">A car dealership wants to manage its <strong>cars</strong> (plate number, make, model, colour and sale price), its <strong>customers</strong> (tax ID, name, address, city and phone; each customer is also distinguished by an internal code that auto-increments when the customer is registered) and the <strong>services</strong> (each one has an auto-incrementing code, and we note whether the filter, oil, brakes or something else were changed). A customer can buy as many cars as they like, but a car can only be bought by one customer (cars on display don't have a buyer yet). Cars can go through several services; every service belongs to a car.</span></div><p><span data-i18n="es">Obtén el esquema relacional. ¿Qué clave primaria eliges para CLIENTE y qué pasa con el NIF?</span><span data-i18n="en">Obtain the relational schema. Which primary key do you choose for CUSTOMER and what happens with the tax ID?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>compra:</strong> CLIENTE (0,N) — COCHE (0,1) → 1:N. La clave de CLIENTE viaja a COCHE y es <strong>nula</strong> mientras el coche no se vende.</li><li data-i18n="en"><strong>compra:</strong> CUSTOMER (0,N) — CAR (0,1) → 1:N. CUSTOMER's key travels to CAR and is <strong>null</strong> while the car is unsold.</li><li data-i18n="es"><strong>se revisa:</strong> COCHE (0,N) — REVISION (1,1) → 1:N. La matrícula viaja a REVISION, <code>NOT NULL</code>.</li><li data-i18n="en"><strong>se revisa:</strong> CAR (0,N) — SERVICE (1,1) → 1:N. The plate number travels to SERVICE, <code>NOT NULL</code>.</li><li data-i18n="es">El enunciado ya da una <strong>clave artificial</strong> para el cliente (<code>cod_cliente</code>, autoincremental): es la clave primaria. El <code>nif</code> sigue siendo único y obligatorio: <strong>clave alternativa</strong> (<code>UNIQUE</code> + <code>NOT NULL</code>).</li><li data-i18n="en">The statement already gives an <strong>artificial key</strong> for the customer (<code>customer_code</code>, auto-increment): it's the primary key. The <code>tax_id</code> is still unique and mandatory: an <strong>alternate key</strong> (<code>UNIQUE</code> + <code>NOT NULL</code>).</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>CLIENTE</b>(<u>cod_cliente</u>, <span class="ak">nif</span>, nombre, direccion, ciudad, telefono)</div><div class="sl" data-i18n="en"><b>CUSTOMER</b>(<u>customer_code</u>, <span class="ak">tax_id</span>, name, address, city, phone)</div><div class="sl" data-i18n="es"><b>COCHE</b>(<u>matricula</u>, marca, modelo, color, precio_venta, <i class="fk">cod_cliente</i>)</div><div class="sl" data-i18n="en"><b>CAR</b>(<u>plate_no</u>, make, model, colour, sale_price, <i class="fk">customer_code</i>)</div><div class="sl" data-i18n="es"><b>REVISION</b>(<u>cod_revision</u>, cambio_filtro, cambio_aceite, cambio_frenos, otros, <i class="fk">matricula</i>)</div><div class="sl" data-i18n="en"><b>SERVICE</b>(<u>service_code</u>, filter_change, oil_change, brakes_change, others, <i class="fk">plate_no</i>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">9</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CASO PRÁCTICO</span><span data-i18n="en">CASE STUDY</span></span>
+        <h3><span data-i18n="es">Dormitorios a medida.</span><span data-i18n="en">Custom bedrooms.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Una empresa de instalación de dormitorios juveniles a medida quiere registrar ventas y montajes. De cada <strong>modelo</strong> de dormitorio interesa su código. De cada <strong>montador</strong>, su NIF, nombre, dirección y teléfono. Cada modelo debe ser montado por al menos dos montadores, y un mismo montador puede montar varios modelos, incluso el mismo modelo en fechas distintas; interesa la fecha de cada montaje y cuántos dormitorios de ese modelo se montaron. De cada <strong>cliente</strong> interesa su NIF, nombre, dirección y teléfono. Un modelo puede ser comprado por varios clientes y un cliente puede comprar varios modelos; interesa la fecha de compra.</span><span data-i18n="en">A company installing custom teenage bedrooms wants to record sales and installations. For each bedroom <strong>model</strong> we need its code. For each <strong>fitter</strong>, their tax ID, name, address and phone. Every model must be fitted by at least two fitters, and the same fitter can fit several models, even the same model on different dates; we need the date of each installation and how many bedrooms of that model were fitted. For each <strong>customer</strong> we need their tax ID, name, address and phone. A model can be bought by several customers and a customer can buy several models; we need the purchase date.</span></div><p><span data-i18n="es">Pasa a tablas. ¿Hay alguna regla del enunciado que el esquema relacional no pueda expresar?</span><span data-i18n="en">Convert to tables. Is there any rule in the statement that the relational schema can't express?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>monta:</strong> MONTADOR (0,N) — MODELO (2,N) → N:M con atributos <code>fecha</code> y <code>cantidad</code>. La fecha entra en la clave porque un montador repite modelo en fechas distintas.</li><li data-i18n="en"><strong>monta:</strong> FITTER (0,N) — MODEL (2,N) → N:M with attributes <code>date</code> and <code>quantity</code>. The date joins the key because a fitter repeats a model on different dates.</li><li data-i18n="es"><strong>compra:</strong> CLIENTE (0,N) — MODELO (0,N) → N:M con atributo <code>fecha_compra</code>; también entra en la clave si un cliente puede repetir modelo.</li><li data-i18n="en"><strong>compra:</strong> CUSTOMER (0,N) — MODEL (0,N) → N:M with attribute <code>purchase_date</code>; it also joins the key if a customer can buy the same model again.</li><li data-i18n="es">La cardinalidad mínima <strong>(2,N)</strong> —«al menos dos montadores por modelo»— <strong>no se puede expresar</strong> con tablas y claves: habría que comprobarla con un disparador o desde la aplicación.</li><li data-i18n="en">The minimum cardinality <strong>(2,N)</strong> —“at least two fitters per model”— <strong>can't be expressed</strong> with tables and keys: it would have to be checked with a trigger or from the application.</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>MODELO</b>(<u>cod_modelo</u>)</div><div class="sl" data-i18n="en"><b>MODEL</b>(<u>model_code</u>)</div><div class="sl" data-i18n="es"><b>MONTADOR</b>(<u>nif</u>, nombre, direccion, telefono)</div><div class="sl" data-i18n="en"><b>FITTER</b>(<u>tax_id</u>, name, address, phone)</div><div class="sl" data-i18n="es"><b>CLIENTE</b>(<u>nif</u>, nombre, direccion, telefono)</div><div class="sl" data-i18n="en"><b>CUSTOMER</b>(<u>tax_id</u>, name, address, phone)</div><div class="sl" data-i18n="es"><b>MONTA</b>(<u><i class="fk">nif_montador</i></u>, <u><i class="fk">cod_modelo</i></u>, <u>fecha</u>, cantidad)</div><div class="sl" data-i18n="en"><b>FITS</b>(<u><i class="fk">fitter_tax_id</i></u>, <u><i class="fk">model_code</i></u>, <u>date</u>, quantity)</div><div class="sl" data-i18n="es"><b>COMPRA</b>(<u><i class="fk">nif_cliente</i></u>, <u><i class="fk">cod_modelo</i></u>, <u>fecha_compra</u>)</div><div class="sl" data-i18n="en"><b>PURCHASE</b>(<u><i class="fk">customer_tax_id</i></u>, <u><i class="fk">model_code</i></u>, <u>purchase_date</u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">10</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">JERARQUÍA Y MULTIVALUADOS</span><span data-i18n="en">HIERARCHY AND MULTI-VALUED</span></span>
+        <h3><span data-i18n="es">Páginas web y publicidad.</span><span data-i18n="en">Web pages and advertising.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Se quiere controlar para cada <strong>usuario</strong> (NIF, nombre, fecha de nacimiento y titulación) las páginas web que ha creado. De cada <strong>página</strong> se guarda la URL, el título, la temática y el autor principal. Cada página es de un tipo: <em>convencional</em> (número de visitas, si tiene marcos), <em>blog</em> (número de entradas y de etiquetas) o <em>wiki</em> (número de referencias y los idiomas que contempla, que pueden ser varios). Toda página es de uno de esos tipos y de uno solo. Las páginas convencionales pueden tener publicidad de varias <strong>empresas</strong> (nombre y actividad); de cada contrato se guarda la fecha de inicio, la de fin y el dinero a percibir.</span><span data-i18n="en">We want to track, for each <strong>user</strong> (tax ID, name, date of birth and qualification), the web pages they've created. For each <strong>page</strong> we store the URL, title, topic and main author. Each page is of a type: <em>conventional</em> (number of visits, whether it has frames), <em>blog</em> (number of posts and tags) or <em>wiki</em> (number of references and the languages it covers, which can be several). Every page is of one of those types and only one. Conventional pages can carry advertising from several <strong>companies</strong> (name and activity); for each contract we store the start date, end date and the money to be received.</span></div><p><span data-i18n="es">Pasa a tablas. Pistas: ¿qué tipo de jerarquía hay? ¿Qué haces con los idiomas?</span><span data-i18n="en">Convert to tables. Hints: what kind of hierarchy is there? What do you do with the languages?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>Jerarquía:</strong> PAGINA → CONVENCIONAL / BLOG / WIKI, <strong>total y exclusiva</strong>. Como PAGINA se relaciona con USUARIO, usamos la <strong>opción 2</strong>: una tabla para el supertipo y una por subtipo con la clave de PAGINA como PK y FK.</li><li data-i18n="en"><strong>Hierarchy:</strong> PAGE → CONVENTIONAL / BLOG / WIKI, <strong>total and exclusive</strong>. Since PAGE relates to USER, we use <strong>option 2</strong>: a table for the supertype and one per subtype with PAGE's key as PK and FK.</li><li data-i18n="es"><strong>crea:</strong> USUARIO (0,N) — PAGINA (1,1) → 1:N, el autor principal es la clave foránea, <code>NOT NULL</code>.</li><li data-i18n="en"><strong>crea:</strong> USER (0,N) — PAGE (1,1) → 1:N, the main author is the foreign key, <code>NOT NULL</code>.</li><li data-i18n="es"><strong>Idiomas</strong> de la wiki: atributo <strong>multivaluado</strong> → nueva tabla <code>IDIOMA_WIKI</code> con clave <code>(url, idioma)</code>.</li><li data-i18n="en">Wiki <strong>languages</strong>: a <strong>multi-valued</strong> attribute → new table <code>WIKI_LANGUAGE</code> with key <code>(url, language)</code>.</li><li data-i18n="es"><strong>publicidad:</strong> EMPRESA (0,N) — CONVENCIONAL (0,N) → N:M con atributos propios; la fecha de inicio entra en la clave porque una empresa puede volver a contratar la misma página.</li><li data-i18n="en"><strong>publicidad:</strong> COMPANY (0,N) — CONVENTIONAL (0,N) → N:M with attributes of its own; the start date joins the key because a company can contract the same page again.</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>USUARIO</b>(<u>nif</u>, nombre, fecha_nacimiento, titulacion)</div><div class="sl" data-i18n="en"><b>USER</b>(<u>tax_id</u>, name, birth_date, qualification)</div><div class="sl" data-i18n="es"><b>PAGINA</b>(<u>url</u>, titulo, tematica, <i class="fk">nif_autor</i>)</div><div class="sl" data-i18n="en"><b>PAGE</b>(<u>url</u>, title, topic, <i class="fk">author_tax_id</i>)</div><div class="sl" data-i18n="es"><b>CONVENCIONAL</b>(<u><i class="fk">url</i></u>, num_visitas, marcos)</div><div class="sl" data-i18n="en"><b>CONVENTIONAL</b>(<u><i class="fk">url</i></u>, num_visits, frames)</div><div class="sl" data-i18n="es"><b>BLOG</b>(<u><i class="fk">url</i></u>, num_entradas, num_etiquetas)</div><div class="sl" data-i18n="en"><b>BLOG</b>(<u><i class="fk">url</i></u>, num_posts, num_tags)</div><div class="sl" data-i18n="es"><b>WIKI</b>(<u><i class="fk">url</i></u>, num_referencias)</div><div class="sl" data-i18n="en"><b>WIKI</b>(<u><i class="fk">url</i></u>, num_references)</div><div class="sl" data-i18n="es"><b>IDIOMA_WIKI</b>(<u><i class="fk">url</i></u>, <u>idioma</u>)</div><div class="sl" data-i18n="en"><b>WIKI_LANGUAGE</b>(<u><i class="fk">url</i></u>, <u>language</u>)</div><div class="sl" data-i18n="es"><b>EMPRESA</b>(<u>nombre</u>, actividad)</div><div class="sl" data-i18n="en"><b>COMPANY</b>(<u>name</u>, activity)</div><div class="sl" data-i18n="es"><b>PUBLICIDAD</b>(<u><i class="fk">nombre_empresa</i></u>, <u><i class="fk">url</i></u>, <u>fecha_inicio</u>, fecha_fin, importe)</div><div class="sl" data-i18n="en"><b>ADVERTISING</b>(<u><i class="fk">company_name</i></u>, <u><i class="fk">url</i></u>, <u>start_date</u>, end_date, amount)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">11</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">DÉBIL, REFLEXIVA Y JERARQUÍA</span><span data-i18n="en">WEAK, REFLEXIVE AND HIERARCHY</span></span>
+        <h3><span data-i18n="es">Empresa de construcción.</span><span data-i18n="en">Construction company.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Una empresa de construcción tiene <strong>empleados</strong> (DNI, nombre y sueldo). Un empleado puede ser jefe de otros, aunque hay empleados que no son jefes de nadie y otros que no tienen jefe; como mucho tiene uno. Los <strong>oficinistas</strong> (además, titulación) están asignados a una oficina. Hay varios <strong>edificios</strong> (nombre y dirección) divididos en <strong>oficinas</strong>, cuyo número es único dentro del edificio pero se repite de un edificio a otro; hay oficinas vacías. Los <strong>obreros</strong> son otro tipo de empleado: tienen siempre una <strong>obra</strong> asignada, con la fecha de asignación, y en cada obra trabaja como mínimo un obrero.</span><span data-i18n="en">A construction company has <strong>employees</strong> (ID number, name and salary). An employee can be the boss of others, although some employees aren't anyone's boss and others have no boss; they have at most one. <strong>Office clerks</strong> (plus qualification) are assigned to an office. There are several <strong>buildings</strong> (name and address) divided into <strong>offices</strong>, whose number is unique within the building but repeats from one building to another; some offices are empty. <strong>Labourers</strong> are another kind of employee: they always have a <strong>site</strong> assigned, with the assignment date, and at least one labourer works at each site.</span></div><p><span data-i18n="es">Pasa a tablas. Hay una entidad débil, una relación reflexiva y una jerarquía: identifícalas.</span><span data-i18n="en">Convert to tables. There's a weak entity, a reflexive relationship and a hierarchy: identify them.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><strong>OFICINA es débil:</strong> su número solo identifica dentro de un edificio. Su clave es <code>(nombre_edificio, num_oficina)</code>, donde <code>nombre_edificio</code> es foránea a EDIFICIO.</li><li data-i18n="en"><strong>OFFICE is weak:</strong> its number only identifies within a building. Its key is <code>(building_name, office_no)</code>, where <code>building_name</code> is a foreign key to BUILDING.</li><li data-i18n="es"><strong>Reflexiva 1:N</strong> sobre EMPLEADO (jefe): <code>dni_jefe</code> en EMPLEADO, nulo para quien no tiene jefe.</li><li data-i18n="en"><strong>Reflexive 1:N</strong> on EMPLOYEE (boss): <code>boss_dni</code> in EMPLOYEE, null for whoever has no boss.</li><li data-i18n="es"><strong>Jerarquía</strong> EMPLEADO → OFICINISTA / OBRERO, parcial y exclusiva. EMPLEADO tiene relaciones propias (jefe), así que usamos la <strong>opción 2</strong>.</li><li data-i18n="en"><strong>Hierarchy</strong> EMPLOYEE → CLERK / LABOURER, partial and exclusive. EMPLOYEE has relationships of its own (boss), so we use <strong>option 2</strong>.</li><li data-i18n="es">OFICINISTA se asigna a una oficina: su clave foránea es <strong>compuesta</strong> (apunta a la clave compuesta de OFICINA). OBRERO guarda la obra (<code>NOT NULL</code>) y la <code>fecha_asignacion</code>.</li><li data-i18n="en">CLERK is assigned to an office: its foreign key is <strong>composite</strong> (it points to OFFICE's composite key). LABOURER stores the site (<code>NOT NULL</code>) and the <code>assignment_date</code>.</li><li data-i18n="es">Que <strong>cada obra tenga al menos un obrero</strong> (mínimo 1 en el lado de OBRA) no se puede forzar con tablas: requiere un disparador o control en la aplicación.</li><li data-i18n="en">That <strong>every site has at least one labourer</strong> (minimum 1 on the SITE side) can't be enforced with tables: it requires a trigger or application control.</li></ul><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>EMPLEADO</b>(<u>dni</u>, nombre, sueldo, <i class="fk">dni_jefe</i>)</div><div class="sl" data-i18n="en"><b>EMPLOYEE</b>(<u>dni</u>, name, salary, <i class="fk">boss_dni</i>)</div><div class="sl" data-i18n="es"><b>OFICINISTA</b>(<u><i class="fk">dni</i></u>, titulacion, <i class="fk">nombre_edificio</i>, <i class="fk">num_oficina</i>)</div><div class="sl" data-i18n="en"><b>CLERK</b>(<u><i class="fk">dni</i></u>, qualification, <i class="fk">building_name</i>, <i class="fk">office_no</i>)</div><div class="sl" data-i18n="es"><b>OBRERO</b>(<u><i class="fk">dni</i></u>, <i class="fk">cod_obra</i>, fecha_asignacion)</div><div class="sl" data-i18n="en"><b>LABOURER</b>(<u><i class="fk">dni</i></u>, <i class="fk">site_code</i>, assignment_date)</div><div class="sl" data-i18n="es"><b>OBRA</b>(<u>cod_obra</u>)</div><div class="sl" data-i18n="en"><b>SITE</b>(<u>site_code</u>)</div><div class="sl" data-i18n="es"><b>EDIFICIO</b>(<u>nombre</u>, direccion)</div><div class="sl" data-i18n="en"><b>BUILDING</b>(<u>name</u>, address)</div><div class="sl" data-i18n="es"><b>OFICINA</b>(<u><i class="fk">nombre_edificio</i></u>, <u>num_oficina</u>)</div><div class="sl" data-i18n="en"><b>OFFICE</b>(<u><i class="fk">building_name</i></u>, <u>office_no</u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="section-title">
+    <span class="n">03</span>
+    <h2><span data-i18n="es">Normalización</span><span data-i18n="en">Normalisation</span></h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">12</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">DEPENDENCIAS</span><span data-i18n="en">DEPENDENCIES</span></span>
+        <h3><span data-i18n="es">Analiza las dependencias funcionales.</span><span data-i18n="en">Analyse the functional dependencies.</span></h3>
+        <div class="er-scenario"><span data-i18n="es">Tabla <code>LINEA(id_pedido, id_producto, nombre_producto, cantidad, id_cliente, ciudad_cliente)</code>, con clave primaria <code>(id_pedido, id_producto)</code>. Cada pedido pertenece a un único cliente; cada cliente vive en una ciudad; cada producto tiene un nombre.</span><span data-i18n="en">Table <code>LINE_ITEM(order_id, product_id, product_name, quantity, customer_id, customer_city)</code>, with primary key <code>(order_id, product_id)</code>. Each order belongs to a single customer; each customer lives in one city; each product has a name.</span></div><p><span data-i18n="es">a) Escribe las dependencias funcionales. b) Clasifica la dependencia de cada atributo no clave: completa, parcial o transitiva. c) ¿En qué forma normal está la tabla?</span><span data-i18n="en">a) Write the functional dependencies. b) Classify each non-key attribute's dependency: full, partial or transitive. c) Which normal form is the table in?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <ul><li data-i18n="es"><code>(id_pedido, id_producto) → cantidad</code>: <strong>completa</strong> (la cantidad es de ese producto en ese pedido).</li><li data-i18n="en"><code>(order_id, product_id) → quantity</code>: <strong>full</strong> (the quantity is of that product in that order).</li><li data-i18n="es"><code>id_producto → nombre_producto</code>: <strong>parcial</strong> (solo depende de parte de la clave).</li><li data-i18n="en"><code>product_id → product_name</code>: <strong>partial</strong> (it depends only on part of the key).</li><li data-i18n="es"><code>id_pedido → id_cliente</code>: <strong>parcial</strong>.</li><li data-i18n="en"><code>order_id → customer_id</code>: <strong>partial</strong>.</li><li data-i18n="es"><code>id_cliente → ciudad_cliente</code>: con la anterior, <code>ciudad_cliente</code> depende de <code>id_pedido</code> <strong>transitivamente</strong> (<code>id_pedido → id_cliente → ciudad_cliente</code>), y además de forma parcial.</li><li data-i18n="en"><code>customer_id → customer_city</code>: together with the previous one, <code>customer_city</code> depends on <code>order_id</code> <strong>transitively</strong> (<code>order_id → customer_id → customer_city</code>), and also partially.</li></ul><p><span data-i18n="es">c) Está en <strong>1FN</strong> (todos los valores son atómicos), pero no en 2FN por las dependencias parciales.</span><span data-i18n="en">c) It's in <strong>1NF</strong> (all values are atomic), but not in 2NF because of the partial dependencies.</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">13</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">1FN → 3FN</span><span data-i18n="en">1NF → 3NF</span></span>
+        <h3><span data-i18n="es">Alumnos y asignaturas.</span><span data-i18n="en">Students and subjects.</span></h3>
+        <div class="er-scenario"><span data-i18n="es"><code>ALUMNOS(dni, apellidos, nombre, direccion, ciudad, provincia, com_aut, codigo, asignatura, nota)</code>. Clave primaria: <code>(dni, codigo)</code>. Se sabe que: un alumno tiene un solo conjunto de datos personales; cada ciudad pertenece a una provincia y cada provincia a una comunidad autónoma; cada código de asignatura corresponde a un nombre; la nota es de un alumno en una asignatura.</span><span data-i18n="en"><code>STUDENTS(dni, surnames, name, address, city, province, aut_community, code, subject, grade)</code>. Primary key: <code>(dni, code)</code>. It's known that: a student has a single set of personal data; each city belongs to one province and each province to one autonomous community; each subject code corresponds to one name; the grade belongs to one student in one subject.</span></div><p><span data-i18n="es">Normaliza hasta 3FN, explicando cada paso.</span><span data-i18n="en">Normalise up to 3NF, explaining each step.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><strong><span data-i18n="es">1FN.</span><span data-i18n="en">1NF.</span></strong> <span data-i18n="es">Los datos del alumno se repetirían por cada asignatura (grupo repetitivo): separamos. <code>ALUMNOS(dni, apellidos, nombre, direccion, ciudad, provincia, com_aut)</code> y <code>ALUMNOS_ASIGNATURAS(dni, codigo, asignatura, nota)</code>.</span><span data-i18n="en">The student's data would repeat for every subject (repeating group): we split. <code>STUDENTS(dni, surnames, name, address, city, province, aut_community)</code> and <code>STUDENT_SUBJECTS(dni, code, subject, grade)</code>.</span></p><p><strong><span data-i18n="es">2FN.</span><span data-i18n="en">2NF.</span></strong> <span data-i18n="es"><code>ALUMNOS</code> tiene clave simple: ya está. En <code>ALUMNOS_ASIGNATURAS</code>, <code>asignatura</code> depende solo de <code>codigo</code> (parcial) → <code>ALUMNOS_ASIGNATURAS(dni, codigo, nota)</code> y <code>ASIGNATURAS(codigo, asignatura)</code>.</span><span data-i18n="en"><code>STUDENTS</code> has a simple key: it's fine. In <code>STUDENT_SUBJECTS</code>, <code>subject</code> depends only on <code>code</code> (partial) → <code>STUDENT_SUBJECTS(dni, code, grade)</code> and <code>SUBJECTS(code, subject)</code>.</span></p><p><strong><span data-i18n="es">3FN.</span><span data-i18n="en">3NF.</span></strong> <span data-i18n="es">En <code>ALUMNOS</code> hay una cadena transitiva: <code>dni → ciudad → provincia → com_aut</code>. Sacamos <code>CIUDAD(ciudad, provincia, com_aut)</code>, que aún tiene <code>ciudad → provincia → com_aut</code>, así que la partimos de nuevo: <code>CIUDAD(ciudad, provincia)</code> y <code>PROVINCIA(provincia, com_aut)</code>.</span><span data-i18n="en"><code>STUDENTS</code> has a transitive chain: <code>dni → city → province → aut_community</code>. We pull out <code>CITY(city, province, aut_community)</code>, which still has <code>city → province → aut_community</code>, so we split it again: <code>CITY(city, province)</code> and <code>PROVINCE(province, aut_community)</code>.</span></p><p><span data-i18n="es"><strong>Resultado final:</strong></span><span data-i18n="en"><strong>Final result:</strong></span></p><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>PROVINCIA</b>(<u>provincia</u>, com_aut)</div><div class="sl" data-i18n="en"><b>PROVINCE</b>(<u>province</u>, aut_community)</div><div class="sl" data-i18n="es"><b>CIUDAD</b>(<u>ciudad</u>, <i class="fk">provincia</i>)</div><div class="sl" data-i18n="en"><b>CITY</b>(<u>city</u>, <i class="fk">province</i>)</div><div class="sl" data-i18n="es"><b>ALUMNOS</b>(<u>dni</u>, apellidos, nombre, direccion, <i class="fk">ciudad</i>)</div><div class="sl" data-i18n="en"><b>STUDENTS</b>(<u>dni</u>, surnames, name, address, <i class="fk">city</i>)</div><div class="sl" data-i18n="es"><b>ASIGNATURAS</b>(<u>codigo</u>, asignatura)</div><div class="sl" data-i18n="en"><b>SUBJECTS</b>(<u>code</u>, subject)</div><div class="sl" data-i18n="es"><b>ALUMNOS_ASIGNATURAS</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">codigo</i></u>, nota)</div><div class="sl" data-i18n="en"><b>STUDENT_SUBJECTS</b>(<u><i class="fk">dni</i></u>, <u><i class="fk">code</i></u>, grade)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">14</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">1FN → 3FN</span><span data-i18n="en">1NF → 3NF</span></span>
+        <h3><span data-i18n="es">Órdenes de compra.</span><span data-i18n="en">Purchase orders.</span></h3>
+        <div class="er-scenario"><span data-i18n="es"><code>ORDENES(id_orden, fecha, id_cliente, nom_cliente, ciudad, id_art, nom_art, cant, precio)</code>. Una orden tiene una fecha y un cliente, y puede incluir varios artículos; cada artículo tiene un nombre y un precio; de cada artículo de una orden se anota la cantidad.</span><span data-i18n="en"><code>ORDERS(order_id, date, customer_id, customer_name, city, item_id, item_name, qty, price)</code>. An order has a date and a customer, and can include several items; each item has a name and a price; the quantity of each item in an order is recorded.</span></div><p><span data-i18n="es">Normaliza hasta 3FN.</span><span data-i18n="en">Normalise up to 3NF.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><strong><span data-i18n="es">1FN.</span><span data-i18n="en">1NF.</span></strong> <span data-i18n="es">Hay un grupo repetitivo (los artículos de cada orden). <code>ORDENES(id_orden, fecha, id_cliente, nom_cliente, ciudad)</code> y <code>ARTICULOS_ORDENES(id_orden, id_art, nom_art, cant, precio)</code>.</span><span data-i18n="en">There's a repeating group (the items in each order). <code>ORDERS(order_id, date, customer_id, customer_name, city)</code> and <code>ORDER_ITEMS(order_id, item_id, item_name, qty, price)</code>.</span></p><p><strong><span data-i18n="es">2FN.</span><span data-i18n="en">2NF.</span></strong> <span data-i18n="es"><code>ORDENES</code> tiene clave simple: bien. En <code>ARTICULOS_ORDENES</code>, <code>nom_art</code> y <code>precio</code> dependen solo de <code>id_art</code> → <code>ARTICULOS_ORDENES(id_orden, id_art, cant)</code> y <code>ARTICULOS(id_art, nom_art, precio)</code>.</span><span data-i18n="en"><code>ORDERS</code> has a simple key: fine. In <code>ORDER_ITEMS</code>, <code>item_name</code> and <code>price</code> depend only on <code>item_id</code> → <code>ORDER_ITEMS(order_id, item_id, qty)</code> and <code>ITEMS(item_id, item_name, price)</code>.</span></p><p><strong><span data-i18n="es">3FN.</span><span data-i18n="en">3NF.</span></strong> <span data-i18n="es">En <code>ORDENES</code>: <code>id_orden → id_cliente → nom_cliente, ciudad</code> (transitiva) → <code>ORDENES(id_orden, fecha, id_cliente)</code> y <code>CLIENTES(id_cliente, nom_cliente, ciudad)</code>.</span><span data-i18n="en">In <code>ORDERS</code>: <code>order_id → customer_id → customer_name, city</code> (transitive) → <code>ORDERS(order_id, date, customer_id)</code> and <code>CUSTOMERS(customer_id, customer_name, city)</code>.</span></p><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>CLIENTES</b>(<u>id_cliente</u>, nom_cliente, ciudad)</div><div class="sl" data-i18n="en"><b>CUSTOMERS</b>(<u>customer_id</u>, customer_name, city)</div><div class="sl" data-i18n="es"><b>ORDENES</b>(<u>id_orden</u>, fecha, <i class="fk">id_cliente</i>)</div><div class="sl" data-i18n="en"><b>ORDERS</b>(<u>order_id</u>, date, <i class="fk">customer_id</i>)</div><div class="sl" data-i18n="es"><b>ARTICULOS</b>(<u>id_art</u>, nom_art, precio)</div><div class="sl" data-i18n="en"><b>ITEMS</b>(<u>item_id</u>, item_name, price)</div><div class="sl" data-i18n="es"><b>ARTICULOS_ORDENES</b>(<u><i class="fk">id_orden</i></u>, <u><i class="fk">id_art</i></u>, cant)</div><div class="sl" data-i18n="en"><b>ORDER_ITEMS</b>(<u><i class="fk">order_id</i></u>, <u><i class="fk">item_id</i></u>, qty)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div><p><span data-i18n="es">Fíjate en que <code>precio</code> vive en <code>ARTICULOS</code>: si el precio puede cambiar con el tiempo, el precio al que se vendió cada artículo debería guardarse además en <code>ARTICULOS_ORDENES</code>.</span><span data-i18n="en">Note that <code>price</code> lives in <code>ITEMS</code>: if the price can change over time, the price at which each item was sold should also be stored in <code>ORDER_ITEMS</code>.</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">15</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">CLAVE COMPUESTA</span><span data-i18n="en">COMPOSITE KEY</span></span>
+        <h3><span data-i18n="es">Películas y estudios.</span><span data-i18n="en">Films and studios.</span></h3>
+        <div class="er-scenario"><span data-i18n="es"><code>PELICULA(titulo, anio, duracion, tipo, estudio, direccion_estudio, actor)</code>. Un título puede tener varias versiones en distintos años, de modo que la película se identifica por <code>(titulo, anio)</code>. Una película tiene varios actores. Cada estudio está en una única dirección.</span><span data-i18n="en"><code>FILM(title, year, duration, type, studio, studio_address, actor)</code>. A title can have several versions in different years, so a film is identified by <code>(title, year)</code>. A film has several actors. Each studio is at a single address.</span></div><p><span data-i18n="es">Normaliza hasta 3FN. ¿Quedan atributos no clave?</span><span data-i18n="en">Normalise up to 3NF. Are there any non-key attributes left?</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><strong><span data-i18n="es">1FN.</span><span data-i18n="en">1NF.</span></strong> <span data-i18n="es">Los actores forman un grupo repetitivo: <code>PELICULA(titulo, anio, duracion, tipo, estudio, direccion_estudio)</code> y <code>PELICULA_ACTOR(titulo, anio, actor)</code>.</span><span data-i18n="en">The actors form a repeating group: <code>FILM(title, year, duration, type, studio, studio_address)</code> and <code>FILM_ACTOR(title, year, actor)</code>.</span></p><p><strong><span data-i18n="es">2FN.</span><span data-i18n="en">2NF.</span></strong> <span data-i18n="es"><code>PELICULA_ACTOR</code> no tiene atributos no clave. En <code>PELICULA</code>, duración, tipo y estudio dependen de <strong>las dos</strong> partes de la clave (título y año): ya cumple.</span><span data-i18n="en"><code>FILM_ACTOR</code> has no non-key attributes. In <code>FILM</code>, duration, type and studio depend on <strong>both</strong> parts of the key (title and year): it already complies.</span></p><p><strong><span data-i18n="es">3FN.</span><span data-i18n="en">3NF.</span></strong> <span data-i18n="es"><code>(titulo, anio) → estudio → direccion_estudio</code> es transitiva → <code>PELICULA(titulo, anio, duracion, tipo, estudio)</code> y <code>ESTUDIO(estudio, direccion)</code>.</span><span data-i18n="en"><code>(title, year) → studio → studio_address</code> is transitive → <code>FILM(title, year, duration, type, studio)</code> and <code>STUDIO(studio, address)</code>.</span></p><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>ESTUDIO</b>(<u>estudio</u>, direccion)</div><div class="sl" data-i18n="en"><b>STUDIO</b>(<u>studio</u>, address)</div><div class="sl" data-i18n="es"><b>PELICULA</b>(<u>titulo</u>, <u>anio</u>, duracion, tipo, <i class="fk">estudio</i>)</div><div class="sl" data-i18n="en"><b>FILM</b>(<u>title</u>, <u>year</u>, duration, type, <i class="fk">studio</i>)</div><div class="sl" data-i18n="es"><b>PELICULA_ACTOR</b>(<u><i class="fk">titulo</i></u>, <u><i class="fk">anio</i></u>, <u>actor</u>)</div><div class="sl" data-i18n="en"><b>FILM_ACTOR</b>(<u><i class="fk">title</i></u>, <u><i class="fk">year</i></u>, <u>actor</u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">16</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">COMPUESTOS Y MULTIVALUADOS</span><span data-i18n="en">COMPOSITE AND MULTI-VALUED</span></span>
+        <h3><span data-i18n="es">Préstamos de biblioteca.</span><span data-i18n="en">Library loans.</span></h3>
+        <div class="er-scenario"><span data-i18n="es"><code>PRESTAMOS(codLibro, titulo, autor, editorial, codLector, nombreLector, fechaDev)</code>. En <code>nombreLector</code> se guarda todo junto, por ejemplo «Lucía, Pérez Gómez». Un libro puede tener varios autores. Cada libro tiene un título y una editorial; cada lector, un código y un nombre.</span><span data-i18n="en"><code>LOANS(bookCode, title, author, publisher, readerCode, readerName, returnDate)</code>. <code>readerName</code> stores everything together, for example “Lucía, Pérez Gómez”. A book can have several authors. Each book has a title and a publisher; each reader, a code and a name.</span></div><p><span data-i18n="es">Normaliza hasta 3FN. Pista: no todo problema de 1FN es un grupo repetitivo.</span><span data-i18n="en">Normalise up to 3NF. Hint: not every 1NF problem is a repeating group.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><strong><span data-i18n="es">1FN.</span><span data-i18n="en">1NF.</span></strong> <span data-i18n="es">Dos problemas. <strong>Atributo compuesto:</strong> <code>nombreLector</code> se divide en <code>nombre</code>, <code>apellido1</code> y <code>apellido2</code>. <strong>Multivaluado:</strong> <code>autor</code> pasa a una tabla propia (con un código de autor): <code>AUTORES_LIBROS(codLibro, codAutor, nombreAutor)</code>.</span><span data-i18n="en">Two problems. <strong>Composite attribute:</strong> <code>readerName</code> is split into <code>name</code>, <code>surname1</code> and <code>surname2</code>. <strong>Multi-valued:</strong> <code>author</code> moves to a table of its own (with an author code): <code>BOOK_AUTHORS(bookCode, authorCode, authorName)</code>.</span></p><p><strong><span data-i18n="es">2FN.</span><span data-i18n="en">2NF.</span></strong> <span data-i18n="es">En <code>PRESTAMOS(codLibro, codLector, ...)</code>, los datos del lector dependen solo de <code>codLector</code> y los del libro solo de <code>codLibro</code>; en <code>AUTORES_LIBROS</code>, <code>nombreAutor</code> depende solo de <code>codAutor</code>. Separamos todo.</span><span data-i18n="en">In <code>LOANS(bookCode, readerCode, ...)</code>, the reader's data depends only on <code>readerCode</code> and the book's data only on <code>bookCode</code>; in <code>BOOK_AUTHORS</code>, <code>authorName</code> depends only on <code>authorCode</code>. We split everything.</span></p><p><strong><span data-i18n="es">3FN.</span><span data-i18n="en">3NF.</span></strong> <span data-i18n="es">No hay dependencias transitivas: las cinco tablas están en 3FN.</span><span data-i18n="en">There are no transitive dependencies: all five tables are in 3NF.</span></p><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>LIBRO</b>(<u>codLibro</u>, titulo, editorial)</div><div class="sl" data-i18n="en"><b>BOOK</b>(<u>bookCode</u>, title, publisher)</div><div class="sl" data-i18n="es"><b>AUTOR</b>(<u>codAutor</u>, nombreAutor)</div><div class="sl" data-i18n="en"><b>AUTHOR</b>(<u>authorCode</u>, authorName)</div><div class="sl" data-i18n="es"><b>AUTORES_LIBROS</b>(<u><i class="fk">codLibro</i></u>, <u><i class="fk">codAutor</i></u>)</div><div class="sl" data-i18n="en"><b>BOOK_AUTHORS</b>(<u><i class="fk">bookCode</i></u>, <u><i class="fk">authorCode</i></u>)</div><div class="sl" data-i18n="es"><b>LECTOR</b>(<u>codLector</u>, nombre, apellido1, apellido2)</div><div class="sl" data-i18n="en"><b>READER</b>(<u>readerCode</u>, name, surname1, surname2)</div><div class="sl" data-i18n="es"><b>PRESTAMOS</b>(<u><i class="fk">codLibro</i></u>, <u><i class="fk">codLector</i></u>, fechaDev)</div><div class="sl" data-i18n="en"><b>LOANS</b>(<u><i class="fk">bookCode</i></u>, <u><i class="fk">readerCode</i></u>, returnDate)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div><p><span data-i18n="es">Si un lector puede llevarse el mismo libro más de una vez, la fecha de préstamo tendría que formar parte de la clave de <code>PRESTAMOS</code>.</span><span data-i18n="en">If a reader can borrow the same book more than once, the loan date would have to be part of <code>LOANS</code>'s key.</span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="q-block">
+    <div class="q-head">
+      <span class="q-num">17</span>
+      <div class="q-body">
+        <span class="q-tag"><span data-i18n="es">FNBC</span><span data-i18n="en">BCNF</span></span>
+        <h3><span data-i18n="es">Un caso que 3FN no detecta.</span><span data-i18n="en">A case that 3NF doesn't detect.</span></h3>
+        <div class="er-scenario"><span data-i18n="es"><code>REPARACION(cliente, tipo, mecanico)</code>. Un cliente lleva su coche a un tipo de reparación (frenos, motor…) y le atiende un mecánico. Cada mecánico está especializado en <strong>un solo tipo</strong> de reparación, y para cada tipo, cada cliente es atendido siempre por el mismo mecánico.</span><span data-i18n="en"><code>REPAIR(customer, type, mechanic)</code>. A customer brings their car for a type of repair (brakes, engine…) and a mechanic attends them. Each mechanic specialises in <strong>a single type</strong> of repair, and for each type, each customer is always attended by the same mechanic.</span></div><div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">REPARACION</div><table class="rel"><thead><tr><th><u>cliente</u></th><th><u>tipo</u></th><th>mecanico</th></tr></thead><tbody><tr><td>Marta</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Iván</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Marta</td><td>motor</td><td>Soto</td></tr><tr><td>Lucía</td><td>motor</td><td>Soto</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">REPAIR</div><table class="rel"><thead><tr><th><u>customer</u></th><th><u>type</u></th><th>mechanic</th></tr></thead><tbody><tr><td>Marta</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Iván</td><td>frenos</td><td>Ruiz</td></tr><tr><td>Marta</td><td>motor</td><td>Soto</td></tr><tr><td>Lucía</td><td>motor</td><td>Soto</td></tr></tbody></table></div></div><p><span data-i18n="es">a) Escribe las dependencias funcionales y las claves candidatas. b) ¿Está en 3FN? ¿Y en FNBC? c) Descomponla si hace falta.</span><span data-i18n="en">a) Write the functional dependencies and the candidate keys. b) Is it in 3NF? And in BCNF? c) Decompose it if necessary.</span></p>
+      </div>
+    </div>
+    <details class="answer">
+      <summary><span data-i18n="es">Ver solución</span><span data-i18n="en">Show solution</span></summary>
+      <div class="answer-body">
+        <p><span data-i18n="es">a) <code>(cliente, tipo) → mecanico</code> y <code>mecanico → tipo</code>. Claves candidatas: <code>(cliente, tipo)</code> y <code>(cliente, mecanico)</code>.</span><span data-i18n="en">a) <code>(customer, type) → mechanic</code> and <code>mechanic → type</code>. Candidate keys: <code>(customer, type)</code> and <code>(customer, mechanic)</code>.</span></p><p><span data-i18n="es">b) Está en <strong>3FN</strong>: todos sus atributos forman parte de alguna clave candidata, así que no hay dependencias transitivas. No está en <strong>FNBC</strong>: <code>mecanico</code> es un determinante (determina el tipo) que no es clave candidata. La consecuencia es una redundancia: si Ruiz cambia de especialidad, hay que tocar varias filas.</span><span data-i18n="en">b) It's in <strong>3NF</strong>: all its attributes belong to some candidate key, so there are no transitive dependencies. It isn't in <strong>BCNF</strong>: <code>mechanic</code> is a determinant (it determines the type) that isn't a candidate key. The consequence is redundancy: if Ruiz changes speciality, several rows must be touched.</span></p><p><span data-i18n="es">c) Descomposición:</span><span data-i18n="en">c) Decomposition:</span></p><div class="schema-box" style="margin-top:12px;"><div class="sl" data-i18n="es"><b>MECANICO</b>(<u>mecanico</u>, tipo)</div><div class="sl" data-i18n="en"><b>MECHANIC</b>(<u>mechanic</u>, type)</div><div class="sl" data-i18n="es"><b>CLIENTE_MECANICO</b>(<u><i class="fk">cliente</i></u>, <u><i class="fk">mecanico</i></u>)</div><div class="sl" data-i18n="en"><b>CUSTOMER_MECHANIC</b>(<u><i class="fk">customer</i></u>, <u><i class="fk">mechanic</i></u>)</div><div class="sleg"><span data-i18n="es"><u>subrayado</u> = clave primaria · <i class="fk">cursiva</i> = clave foránea · <span class="ak">discontinuo</span> = única</span><span data-i18n="en"><u>underlined</u> = primary key · <i class="fk">italic</i> = foreign key · <span class="ak">dashed</span> = unique</span></div></div><p><span data-i18n="es">Uniendo las dos tablas por <code>mecanico</code> recuperamos exactamente las filas originales: no se pierde información.</span><span data-i18n="en">Joining both tables on <code>mechanic</code> gets back exactly the original rows: no information is lost.</span></p>
+      </div>
+    </details>
+  </div>
+
+</main>
+
+<footer>
+
+</footer>
+
+</div><!-- /#ut3-app -->
+<script>
+function setLang(lang){
+  var app = document.getElementById('ut3-app');
+  if(app) app.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.getElementById('btn-es').classList.toggle('active', lang==='es');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  try{ localStorage.setItem('ut3-lang', lang); }catch(e){}
+}
+(function(){
+  var saved = null;
+  try{ saved = localStorage.getItem('ut3-lang'); }catch(e){}
+  if(saved === 'en' || saved === 'es'){ setLang(saved); }
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  var THEME_KEY = 'bbdd-theme';
+  var btn = document.getElementById('theme-toggle');
+  var icon = document.getElementById('theme-toggle-icon');
+  var label = document.getElementById('theme-toggle-label');
+  function apply(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    if(icon) icon.textContent = theme === 'light' ? '🌙' : '☀️';
+    if(label) label.textContent = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(e){}
+  apply(saved === 'light' ? 'light' : 'dark');
+  if(btn){
+    btn.addEventListener('click', function(){
+      var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      apply(next);
+      try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    });
+  }
+})();
+</script>
+</body>
+</html>
