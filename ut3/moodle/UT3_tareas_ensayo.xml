@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+<!-- ============================================================
+UT3 · Tareas de redacción y comprensión lectora (tipo Ensayo)
+Importar: Banco de preguntas > Importar > formato Moodle XML > seleccionar este fichero.
+Contiene 6 preguntas de desarrollo en español (categoría "Tareas de redacción")
+y 9 preguntas en inglés (categoría "Reading and writing (EN)"): 8 de comprensión
+del texto "Why normalise?" y 1 de redacción. Son preguntas de corrección manual;
+el campo "información para el corrector" (graderinfo) lleva la pauta, visible solo
+para el profesorado.
+UT3 · Written tasks and reading comprehension (essay type), see above.
+============================================================ -->
+
+<question type="category">
+  <category><text>$course$/UT3/Tareas de redacción</text></category>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 1 - Paso a tablas: tienda online</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Una tienda online guarda esta información:</p>
+<ul><li>CLIENTE (dni, nombre, email). Un cliente puede hacer varios pedidos o ninguno.</li><li>PEDIDO (num_pedido, fecha). Cada pedido lo hace exactamente un cliente.</li><li>PRODUCTO (cod_producto, nombre, precio). Un producto pertenece exactamente a una categoría.</li><li>CATEGORIA (id_categoria, nombre). Una categoría puede tener muchos productos o ninguno.</li><li>Un pedido contiene uno o varios productos, y un producto puede estar en muchos pedidos (o en ninguno). De cada producto de un pedido interesa la cantidad pedida.</li></ul>
+<p>Se pide: (a) dibuja el diagrama entidad-relación con cardinalidades; (b) pásalo a tablas, indicando clave primaria, claves foráneas y si cada foránea admite nulos; (c) escribe el resultado en notación textual: TABLA(pk, atributo, #fk).</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo (tablas):</p>
+<pre>CLIENTE(dni, nombre, email)
+CATEGORIA(id_categoria, nombre)
+PRODUCTO(cod_producto, nombre, precio, #id_categoria)   FK NOT NULL
+PEDIDO(num_pedido, fecha, #dni)                         FK NOT NULL
+LINEA_PEDIDO(#num_pedido, #cod_producto, cantidad)      PK compuesta</pre>
+<p>Claves: la 1:N se resuelve con la foránea en el lado del 1 (el lado «máx = 1»); como la participación de ese lado es obligatoria (1,1), la foránea es NOT NULL. La N:M obliga a crear una tabla nueva (LINEA_PEDIDO) cuya clave primaria es la unión de las dos foráneas; el atributo «cantidad» viaja a esa tabla.</p>
+<p>Valoración orientativa (10 pt): diagrama correcto 2; tabla de la N:M con clave compuesta 3; foráneas en el lado correcto 3; NOT NULL justificado 1; notación textual limpia 1.</p>
+<p>Errores típicos: poner la foránea en CLIENTE; crear una tabla intermedia también para las 1:N; olvidar que «cantidad» es atributo de la relación; clave de LINEA_PEDIDO con un solo campo.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 2 - Normalizar una factura hasta 3FN</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Una empresa guarda todo en una única relación:</p>
+<pre>FACTURA(num_factura, fecha, dni_cliente, nombre_cliente, dir_cliente,
+        cod_producto, nombre_producto, precio, cantidad)</pre>
+<p>Reglas del negocio: cada factura tiene una fecha y un único cliente; el nombre y la dirección dependen del cliente; el nombre y el precio dependen del producto; la cantidad depende de la factura y del producto a la vez. Considera atómicos todos los atributos.</p>
+<p>Se pide: (a) lista las dependencias funcionales; (b) indica la clave candidata; (c) normaliza paso a paso hasta 3FN, explicando qué dependencia viola cada forma normal y escribiendo las relaciones resultantes.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo:</p>
+<pre>DFs: num_factura -&gt; fecha, dni_cliente
+     dni_cliente -&gt; nombre_cliente, dir_cliente
+     cod_producto -&gt; nombre_producto, precio
+     (num_factura, cod_producto) -&gt; cantidad
+Clave candidata: (num_factura, cod_producto)</pre>
+<p>1FN: ya cumple (atributos atómicos, hay clave). 2FN: hay dependencias parciales (fecha, dni_cliente, nombre_cliente y dir_cliente dependen solo de num_factura; nombre_producto y precio solo de cod_producto). Se separan:</p>
+<pre>FACTURA(num_factura, fecha, dni_cliente, nombre_cliente, dir_cliente)
+PRODUCTO(cod_producto, nombre_producto, precio)
+LINEA(#num_factura, #cod_producto, cantidad)</pre>
+<p>3FN: en FACTURA hay una dependencia transitiva num_factura -&gt; dni_cliente -&gt; nombre_cliente, dir_cliente. Se separa el cliente:</p>
+<pre>CLIENTE(dni_cliente, nombre_cliente, dir_cliente)
+FACTURA(num_factura, fecha, #dni_cliente)
+PRODUCTO(cod_producto, nombre_producto, precio)
+LINEA(#num_factura, #cod_producto, cantidad)</pre>
+<p>Valoración orientativa (10 pt): DFs 2; clave candidata 1; 2FN con la dependencia parcial señalada 3; 3FN con la transitiva señalada 3; relaciones finales con foráneas marcadas 1.</p>
+<p>Matiz para nota alta: si el precio puede cambiar con el tiempo, el precio vigente en la venta debería guardarse en LINEA (precio_unitario) y no en PRODUCTO. Es una mejora, no un error del enunciado.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 3 - Políticas de borrado y modificación</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Dado este esquema relacional de una tienda:</p>
+<pre>CLIENTE(dni, nombre)
+PEDIDO(num_pedido, fecha, #dni)
+PRODUCTO(cod_producto, nombre, precio)
+LINEA(#num_pedido, #cod_producto, cantidad)</pre>
+<p>Para cada una de las tres claves foráneas (PEDIDO.dni, LINEA.num_pedido y LINEA.cod_producto) elige la política ON DELETE y ON UPDATE (RESTRICT, CASCADE, SET NULL) y justifícala con una frase de negocio. Explica además qué ocurriría al borrar un cliente que tiene pedidos con cada política posible.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo:</p>
+<pre>PEDIDO.dni         -&gt; CLIENTE      ON DELETE RESTRICT   ON UPDATE CASCADE
+LINEA.num_pedido   -&gt; PEDIDO       ON DELETE CASCADE    ON UPDATE CASCADE
+LINEA.cod_producto -&gt; PRODUCTO     ON DELETE RESTRICT   ON UPDATE CASCADE</pre>
+<p>PEDIDO.dni: RESTRICT; un cliente con pedidos no puede borrarse (historial contable y obligaciones legales). CASCADE borraría también sus pedidos y falsearía la contabilidad; SET NULL es imposible si la foránea es NOT NULL y, aunque no lo fuera, dejaría pedidos huérfanos de dueño.</p>
+<p>LINEA.num_pedido: CASCADE; una línea no tiene sentido sin su pedido (dependencia de existencia), así que al borrar el pedido se borran sus líneas.</p>
+<p>LINEA.cod_producto: RESTRICT; no se puede borrar un producto que ya se vendió. Lo habitual es una baja lógica (columna «activo»).</p>
+<p>ON UPDATE CASCADE propaga el cambio de una clave natural (por ejemplo, la corrección de un DNI mal tecleado); con claves artificiales apenas se usa.</p>
+<p>Valoración orientativa (10 pt): cada foránea bien elegida y justificada 2 (total 6); explicación de las consecuencias de borrar un cliente 3; mención de la baja lógica u otra alternativa razonada 1.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 4 - Clave natural o clave artificial</text></name>
+  <questiontext format="html"><text><![CDATA[<p>La tabla EMPLEADO guarda: dni, num_seguridad_social, email_corporativo, nombre, fecha_alta y salario.</p>
+<p>Se pide: (a) indica qué atributos son claves candidatas y por qué; (b) elige una clave primaria y di qué papel queda para el resto; (c) discute las ventajas e inconvenientes de usar una clave natural (por ejemplo, el DNI) frente a una clave artificial autonumérica (id_empleado).</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo:</p>
+<p>(a) dni, num_seguridad_social y email_corporativo son candidatas si son únicos y obligatorios para todos los empleados (el email puede dejar de serlo si cambia la política de la empresa). (b) Se elige una como primaria; las demás son claves alternativas y se declaran UNIQUE (y NOT NULL) para que el SGBD siga garantizando su unicidad.</p>
+<p>(c) Natural: tiene significado y evita una columna extra, pero puede cambiar (corrección de errores), puede ser un dato personal sensible que acaba propagándose como foránea a muchas tablas, y no siempre existe (extranjeros sin DNI, becarios). Artificial: estable, compacta, anónima e inmutable, ideal como destino de foráneas; a cambio añade una columna sin significado y obliga a declarar UNIQUE las claves naturales para no perder esa restricción.</p>
+<p>Se valora que el alumno argumente una decisión, no que coincida con la «correcta». Una buena respuesta propone clave artificial más UNIQUE sobre las naturales.</p>
+<p>Valoración orientativa (10 pt): candidatas identificadas 3; elección y papel de las alternativas 3; comparación argumentada 4.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 5 - Jerarquía ISA: tres formas de pasarla a tablas</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Un concesionario gestiona VEHICULO (matricula, marca, modelo). Un vehículo es siempre un COCHE (num_puertas), una MOTO (cilindrada) o un CAMION (carga_maxima), y nunca más de uno de ellos (jerarquía total y disjunta).</p>
+<p>Se pide: pasa la jerarquía a tablas con las tres opciones posibles, escribe el esquema relacional de cada una, indica una ventaja y un inconveniente de cada opción y elige razonadamente una para este caso.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo:</p>
+<pre>Opción 1 · una única tabla con todos los atributos
+  VEHICULO(matricula, marca, modelo, tipo, num_puertas, cilindrada, carga_maxima)
+
+Opción 2 · una tabla por entidad (supertipo + subtipos)
+  VEHICULO(matricula, marca, modelo)
+  COCHE(#matricula, num_puertas)  MOTO(#matricula, cilindrada)  CAMION(#matricula, carga_maxima)
+
+Opción 3 · solo los subtipos (el supertipo desaparece)
+  COCHE(matricula, marca, modelo, num_puertas)
+  MOTO(matricula, marca, modelo, cilindrada)
+  CAMION(matricula, marca, modelo, carga_maxima)</pre>
+<p>Opción 1: la más simple y sin JOIN, pero llena de nulos (num_puertas es NULL en una moto), con riesgo de incoherencias y necesita la columna «tipo»; por eso casi no se usa. Opción 2: la más limpia y válida en cualquier caso, pero exige JOIN para obtener un vehículo completo. Opción 3: consultas rápidas por subtipo, pero repite las columnas comunes y solo funciona bien si la jerarquía es total (aquí lo es).</p>
+<p>Elección razonable: la 2 (es la solución general) o la 3 si casi todas las consultas son por tipo de vehículo. La 1 es defendible si los subtipos tuvieran muy pocos atributos propios. Lo que no vale es elegir sin justificar.</p>
+<p>Valoración orientativa (10 pt): tres esquemas correctos 6 (2 cada uno); ventaja e inconveniente de cada uno 2; elección justificada 2.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Tarea 6 - Forma normal de Boyce-Codd: las tutorías</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Una academia registra qué profesor tutoriza a cada alumno en cada asignatura:</p>
+<pre>TUTORIA(alumno, asignatura, profesor)</pre>
+<p>Reglas: un profesor imparte una única asignatura; un alumno tiene un solo profesor por asignatura (pero varios alumnos pueden compartir profesor).</p>
+<p>Se pide: (a) escribe las dependencias funcionales; (b) halla las claves candidatas; (c) indica si la relación está en 3FN y en FNBC, razonando; (d) si no está en FNBC, descomponla y comenta qué dependencia se pierde.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>14</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Respuesta modelo:</p>
+<pre>DFs: (alumno, asignatura) -&gt; profesor
+     profesor -&gt; asignatura
+Claves candidatas: (alumno, asignatura) y (alumno, profesor)</pre>
+<p>3FN: sí, porque en la DF profesor -&gt; asignatura el lado derecho (asignatura) es un atributo primo (forma parte de una clave candidata). FNBC: no, porque el determinante «profesor» no es superclave. Consecuencia: la relación presenta redundancia (la asignatura de un profesor se repite en cada alumno que tutoriza).</p>
+<p>Descomposición sin pérdida:</p>
+<pre>PROFESOR_ASIGNATURA(profesor, asignatura)   PK profesor
+TUTORIA(#alumno, #profesor)                  PK (alumno, profesor)</pre>
+<p>Se pierde la DF (alumno, asignatura) -&gt; profesor: ya no hay ninguna clave que impida que un alumno tenga dos profesores distintos de la misma asignatura; habría que garantizarlo con un disparador o un control en la aplicación. Es el precio habitual de llegar a FNBC.</p>
+<p>Valoración orientativa (10 pt): DFs 2; claves candidatas 2; 3FN y FNBC razonadas 3; descomposición correcta 2; DF perdida 1.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="category">
+  <category><text>$course$/UT3 (English)/Reading and writing (EN)</text></category>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q1</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>What does the shop keep in its single big table?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>The order number, the customer's name and address, the product and its price (all in every row).</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q2</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>Name the three anomalies mentioned in the text and give an example of one of them.</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Update, insertion and deletion anomalies. E.g. update: if a customer moves, the address must be changed in every row, and if one row is missed the data contradicts itself. Insertion: a new product nobody has ordered cannot be added. Deletion: deleting the only order for a product also deletes the product.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q3</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>What causes these anomalies?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Redundancy: the same fact is stored in many rows.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q4</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>What does normalisation use as a guide to split a table?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Functional dependencies (if one attribute determines another, the second goes in the table whose key is the first).</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q5</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>What does second normal form require?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>That no attribute depends on only part of the key (no partial dependencies).</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q6</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>What does third normal form require?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>That no non-key attribute depends on another non-key attribute (no transitive dependencies).</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q7</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>How are the smaller tables connected afterwards, and why does that matter?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>With foreign keys; so that no information is lost and the original data can be rebuilt with a join.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Reading Q8</text></name>
+  <questiontext format="html"><text><![CDATA[<p><em>Read the text and answer.</em></p>
+<p>Imagine a small online shop that keeps everything in one big table: every row holds the order number, the customer's name and address, the product and its price. At first it works. But soon the problems begin. When a customer moves house, the address must be changed in every row where that customer appears; if one row is forgotten, the database contradicts itself. If the shop wants to add a new product that nobody has ordered yet, there is no row to put it in. And if the only order for a product is deleted, the product disappears too. These problems are called update, insertion and deletion anomalies, and they are caused by redundancy.</p>
+<p>Normalisation is the cure. It is a step-by-step method that splits a badly designed table into smaller ones, using functional dependencies as a guide: if one attribute determines another, the second must live in the table whose key is the first. In first normal form every cell holds a single value; in second normal form no attribute depends on only part of the key; in third normal form no attribute depends on another non-key attribute. The smaller tables are then connected with foreign keys, so no information is lost, and every fact is stored exactly once.</p>
+<p><strong>The text says that "every fact is stored exactly once". Why is that an advantage?</strong></p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>5</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>There is nothing to keep in sync: a fact is changed in one place only, so the database cannot contradict itself, and it also saves space.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+<question type="essay">
+  <name><text>UT3 Short writing - Primary key vs foreign key</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Write 5-6 sentences in English explaining, in your own words, the difference between a primary key and a foreign key, and why a foreign key helps to keep the database consistent. Use at least three of these terms: constraint, referential integrity, null, parent table, child table, ON DELETE.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[]]></text></generalfeedback>
+  <defaultgrade>1</defaultgrade>
+  <penalty>0</penalty>
+  <hidden>0</hidden>
+  <responseformat>editor</responseformat>
+  <responserequired>1</responserequired>
+  <responsefieldlines>12</responsefieldlines>
+  <minwordlimit></minwordlimit>
+  <maxwordlimit></maxwordlimit>
+  <attachments>0</attachments>
+  <attachmentsrequired>0</attachmentsrequired>
+  <maxbytes>0</maxbytes>
+  <filetypeslist></filetypeslist>
+  <graderinfo format="html"><text><![CDATA[<p>Look for: (1) the primary key identifies each row of its own table, is unique and never null; (2) the foreign key lives in the child table and points to the primary key of the parent table; (3) referential integrity: a foreign key is either null or matches an existing key, so the DBMS refuses orphan rows; (4) correct use of at least three of the requested terms (ON DELETE = what happens to child rows when the parent row is deleted); (5) understandable English. Spelling and minor grammar slips should not weigh much; they are a language activity, not an English exam.</p>]]></text></graderinfo>
+  <responsetemplate format="html"><text></text></responsetemplate>
+</question>
+
+</quiz>
