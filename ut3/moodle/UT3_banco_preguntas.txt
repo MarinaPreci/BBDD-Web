@@ -1,0 +1,389 @@
+// ============================================================
+// UT3 · Diseño lógico: modelo relacional, paso a tablas y normalización
+// 1º DAM bilingüe — Marina Preciados Agapito
+// Banco de preguntas en formato GIFT para importar en Moodle:
+// Banco de preguntas > Importar > formato GIFT > seleccionar este fichero.
+// Organizado en categorías (una por bloque) para poder generar
+// cuestionarios distintos tomando preguntas aleatorias de cada categoría.
+// ============================================================
+
+
+$CATEGORY: $course$/UT3/Bloque 1 · El modelo relacional
+
+::B1-1 Datos en tablas::En el modelo relacional los datos se organizan en tablas formadas por filas (tuplas) y columnas (atributos). {TRUE#Es la idea central del modelo de Codd.#Es la idea central del modelo de Codd.}
+
+::B1-2 Grado de una relación::El grado de una relación es... {
+	=el número de atributos (columnas) #Correcto.
+	~el número de tuplas (filas) #Eso es la cardinalidad.
+	~el número de claves candidatas #No tiene relación con las claves.
+	~el número de tablas de la base de datos #El grado se mide dentro de una sola relación.
+}
+
+::B1-3 Vocabulario formal::Relaciona cada término con su definición. {
+	=Grado -> Número de atributos
+	=Cardinalidad -> Número de tuplas
+	=Dominio -> Valores permitidos para un atributo
+	=Tupla -> Una fila de la tabla
+}
+
+::B1-4 Propiedad falsa::¿Cuál de estas afirmaciones sobre las tablas relacionales es FALSA? {
+	~Cada tabla tiene un nombre único #Es verdadera.
+	=El orden de las filas tiene significado propio #Correcto\: el orden de filas y de columnas no importa.
+	~No puede haber dos tuplas idénticas #Es verdadera.
+	~Cada celda contiene un único valor #Es verdadera.
+}
+
+::B1-5 Atributos repetidos::Una tabla puede tener dos columnas con el mismo nombre. {FALSE#Los atributos de una misma tabla deben tener nombres distintos.#Los atributos de una misma tabla deben tener nombres distintos.}
+
+::B1-6 Dominio de un atributo::¿Qué dominio es razonable para el atributo edad de una persona? {
+	=Enteros entre 0 y 120 #Correcto.
+	~Cualquier texto #Un texto libre no tiene sentido para una edad.
+	~Decimales negativos #Una edad no es negativa ni decimal.
+	~Fechas #Eso sería la fecha de nacimiento, de la que se deriva la edad.
+}
+
+::B1-7 Tres vocabularios::Relaciona cada término relacional con su equivalente en el vocabulario de tablas. {
+	=Relación -> Tabla
+	=Tupla -> Fila
+	=Atributo -> Columna
+}
+
+::B1-8 Nivel del modelo::El modelo relacional pertenece al nivel... {
+	~conceptual #El conceptual es el modelo entidad-relación.
+	=lógico #Correcto\: depende del tipo de base de datos (relacional).
+	~físico #El físico describe ficheros y estructuras de almacenamiento.
+}
+
+
+$CATEGORY: $course$/UT3/Bloque 2 · Claves
+
+::B2-1 Clave candidata::Una clave candidata es... {
+	=un atributo o conjunto de atributos que identifica cada fila sin ambigüedad #Correcto.
+	~cualquier atributo que no admite nulos #No basta con no admitir nulos\: también debe ser único.
+	~la columna que apunta a otra tabla #Eso es una clave foránea.
+}
+
+::B2-2 Varias primarias::Una tabla puede tener varias claves primarias. {FALSE#Puede tener varias candidatas, pero solo una primaria.#Puede tener varias candidatas, pero solo una primaria.}
+
+::B2-3 Clave alternativa::Una clave alternativa es... {
+	=una candidata que no se ha elegido como primaria #Correcto.
+	~una clave foránea con otro nombre #No\: una foránea apunta a otra tabla.
+	~una copia de seguridad de la clave primaria #No tiene que ver con copias de seguridad.
+}
+
+::B2-4 Primaria y nulos::La clave primaria puede contener valores nulos. {FALSE#Nunca\: es única y obligatoria.#Nunca\: es única y obligatoria.}
+
+::B2-5 Foránea y nulos::Una clave foránea puede ser nula, salvo que se declare NOT NULL. {TRUE#Significa «todavía sin relacionar».#Significa «todavía sin relacionar».}
+
+::B2-6 Quién es email::En PERSONA(dni, email, nombre), dni y email son únicos y obligatorios. Si elegimos dni como clave primaria, ¿qué es email? {
+	=una clave alternativa (UNIQUE NOT NULL) #Correcto.
+	~una clave foránea #No apunta a ninguna otra tabla.
+	~un atributo derivado #No se calcula a partir de otro.
+	~una clave compuesta #Es un solo atributo.
+}
+
+::B2-7 Destino de una foránea::Una clave foránea apunta a... {
+	=la clave primaria de otra tabla (o de la misma) #Correcto.
+	~cualquier columna de otra tabla #Debe ser una clave (normalmente la primaria).
+	~un índice del SGBD #No tiene que ver con los índices.
+}
+
+::B2-8 Clave artificial::¿Cuándo conviene crear una clave artificial (por ejemplo, id_cliente)? {
+	=cuando ninguna combinación natural de atributos sirve como clave estable #Correcto.
+	~siempre, para todas las tablas #No siempre hace falta\: un DNI, por ejemplo, ya sirve.
+	~nunca, porque rompe el modelo relacional #Es una práctica habitual y válida.
+}
+
+
+$CATEGORY: $course$/UT3/Bloque 3 · Restricciones e integridad referencial
+
+::B3-1 Restricciones SQL::Relaciona cada restricción con lo que impone. {
+	=PRIMARY KEY -> Valores únicos y nunca nulos
+	=UNIQUE -> No se repite, pero puede ser nulo
+	=NOT NULL -> No puede quedar vacío
+	=CHECK -> Condición lógica sobre las columnas
+	=FOREIGN KEY -> Solo valores que existan en la tabla principal
+}
+
+::B3-2 Simular alternativa::¿Cómo se declara una clave alternativa en SQL? {
+	=UNIQUE + NOT NULL #Correcto.
+	~PRIMARY KEY dos veces #Solo puede haber una primaria.
+	~CHECK #CHECK valida condiciones, no unicidad.
+}
+
+::B3-3 NO ACTION::Con la política NO ACTION, ¿qué ocurre al borrar una fila principal que tiene filas dependientes? {
+	=El SGBD rechaza el borrado #Correcto.
+	~Se borran también las dependientes #Eso es CASCADE.
+	~Las dependientes quedan con la foránea a NULL #Eso es SET NULL.
+}
+
+::B3-4 CASCADE::Con ON DELETE CASCADE, al borrar a un empleado... {
+	=se borran también sus hijos registrados #Correcto.
+	~se rechaza el borrado #Eso es NO ACTION.
+	~sus hijos pasan a NULL #Eso es SET NULL.
+}
+
+::B3-5 SET NULL::Para poder usar ON DELETE SET NULL, la clave foránea debe... {
+	=admitir valores nulos #Correcto.
+	~ser también clave primaria #Una clave primaria no admite nulos\: sería imposible.
+	~ser de tipo texto #El tipo no influye.
+}
+
+::B3-6 Foránea huérfana::El SGBD acepta insertar un alquiler cuyo cod_cliente no existe en CLIENTE si la columna es numérica. {FALSE#La integridad referencial lo impide, sea cual sea el tipo.#La integridad referencial lo impide, sea cual sea el tipo.}
+
+::B3-7 Validar un rango::¿Qué restricción usarías para exigir que sueldo > 1000? {
+	=CHECK #Correcto.
+	~UNIQUE #UNIQUE no valida valores, solo evita repeticiones.
+	~FOREIGN KEY #No hay ninguna otra tabla implicada.
+}
+
+::B3-8 Lo que no cabe en tablas::¿Qué regla NO puede garantizar un esquema relacional solo con claves y tablas? {
+	=que cada modelo sea montado por al menos dos montadores (mínimo 2) #Correcto\: se controla con un disparador o desde la aplicación.
+	~que el DNI de un empleado no se repita #Eso lo garantiza una clave.
+	~que una factura apunte a un cliente existente #Eso lo garantiza la clave foránea.
+}
+
+
+$CATEGORY: $course$/UT3/Bloque 4 · Paso a tablas: reglas básicas
+
+::B4-1 Atributo derivado::Al pasar a tablas, un atributo derivado como edad... {
+	=no se almacena\: se calcula al consultar #Correcto.
+	~se guarda como una columna más #Provocaría inconsistencias.
+	~se convierte en una tabla #No hace falta una tabla para un valor calculable.
+}
+
+::B4-2 Atributo compuesto::Un atributo compuesto como nombre_completo... {
+	=se sustituye por los atributos simples que lo forman #Correcto.
+	~pasa a ser clave primaria #No tiene relación con las claves.
+	~se guarda sin cambios #Sería un atributo no atómico.
+}
+
+::B4-3 Atributo multivaluado::Un atributo multivaluado, como los varios emails de un empleado... {
+	=se convierte en una entidad (tabla) relacionada 1\:N con la original #Correcto.
+	~se guarda en una celda separada por comas #Rompe la primera forma normal.
+	~se descarta #Se perdería información.
+}
+
+::B4-4 Relación N\:M::Una relación N\:M se convierte en... {
+	=una tabla nueva con las claves de las dos entidades y los atributos de la relación #Correcto.
+	~una clave foránea en cualquiera de las dos tablas #Eso no permite varios valores por lado.
+	~una sola tabla que fusiona las dos entidades #Se perdería la independencia entre ellas.
+}
+
+::B4-5 PK de la N\:M::En la tabla que sale de una relación N\:M, la clave primaria es... {
+	=la unión de las dos claves foráneas #Correcto.
+	~solo la clave de la primera entidad #Impediría repetir esa entidad con otras.
+	~un atributo de la relación #Los atributos de la relación no identifican la fila.
+}
+
+::B4-6 Histórico::Un alumno puede cursar la misma asignatura en años distintos y queremos guardarlo. ¿Qué hacemos con la tabla CURSA? {
+	=añadir el año (o la fecha) a la clave primaria #Correcto.
+	~quitar la clave primaria #Toda tabla necesita una clave.
+	~duplicar la fila sin cambiar la clave #Dos filas con la misma clave no son posibles.
+}
+
+::B4-7 1\:N\: dónde va la foránea::EMPLEADO (1,1) pertenece a DEPARTAMENTO (0,N). ¿Dónde va la clave foránea? {
+	=En EMPLEADO, con NOT NULL #Correcto\: va en el lado «muchos» y el mínimo 1 exige NOT NULL.
+	~En DEPARTAMENTO #Un departamento tendría que guardar muchos empleados.
+	~En una tabla nueva obligatoriamente #Solo en casos especiales (muchos nulos, N\:M futura...).
+}
+
+::B4-8 Entidad débil::HIJO es una entidad débil de EMPLEADO. ¿Cuál es su clave primaria? {
+	=nif_empleado (foránea) + nombre_hijo #Correcto.
+	~solo nombre_hijo #Dos empleados pueden tener hijos con el mismo nombre.
+	~solo nif_empleado #Un empleado puede tener varios hijos.
+}
+
+::B4-9 1\:1::EMPLEADO (0,1) dirige DEPARTAMENTO (1,1). ¿Dónde va la clave foránea? {
+	=En DEPARTAMENTO, con NOT NULL y UNIQUE #Correcto\: es la entidad que siempre participa.
+	~En EMPLEADO, con NOT NULL #No todo empleado dirige un departamento.
+	~En ninguna\: hay que fusionar las tablas #No es obligatorio fusionar.
+}
+
+::B4-10 (0,1)\:(0,1)::En una relación 1\:1 en la que ninguna de las dos entidades participa siempre, (0,1)\:(0,1), lo habitual es... {
+	=crear una tabla propia para la relación #Correcto\: evita llenar de nulos cualquiera de las dos.
+	~poner la foránea en cualquiera de las dos con NOT NULL #NOT NULL impediría filas sin relación.
+	~ignorar la relación #Se perdería información.
+}
+
+
+$CATEGORY: $course$/UT3/Bloque 5 · Reflexivas, ternarias y jerarquías
+
+::B5-1 Reflexiva::EMPLEADO dirige a EMPLEADO (cada empleado tiene como mucho un jefe). ¿Cómo queda la tabla? {
+	=EMPLEADO(dni, nombre, dni_jefe) con dni_jefe foránea a la propia tabla y admitiendo nulos #Correcto\: el director no tiene jefe.
+	~dos tablas EMPLEADO y JEFE con las mismas columnas #Duplica información sin necesidad.
+	~dni_jefe con NOT NULL #El director general no podría insertarse.
+}
+
+::B5-2 Ternaria N\:N\:N::Una relación ternaria con cardinalidades N\:N\:N genera una tabla cuya clave primaria es... {
+	=la unión de las tres claves foráneas #Correcto.
+	~solo las dos primeras claves #Se perdería la tercera entidad.
+	~una sola de las tres #No identificaría la fila.
+}
+
+::B5-3 Ternaria 1\:N\:N::En una ternaria 1\:N\:N, la clave primaria de la tabla resultante se forma con... {
+	=las claves de las dos entidades con máximo N (se quita la del lado 1) #Correcto.
+	~las tres claves #Sería redundante\: la del lado 1 queda determinada.
+	~solo la del lado 1 #No identificaría la fila.
+}
+
+::B5-4 ISA opción 3::La opción «solo las tablas de los subtipos» de una jerarquía ISA solo es válida si la jerarquía es... {
+	=total y exclusiva, y el supertipo no tiene relaciones propias #Correcto.
+	~parcial y solapada #Perderíamos los ejemplares sin subtipo.
+	~cualquiera\: siempre se puede #Tiene restricciones.
+}
+
+::B5-5 ISA general::¿Qué opción de paso a tablas de una jerarquía ISA sirve siempre, incluso si es solapada? {
+	=una tabla por entidad (supertipo + una por subtipo con su clave) #Correcto.
+	~una sola tabla sin columna de tipo #No se sabría el subtipo de cada fila.
+	~solo la tabla del supertipo #Se perderían los atributos de los subtipos.
+}
+
+::B5-6 Parte total::Las claves y tablas de una jerarquía garantizan que todo ejemplar del supertipo tenga fila en algún subtipo (parte total). {FALSE#Hay que comprobarlo con un disparador o desde la aplicación.#Hay que comprobarlo con un disparador o desde la aplicación.}
+
+
+$CATEGORY: $course$/UT3/Bloque 6 · Dependencias funcionales y 1FN a 3FN
+
+::B6-1 Anomalía de modificación::En PEDIDO(id_pedido, cliente, ciudad, producto, precio), Marta se muda y hay que cambiar su ciudad en dos pedidos. Si falla uno, la BD dice a la vez dos ciudades. Esto es una anomalía de... {
+	=modificación #Correcto.
+	~inserción #La de inserción impide dar de alta datos sin un pedido.
+	~borrado #La de borrado pierde datos al borrar una fila.
+}
+
+::B6-2 Dependencia funcional::Decir que X → Y (X determina funcionalmente a Y) significa que... {
+	=para cada valor de X existe un único valor de Y #Correcto.
+	~X e Y son siempre iguales #No\: solo que Y queda fijado por X.
+	~para cada valor de Y hay un único valor de X #Eso sería Y → X.
+}
+
+::B6-3 Nombre → DNI::La dependencia nombre → dni es cierta, porque cada nombre identifica a una persona. {FALSE#Dos personas pueden llamarse igual.#Dos personas pueden llamarse igual.}
+
+::B6-4 Tipos de dependencia::Relaciona cada concepto con su definición. {
+	=Dependencia completa -> Depende de toda la clave compuesta
+	=Dependencia parcial -> Depende solo de una parte de la clave
+	=Dependencia transitiva -> A → B y B → C, luego C depende de A a través de B
+	=Determinante -> Lo que está a la izquierda de la flecha
+}
+
+::B6-5 1FN::Una tabla está en 1FN cuando... {
+	=todos sus atributos contienen valores atómicos #Correcto.
+	~no tiene dependencias parciales #Eso es la 2FN.
+	~no tiene dependencias transitivas #Eso es la 3FN.
+}
+
+::B6-6 2FN::Una tabla en 1FN está en 2FN cuando... {
+	=ningún atributo no clave depende solo de una parte de la clave #Correcto.
+	~todos sus determinantes son claves candidatas #Eso es la FNBC.
+	~no tiene nulos #Los nulos no determinan la forma normal.
+}
+
+::B6-7 Clave simple y 2FN::Una tabla en 1FN cuya clave primaria es un único atributo ya está en 2FN. {TRUE#Las dependencias parciales solo aparecen con claves compuestas.#Las dependencias parciales solo aparecen con claves compuestas.}
+
+::B6-8 3FN::Una tabla en 2FN está en 3FN cuando... {
+	=no hay dependencias transitivas entre atributos no clave #Correcto.
+	~la clave primaria es compuesta #No tiene relación.
+	~todos los atributos son clave #No es necesario.
+}
+
+::B6-9 El método::Cuando una tabla incumple una forma normal, el método de normalización consiste en... {
+	=dejar lo que cumple con la clave original y sacar lo que incumple a una tabla nueva con su determinante como clave #Correcto\: se repite hasta que todas cumplen.
+	~borrar los atributos que incumplen #Se perdería información.
+	~añadir más columnas a la tabla #Empeoraría la redundancia.
+}
+
+::B6-10 Qué forma incumple::ALUMNO(dni, nombre, ciudad, provincia), con clave dni y ciudad → provincia. ¿Qué forma normal incumple? {
+	=la 3FN (dependencia transitiva dni → ciudad → provincia) #Correcto\: está en 2FN pero no en 3FN.
+	~la 1FN #Todos los valores son atómicos.
+	~la 2FN #La clave es simple\: no puede haber dependencias parciales.
+}
+
+
+$CATEGORY: $course$/UT3/Bloque 7 · Forma normal de Boyce-Codd
+
+::B7-1 FNBC::Una tabla está en FNBC cuando... {
+	=todo determinante es una clave candidata #Correcto.
+	~no tiene claves compuestas #Puede tenerlas.
+	~no tiene dependencias funcionales #Siempre las hay\: la clave determina el resto.
+}
+
+::B7-2 FNBC y 3FN::Toda tabla en FNBC está también en 3FN. {TRUE#Cada forma normal contiene a las anteriores.#Cada forma normal contiene a las anteriores.}
+
+::B7-3 Caso REPARACION::REPARACION(cliente, tipo, mecanico)\: cada mecánico solo hace un tipo de reparación (mecanico → tipo). Claves candidatas\: (cliente, tipo) y (cliente, mecanico). La tabla está en... {
+	=3FN pero no en FNBC #Correcto\: mecanico es determinante y no es clave candidata.
+	~FNBC #mecanico determina tipo y no es clave candidata.
+	~ni siquiera en 3FN #Todos sus atributos forman parte de alguna clave candidata.
+}
+
+::B7-4 Más allá de 3FN::Hay tablas en 3FN que no están en FNBC. {TRUE#Por ejemplo, REPARACION(cliente, tipo, mecanico).#Por ejemplo, REPARACION(cliente, tipo, mecanico).}
+
+
+$CATEGORY: $course$/UT3/Repaso general
+
+::R-1 Orden de fases::¿Cuál es el orden correcto del diseño de una base de datos? {
+	=modelo E/R → modelo relacional → normalización → SQL #Correcto.
+	~SQL → modelo E/R → modelo relacional → normalización #Se codificaría sin haber diseñado.
+	~normalización → modelo E/R → SQL → modelo relacional #No tiene sentido normalizar antes de tener tablas.
+}
+
+::R-2 Guardar la edad::Es buena práctica guardar la edad como columna y actualizarla cada cumpleaños. {FALSE#Es un atributo derivado\: se calcula desde la fecha de nacimiento.#Es un atributo derivado\: se calcula desde la fecha de nacimiento.}
+
+::R-3 Borrar un cliente::Con NO ACTION, ¿qué pasa al borrar un cliente que tiene alquileres? {
+	=El borrado se rechaza #Correcto.
+	~Se borran los alquileres #Eso sería CASCADE.
+	~Los alquileres quedan huérfanos #La integridad referencial lo impide.
+}
+
+::R-4 Tabla CLIENTE::CLIENTE(id, nombre, ciudad, provincia) con ciudad → provincia. ¿Qué hay que hacer para llegar a 3FN? {
+	=sacar CIUDAD(ciudad, provincia) y dejar la ciudad como foránea en CLIENTE #Correcto.
+	~borrar la columna provincia #Se perdería información.
+	~hacer clave primaria a la provincia #No identifica al cliente.
+}
+
+::R-5 Atributo de la N\:M::ALUMNO cursa ASIGNATURA y cada pareja tiene una nota. ¿Dónde se guarda la nota? {
+	=en la tabla de la relación (CURSA) #Correcto.
+	~en ALUMNO #Un alumno tiene muchas notas.
+	~en ASIGNATURA #Una asignatura tiene notas de muchos alumnos.
+}
+
+::R-6 Foránea obligatoria::Una clave foránea siempre debe declararse NOT NULL. {FALSE#Depende de la cardinalidad mínima\: (0,·) admite nulos, (1,·) no.#Depende de la cardinalidad mínima\: (0,·) admite nulos, (1,·) no.}
+
+::R-7 Para qué normalizar::¿Cuál es el motivo principal para normalizar? {
+	=evitar redundancias y anomalías de modificación, inserción y borrado #Correcto.
+	~hacer las consultas siempre más rápidas #A veces las hace más lentas (más uniones).
+	~ahorrar siempre espacio en disco #Ese no es el objetivo principal.
+}
+
+::R-8 Teléfonos en una celda::En CLIENTE hay una columna telefonos con varios números separados por comas. ¿Qué forma normal se incumple y cómo se arregla? {
+	=la 1FN\: se crea una tabla TELEFONO relacionada 1\:N con CLIENTE #Correcto.
+	~la 2FN\: se divide la clave #No hay clave compuesta.
+	~la 3FN\: se quita el campo #Se perdería información.
+}
+
+::R-9 Reglas de paso a tablas::Relaciona cada elemento del E/R con su traducción. {
+	=Relación N\:M -> Tabla nueva con las dos claves foráneas
+	=Relación 1\:N -> Clave foránea en el lado «muchos»
+	=Atributo derivado -> No se almacena
+	=Atributo multivaluado -> Nueva entidad relacionada 1\:N
+}
+
+::R-10 Formas normales::¿Qué relación hay entre las formas normales? {
+	=cada una contiene a las anteriores\: FNBC ⊂ 3FN ⊂ 2FN ⊂ 1FN #Correcto.
+	~son independientes entre sí #Cada una exige también las anteriores.
+	~la 2FN es más estricta que la 3FN #Al revés.
+}
+
+
+$CATEGORY: $course$/UT3/Inglés · Vocabulario técnico
+
+::ING-1 Vocabulario técnico EN-ES::Match each English term with its Spanish equivalent. {
+	=tuple -> tupla
+	=attribute -> atributo
+	=primary key -> clave primaria
+	=foreign key -> clave foránea
+	=constraint -> restricción
+	=normalisation -> normalización
+	=determinant -> determinante
+	=composite key -> clave compuesta
+	=weak entity -> entidad débil
+	=join -> unión (de tablas)
+}

@@ -1,0 +1,391 @@
+// ============================================================
+// UT3 · Logical design: relational model, E/R-to-tables mapping and normalisation
+// 1st year DAM (bilingual) — Marina Preciados Agapito
+// English version of the GIFT question bank, for the bilingual
+// module and the unit's English activity.
+// To import into Moodle: Question bank > Import > GIFT format >
+// select this file.
+// Organized into categories (one per block) so different quizzes
+// can be built by pulling random questions from each category.
+// ============================================================
+
+
+$CATEGORY: $course$/UT3 (English)/Block 1 · The relational model
+
+::B1-1 Data in tables::In the relational model, data is organised into tables made of rows (tuples) and columns (attributes). {TRUE#That is the core idea of Codd's model.#That is the core idea of Codd's model.}
+
+::B1-2 Degree of a relation::The degree of a relation is... {
+	=the number of attributes (columns) #Correct.
+	~the number of tuples (rows) #That is the cardinality.
+	~the number of candidate keys #It has nothing to do with keys.
+	~the number of tables in the database #Degree is measured inside a single relation.
+}
+
+::B1-3 Formal vocabulary::Match each term with its definition. {
+	=Degree -> Number of attributes
+	=Cardinality -> Number of tuples
+	=Domain -> Values allowed for an attribute
+	=Tuple -> One row of the table
+}
+
+::B1-4 False property::Which of these statements about relational tables is FALSE? {
+	~Every table has a unique name #It is true.
+	=The order of the rows has a meaning of its own #Correct\: neither row order nor column order matters.
+	~There can't be two identical tuples #It is true.
+	~Each cell holds a single value #It is true.
+}
+
+::B1-5 Repeated attributes::A table can have two columns with the same name. {FALSE#The attributes of one table must have distinct names.#The attributes of one table must have distinct names.}
+
+::B1-6 Domain of an attribute::Which domain is reasonable for a person's age attribute? {
+	=Integers between 0 and 120 #Correct.
+	~Any text #Free text makes no sense for an age.
+	~Negative decimals #An age is neither negative nor decimal.
+	~Dates #That would be the birth date, from which age is derived.
+}
+
+::B1-7 Three vocabularies::Match each relational term with its equivalent in table vocabulary. {
+	=Relation -> Table
+	=Tuple -> Row
+	=Attribute -> Column
+}
+
+::B1-8 Model level::The relational model belongs to the ... level. {
+	~conceptual #The conceptual level is the entity-relationship model.
+	=logical #Correct\: it depends on the type of database (relational).
+	~physical #The physical level describes files and storage structures.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 2 · Keys
+
+::B2-1 Candidate key::A candidate key is... {
+	=an attribute or set of attributes that identifies each row unambiguously #Correct.
+	~any attribute that doesn't allow nulls #Not allowing nulls is not enough\: it must also be unique.
+	~the column that points to another table #That is a foreign key.
+}
+
+::B2-2 Several primary keys::A table can have several primary keys. {FALSE#It can have several candidates, but only one primary key.#It can have several candidates, but only one primary key.}
+
+::B2-3 Alternate key::An alternate key is... {
+	=a candidate that wasn't chosen as primary #Correct.
+	~a foreign key with another name #No\: a foreign key points to another table.
+	~a backup of the primary key #It has nothing to do with backups.
+}
+
+::B2-4 Primary key and nulls::The primary key can contain null values. {FALSE#Never\: it is unique and mandatory.#Never\: it is unique and mandatory.}
+
+::B2-5 Foreign key and nulls::A foreign key can be null unless it is declared NOT NULL. {TRUE#It means “not related yet”.#It means “not related yet”.}
+
+::B2-6 What email is::In PERSON(dni, email, nombre), dni and email are unique and mandatory. If we choose dni as the primary key, what is email? {
+	=an alternate key (UNIQUE NOT NULL) #Correct.
+	~a foreign key #It points to no other table.
+	~a derived attribute #It isn't calculated from another one.
+	~a composite key #It is a single attribute.
+}
+
+::B2-7 Target of a foreign key::A foreign key points to... {
+	=the primary key of another table (or of the same one) #Correct.
+	~any column of another table #It must be a key (normally the primary one).
+	~a DBMS index #It has nothing to do with indexes.
+}
+
+::B2-8 Artificial key::When is it advisable to create an artificial key (for example, customer_id)? {
+	=when no natural combination of attributes works as a stable key #Correct.
+	~always, for every table #Not always needed\: an ID number, for instance, already works.
+	~never, because it breaks the relational model #It is a common and valid practice.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 3 · Constraints and referential integrity
+
+::B3-1 SQL constraints::Match each constraint with what it enforces. {
+	=PRIMARY KEY -> Unique, never-null values
+	=UNIQUE -> Doesn't repeat, but may be null
+	=NOT NULL -> Can't be left empty
+	=CHECK -> Logical condition on the columns
+	=FOREIGN KEY -> Only values that exist in the main table
+}
+
+::B3-2 Simulating an alternate key::How is an alternate key declared in SQL? {
+	=UNIQUE + NOT NULL #Correct.
+	~PRIMARY KEY twice #There can be only one primary key.
+	~CHECK #CHECK validates conditions, not uniqueness.
+}
+
+::B3-3 NO ACTION::With the NO ACTION policy, what happens when you delete a main row that has dependent rows? {
+	=The DBMS rejects the deletion #Correct.
+	~The dependent rows are deleted too #That is CASCADE.
+	~The dependent rows keep a NULL foreign key #That is SET NULL.
+}
+
+::B3-4 CASCADE::With ON DELETE CASCADE, when an employee is deleted... {
+	=their registered children are deleted as well #Correct.
+	~the deletion is rejected #That is NO ACTION.
+	~their children are set to NULL #That is SET NULL.
+}
+
+::B3-5 SET NULL::To use ON DELETE SET NULL, the foreign key must... {
+	=allow null values #Correct.
+	~also be a primary key #A primary key doesn't allow nulls\: it would be impossible.
+	~be of text type #The type doesn't matter.
+}
+
+::B3-6 Orphan foreign key::The DBMS accepts inserting a rental whose customer code doesn't exist in CUSTOMER as long as the column is numeric. {FALSE#Referential integrity prevents it, whatever the type.#Referential integrity prevents it, whatever the type.}
+
+::B3-7 Validating a range::Which constraint would you use to require salary > 1000? {
+	=CHECK #Correct.
+	~UNIQUE #UNIQUE doesn't validate values, it only prevents repeats.
+	~FOREIGN KEY #No other table is involved.
+}
+
+::B3-8 What doesn't fit in tables::Which rule can NOT be guaranteed by a relational schema with keys and tables alone? {
+	=that each model be fitted by at least two fitters (minimum of 2) #Correct\: it is enforced with a trigger or from the application.
+	~that an employee's ID number not repeat #A key guarantees that.
+	~that an invoice point to an existing customer #The foreign key guarantees that.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 4 · Mapping to tables: basic rules
+
+::B4-1 Derived attribute::When mapping to tables, a derived attribute such as age... {
+	=isn't stored\: it is calculated when querying #Correct.
+	~is stored as one more column #It would cause inconsistencies.
+	~becomes a table #A calculable value doesn't need a table.
+}
+
+::B4-2 Composite attribute::A composite attribute such as full_name... {
+	=is replaced by the simple attributes that make it up #Correct.
+	~becomes the primary key #It has nothing to do with keys.
+	~is stored unchanged #It would be a non-atomic attribute.
+}
+
+::B4-3 Multi-valued attribute::A multi-valued attribute, such as an employee's several emails... {
+	=becomes an entity (table) related 1\:N to the original one #Correct.
+	~is stored in one comma-separated cell #It breaks first normal form.
+	~is discarded #Information would be lost.
+}
+
+::B4-4 N\:M relationship::An N\:M relationship becomes... {
+	=a new table with both entities' keys and the relationship's attributes #Correct.
+	~a foreign key in either table #That doesn't allow several values on each side.
+	~a single table merging both entities #The independence between them would be lost.
+}
+
+::B4-5 PK of the N\:M::In the table that comes from an N\:M relationship, the primary key is... {
+	=the union of the two foreign keys #Correct.
+	~just the first entity's key #It would prevent that entity from repeating with others.
+	~an attribute of the relationship #The relationship's attributes don't identify the row.
+}
+
+::B4-6 History::A student can take the same subject in different years and we want to record it. What do we do with the TAKES table? {
+	=add the year (or date) to the primary key #Correct.
+	~remove the primary key #Every table needs a key.
+	~duplicate the row without changing the key #Two rows with the same key are not possible.
+}
+
+::B4-7 1\:N\: where the foreign key goes::EMPLOYEE (1,1) belongs to DEPARTMENT (0,N). Where does the foreign key go? {
+	=In EMPLOYEE, NOT NULL #Correct\: it goes on the “many” side and the minimum of 1 requires NOT NULL.
+	~In DEPARTMENT #A department would have to store many employees.
+	~In a new table, necessarily #Only in special cases (many nulls, a future N\:M...).
+}
+
+::B4-8 Weak entity::CHILD is a weak entity of EMPLOYEE. What is its primary key? {
+	=employee_tax_id (foreign) + child_name #Correct.
+	~just child_name #Two employees can have children with the same name.
+	~just employee_tax_id #An employee can have several children.
+}
+
+::B4-9 1\:1::EMPLOYEE (0,1) directs DEPARTMENT (1,1). Where does the foreign key go? {
+	=In DEPARTMENT, NOT NULL and UNIQUE #Correct\: it is the entity that always participates.
+	~In EMPLOYEE, NOT NULL #Not every employee directs a department.
+	~In neither\: the tables must be merged #Merging isn't mandatory.
+}
+
+::B4-10 (0,1)\:(0,1)::In a 1\:1 relationship where neither entity always participates, (0,1)\:(0,1), the usual solution is... {
+	=to create a table of its own for the relationship #Correct\: it avoids filling either one with nulls.
+	~to put the foreign key in either one as NOT NULL #NOT NULL would prevent rows with no relationship.
+	~to ignore the relationship #Information would be lost.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 5 · Reflexive, ternary and hierarchies
+
+::B5-1 Reflexive::EMPLOYEE manages EMPLOYEE (each employee has at most one boss). How does the table look? {
+	=EMPLOYEE(dni, name, boss_dni) with boss_dni a foreign key to the same table, allowing nulls #Correct\: the director has no boss.
+	~two tables EMPLOYEE and BOSS with the same columns #It duplicates information needlessly.
+	~boss_dni with NOT NULL #The top director couldn't be inserted.
+}
+
+::B5-2 Ternary N\:N\:N::A ternary relationship with N\:N\:N cardinalities generates a table whose primary key is... {
+	=the union of the three foreign keys #Correct.
+	~just the first two keys #The third entity would be lost.
+	~just one of the three #It wouldn't identify the row.
+}
+
+::B5-3 Ternary 1\:N\:N::In a 1\:N\:N ternary, the primary key of the resulting table is made of... {
+	=the keys of the two entities with maximum N (the 1-side key is dropped) #Correct.
+	~all three keys #It would be redundant\: the 1-side key is determined.
+	~only the 1-side key #It wouldn't identify the row.
+}
+
+::B5-4 ISA option 3::The “subtype tables only” option of an ISA hierarchy is only valid if the hierarchy is... {
+	=total and exclusive, and the supertype has no relationships of its own #Correct.
+	~partial and overlapping #We would lose instances with no subtype.
+	~any\: it always works #It has restrictions.
+}
+
+::B5-5 General ISA option::Which mapping option for an ISA hierarchy always works, even if it is overlapping? {
+	=a table per entity (supertype + one per subtype holding its key) #Correct.
+	~a single table with no type column #You couldn't tell each row's subtype.
+	~just the supertype's table #The subtypes' attributes would be lost.
+}
+
+::B5-6 Total part::The keys and tables of a hierarchy guarantee that every supertype instance has a row in some subtype (total part). {FALSE#It must be checked with a trigger or from the application.#It must be checked with a trigger or from the application.}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 6 · Functional dependencies and 1NF to 3NF
+
+::B6-1 Update anomaly::In ORDER(order_id, customer, city, product, price), Marta moves and her city must be changed in two orders. If one is missed, the DB gives two cities at once. This is an anomaly of... {
+	=update #Correct.
+	~insertion #The insertion anomaly prevents adding data with no order.
+	~deletion #The deletion anomaly loses data when a row is deleted.
+}
+
+::B6-2 Functional dependency::Saying X → Y (X functionally determines Y) means that... {
+	=for each value of X there is a single value of Y #Correct.
+	~X and Y are always equal #No\: only that X fixes Y.
+	~for each value of Y there is a single value of X #That would be Y → X.
+}
+
+::B6-3 Name → ID::The dependency name → dni holds, because each name identifies one person. {FALSE#Two people can share a name.#Two people can share a name.}
+
+::B6-4 Kinds of dependency::Match each concept with its definition. {
+	=Full dependency -> Depends on the whole composite key
+	=Partial dependency -> Depends on only part of the key
+	=Transitive dependency -> A → B and B → C, so C depends on A through B
+	=Determinant -> What is on the left of the arrow
+}
+
+::B6-5 1NF::A table is in 1NF when... {
+	=all its attributes hold atomic values #Correct.
+	~it has no partial dependencies #That is 2NF.
+	~it has no transitive dependencies #That is 3NF.
+}
+
+::B6-6 2NF::A table in 1NF is in 2NF when... {
+	=no non-key attribute depends on only part of the key #Correct.
+	~all its determinants are candidate keys #That is BCNF.
+	~it has no nulls #Nulls don't determine the normal form.
+}
+
+::B6-7 Simple key and 2NF::A 1NF table whose primary key is a single attribute is already in 2NF. {TRUE#Partial dependencies only appear with composite keys.#Partial dependencies only appear with composite keys.}
+
+::B6-8 3NF::A table in 2NF is in 3NF when... {
+	=there are no transitive dependencies among non-key attributes #Correct.
+	~the primary key is composite #It's unrelated.
+	~all attributes are keys #That isn't required.
+}
+
+::B6-9 The method::When a table breaks a normal form, the normalisation method consists of... {
+	=keeping what complies with the original key and moving what breaks the rule to a new table with its determinant as key #Correct\: repeat until every table complies.
+	~deleting the attributes that break the rule #Information would be lost.
+	~adding more columns to the table #It would worsen redundancy.
+}
+
+::B6-10 Which form is broken::STUDENT(dni, name, city, province), with key dni and city → province. Which normal form does it break? {
+	=3NF (transitive dependency dni → city → province) #Correct\: it is in 2NF but not in 3NF.
+	~1NF #All values are atomic.
+	~2NF #The key is simple\: there can be no partial dependencies.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/Block 7 · Boyce-Codd normal form
+
+::B7-1 BCNF::A table is in BCNF when... {
+	=every determinant is a candidate key #Correct.
+	~it has no composite keys #It may have them.
+	~it has no functional dependencies #There always are\: the key determines the rest.
+}
+
+::B7-2 BCNF and 3NF::Every BCNF table is also in 3NF. {TRUE#Each normal form contains the previous ones.#Each normal form contains the previous ones.}
+
+::B7-3 REPAIR case::REPAIR(customer, type, mechanic)\: each mechanic does only one type of repair (mechanic → type). Candidate keys\: (customer, type) and (customer, mechanic). The table is in... {
+	=3NF but not BCNF #Correct\: mechanic is a determinant and not a candidate key.
+	~BCNF #mechanic determines type and is not a candidate key.
+	~not even 3NF #All its attributes belong to some candidate key.
+}
+
+::B7-4 Beyond 3NF::There are tables in 3NF that are not in BCNF. {TRUE#For example, REPAIR(customer, type, mechanic).#For example, REPAIR(customer, type, mechanic).}
+
+
+$CATEGORY: $course$/UT3 (English)/General review
+
+::R-1 Order of phases::What is the correct order of database design? {
+	=E/R model → relational model → normalisation → SQL #Correct.
+	~SQL → E/R model → relational model → normalisation #It would be coded before being designed.
+	~normalisation → E/R model → SQL → relational model #Normalising before having tables makes no sense.
+}
+
+::R-2 Storing age::It is good practice to store age as a column and update it every birthday. {FALSE#It is a derived attribute\: it is calculated from the birth date.#It is a derived attribute\: it is calculated from the birth date.}
+
+::R-3 Deleting a customer::With NO ACTION, what happens when you delete a customer who has rentals? {
+	=The deletion is rejected #Correct.
+	~The rentals are deleted #That would be CASCADE.
+	~The rentals are left orphaned #Referential integrity prevents it.
+}
+
+::R-4 CUSTOMER table::CUSTOMER(id, name, city, province) with city → province. What must be done to reach 3NF? {
+	=split out CITY(city, province) and keep city as a foreign key in CUSTOMER #Correct.
+	~delete the province column #Information would be lost.
+	~make province the primary key #It doesn't identify the customer.
+}
+
+::R-5 N\:M attribute::STUDENT takes SUBJECT and each pair has a grade. Where is the grade stored? {
+	=in the relationship's table (TAKES) #Correct.
+	~in STUDENT #A student has many grades.
+	~in SUBJECT #A subject has grades from many students.
+}
+
+::R-6 Mandatory foreign key::A foreign key must always be declared NOT NULL. {FALSE#It depends on the minimum cardinality\: (0,·) allows nulls, (1,·) doesn't.#It depends on the minimum cardinality\: (0,·) allows nulls, (1,·) doesn't.}
+
+::R-7 Why normalise::What is the main reason to normalise? {
+	=avoid redundancy and update, insertion and deletion anomalies #Correct.
+	~make queries always faster #It sometimes makes them slower (more joins).
+	~always save disk space #That isn't the main goal.
+}
+
+::R-8 Phones in one cell::CUSTOMER has a phones column with several numbers separated by commas. Which normal form is broken and how is it fixed? {
+	=1NF\: a PHONE table is created, related 1\:N to CUSTOMER #Correct.
+	~2NF\: the key is split #There is no composite key.
+	~3NF\: the field is removed #Information would be lost.
+}
+
+::R-9 Mapping rules::Match each E/R element with its translation. {
+	=N\:M relationship -> New table with both foreign keys
+	=1\:N relationship -> Foreign key on the “many” side
+	=Derived attribute -> Not stored
+	=Multi-valued attribute -> New entity related 1\:N
+}
+
+::R-10 Normal forms::How are the normal forms related? {
+	=each one contains the previous ones\: BCNF ⊂ 3NF ⊂ 2NF ⊂ 1NF #Correct.
+	~they are independent of each other #Each one also requires the previous ones.
+	~2NF is stricter than 3NF #It's the other way round.
+}
+
+
+$CATEGORY: $course$/UT3 (English)/English · Technical vocabulary
+
+::ING-1 Technical vocabulary EN-ES::Match each English term with its Spanish equivalent. {
+	=tuple -> tupla
+	=attribute -> atributo
+	=primary key -> clave primaria
+	=foreign key -> clave foránea
+	=constraint -> restricción
+	=normalisation -> normalización
+	=determinant -> determinante
+	=composite key -> clave compuesta
+	=weak entity -> entidad débil
+	=join -> unión (de tablas)
+}
