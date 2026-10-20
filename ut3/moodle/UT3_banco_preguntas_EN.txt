@@ -184,8 +184,8 @@ $CATEGORY: $course$/UT3 (English)/Block 4 · Mapping to tables: basic rules
 	~duplicate the row without changing the key #Two rows with the same key are not possible.
 }
 
-::B4-7 1\:N\: where the foreign key goes::EMPLOYEE (1,1) belongs to DEPARTMENT (0,N). Where does the foreign key go? {
-	=In EMPLOYEE, NOT NULL #Correct\: it goes on the “many” side and the minimum of 1 requires NOT NULL.
+::B4-7 1\:N\: where the foreign key goes::EMPLOYEE (0,N) — belongs — DEPARTMENT (1,1) (crossed cardinalities). Where does the foreign key go? {
+	=In EMPLOYEE, NOT NULL #Correct\: the N is drawn next to EMPLOYEE, and the (1,1) drawn next to DEPARTMENT requires NOT NULL.
 	~In DEPARTMENT #A department would have to store many employees.
 	~In a new table, necessarily #Only in special cases (many nulls, a future N\:M...).
 }
@@ -196,13 +196,13 @@ $CATEGORY: $course$/UT3 (English)/Block 4 · Mapping to tables: basic rules
 	~just employee_tax_id #An employee can have several children.
 }
 
-::B4-9 1\:1::EMPLOYEE (0,1) directs DEPARTMENT (1,1). Where does the foreign key go? {
-	=In DEPARTMENT, NOT NULL and UNIQUE #Correct\: it is the entity that always participates.
-	~In EMPLOYEE, NOT NULL #Not every employee directs a department.
+::B4-9 1\:1::EMPLOYEE (1,1) — directs — DEPARTMENT (0,1) (crossed cardinalities). Where does the foreign key go? {
+	=In DEPARTMENT, NOT NULL and UNIQUE #Correct\: the (0,1) is drawn next to DEPARTMENT, and the key goes in the table that has it next to it.
+	~In EMPLOYEE, NOT NULL #Next to EMPLOYEE the (1,1) is drawn, not the (0,1).
 	~In neither\: the tables must be merged #Merging isn't mandatory.
 }
 
-::B4-10 (0,1)\:(0,1)::In a 1\:1 relationship where neither entity always participates, (0,1)\:(0,1), the usual solution is... {
+::B4-10 (0,1)\:(0,1)::In a 1\:1 relationship with (0,1) drawn at both ends, the usual solution is... {
 	=to create a table of its own for the relationship #Correct\: it avoids filling either one with nulls.
 	~to put the foreign key in either one as NOT NULL #NOT NULL would prevent rows with no relationship.
 	~to ignore the relationship #Information would be lost.
@@ -347,7 +347,7 @@ $CATEGORY: $course$/UT3 (English)/General review
 	~in SUBJECT #A subject has grades from many students.
 }
 
-::R-6 Mandatory foreign key::A foreign key must always be declared NOT NULL. {FALSE#It depends on the minimum cardinality\: (0,·) allows nulls, (1,·) doesn't.#It depends on the minimum cardinality\: (0,·) allows nulls, (1,·) doesn't.}
+::R-6 Mandatory foreign key::A foreign key must always be declared NOT NULL. {FALSE#It depends on the minimum drawn next to the referenced table\: (0,·) allows nulls, (1,·) doesn't.#It depends on the minimum drawn next to the referenced table\: (0,·) allows nulls, (1,·) doesn't.}
 
 ::R-7 Why normalise::What is the main reason to normalise? {
 	=avoid redundancy and update, insertion and deletion anomalies #Correct.
@@ -363,7 +363,7 @@ $CATEGORY: $course$/UT3 (English)/General review
 
 ::R-9 Mapping rules::Match each E/R element with its translation. {
 	=N\:M relationship -> New table with both foreign keys
-	=1\:N relationship -> Foreign key on the “many” side
+	=1\:N relationship -> Foreign key in the table that has the N drawn next to it
 	=Derived attribute -> Not stored
 	=Multi-valued attribute -> New entity related 1\:N
 }

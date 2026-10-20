@@ -40,7 +40,7 @@ CATEGORIA(id_categoria, nombre)
 PRODUCTO(cod_producto, nombre, precio, #id_categoria)   FK NOT NULL
 PEDIDO(num_pedido, fecha, #dni)                         FK NOT NULL
 LINEA_PEDIDO(#num_pedido, #cod_producto, cantidad)      PK compuesta</pre>
-<p>Claves: la 1:N se resuelve con la foránea en el lado del 1 (el lado «máx = 1»); como la participación de ese lado es obligatoria (1,1), la foránea es NOT NULL. La N:M obliga a crear una tabla nueva (LINEA_PEDIDO) cuya clave primaria es la unión de las dos foráneas; el atributo «cantidad» viaja a esa tabla.</p>
+<p>Claves: en cada 1:N la foránea va en la tabla que tiene la N pintada al lado (PEDIDO y PRODUCTO); como el (1,1) pintado junto a CLIENTE y a CATEGORIA dice que cada pedido y cada producto tienen exactamente uno, la foránea es NOT NULL. La N:M obliga a crear una tabla nueva (LINEA_PEDIDO) cuya clave primaria es la unión de las dos foráneas; el atributo «cantidad» viaja a esa tabla.</p>
 <p>Valoración orientativa (10 pt): diagrama correcto 2; tabla de la N:M con clave compuesta 3; foráneas en el lado correcto 3; NOT NULL justificado 1; notación textual limpia 1.</p>
 <p>Errores típicos: poner la foránea en CLIENTE; crear una tabla intermedia también para las 1:N; olvidar que «cantidad» es atributo de la relación; clave de LINEA_PEDIDO con un solo campo.</p>]]></text></graderinfo>
   <responsetemplate format="html"><text></text></responsetemplate>

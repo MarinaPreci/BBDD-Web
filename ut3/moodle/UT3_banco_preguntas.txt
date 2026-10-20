@@ -182,8 +182,8 @@ $CATEGORY: $course$/UT3/Bloque 4 · Paso a tablas: reglas básicas
 	~duplicar la fila sin cambiar la clave #Dos filas con la misma clave no son posibles.
 }
 
-::B4-7 1\:N\: dónde va la foránea::EMPLEADO (1,1) pertenece a DEPARTAMENTO (0,N). ¿Dónde va la clave foránea? {
-	=En EMPLEADO, con NOT NULL #Correcto\: va en el lado «muchos» y el mínimo 1 exige NOT NULL.
+::B4-7 1\:N\: dónde va la foránea::EMPLEADO (0,N) — pertenece — DEPARTAMENTO (1,1) (cardinalidades cruzadas). ¿Dónde va la clave foránea? {
+	=En EMPLEADO, con NOT NULL #Correcto\: la N está pintada junto a EMPLEADO, y el (1,1) pintado junto a DEPARTAMENTO exige NOT NULL.
 	~En DEPARTAMENTO #Un departamento tendría que guardar muchos empleados.
 	~En una tabla nueva obligatoriamente #Solo en casos especiales (muchos nulos, N\:M futura...).
 }
@@ -194,13 +194,13 @@ $CATEGORY: $course$/UT3/Bloque 4 · Paso a tablas: reglas básicas
 	~solo nif_empleado #Un empleado puede tener varios hijos.
 }
 
-::B4-9 1\:1::EMPLEADO (0,1) dirige DEPARTAMENTO (1,1). ¿Dónde va la clave foránea? {
-	=En DEPARTAMENTO, con NOT NULL y UNIQUE #Correcto\: es la entidad que siempre participa.
-	~En EMPLEADO, con NOT NULL #No todo empleado dirige un departamento.
+::B4-9 1\:1::EMPLEADO (1,1) — dirige — DEPARTAMENTO (0,1) (cardinalidades cruzadas). ¿Dónde va la clave foránea? {
+	=En DEPARTAMENTO, con NOT NULL y UNIQUE #Correcto\: el (0,1) está pintado junto a DEPARTAMENTO, y la clave va en la tabla que lo tiene al lado.
+	~En EMPLEADO, con NOT NULL #Junto a EMPLEADO está pintado el (1,1), no el (0,1).
 	~En ninguna\: hay que fusionar las tablas #No es obligatorio fusionar.
 }
 
-::B4-10 (0,1)\:(0,1)::En una relación 1\:1 en la que ninguna de las dos entidades participa siempre, (0,1)\:(0,1), lo habitual es... {
+::B4-10 (0,1)\:(0,1)::En una relación 1\:1 con (0,1) pintado en los dos extremos, lo habitual es... {
 	=crear una tabla propia para la relación #Correcto\: evita llenar de nulos cualquiera de las dos.
 	~poner la foránea en cualquiera de las dos con NOT NULL #NOT NULL impediría filas sin relación.
 	~ignorar la relación #Se perdería información.
@@ -345,7 +345,7 @@ $CATEGORY: $course$/UT3/Repaso general
 	~en ASIGNATURA #Una asignatura tiene notas de muchos alumnos.
 }
 
-::R-6 Foránea obligatoria::Una clave foránea siempre debe declararse NOT NULL. {FALSE#Depende de la cardinalidad mínima\: (0,·) admite nulos, (1,·) no.#Depende de la cardinalidad mínima\: (0,·) admite nulos, (1,·) no.}
+::R-6 Foránea obligatoria::Una clave foránea siempre debe declararse NOT NULL. {FALSE#Depende del mínimo pintado junto a la tabla referenciada\: (0,·) admite nulos, (1,·) no.#Depende del mínimo pintado junto a la tabla referenciada\: (0,·) admite nulos, (1,·) no.}
 
 ::R-7 Para qué normalizar::¿Cuál es el motivo principal para normalizar? {
 	=evitar redundancias y anomalías de modificación, inserción y borrado #Correcto.
@@ -361,7 +361,7 @@ $CATEGORY: $course$/UT3/Repaso general
 
 ::R-9 Reglas de paso a tablas::Relaciona cada elemento del E/R con su traducción. {
 	=Relación N\:M -> Tabla nueva con las dos claves foráneas
-	=Relación 1\:N -> Clave foránea en el lado «muchos»
+	=Relación 1\:N -> Clave foránea en la tabla que tiene la N pintada al lado
 	=Atributo derivado -> No se almacena
 	=Atributo multivaluado -> Nueva entidad relacionada 1\:N
 }
