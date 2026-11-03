@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT4 · Resumen — El diseño físico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15171c;
+  --ink-soft:#4b4f58;
+  --ink-dim:#767c8a;
+  --paper:#ffffff;
+  --stage-bg:#f0ede6;
+  --line:#e7e3da;
+  --blue:#1b39e6;
+  --blue-deep:#0d1a7a;
+  --lilac:#e9c3ef;
+  --mint:#8ed0aa;
+  --mint-deep:#3f9468;
+  --yellow:#ffd23f;
+  --orange:#ff5a2e;
+  --shadow: 0 30px 70px -30px rgba(20,20,30,.35);
+  --tint-blue: color-mix(in srgb, var(--blue) 10%, var(--paper));
+  --tint-mint: color-mix(in srgb, var(--mint-deep) 14%, var(--paper));
+  --tint-ink: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  --tint-yellow: color-mix(in srgb, var(--yellow) 22%, var(--paper));
+}
+html[data-theme="dark"]{
+  --ink:#f1f0ec;
+  --ink-soft:#c7c8d2;
+  --ink-dim:#9296a8;
+  --paper:#22242c;
+  --stage-bg:#15161b;
+  --line:#3a3d48;
+  --blue-deep:#93a8ff;
+  --mint-deep:#7fd9a8;
+  --shadow: 0 30px 70px -30px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--stage-bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:28px 16px;
+}
+h1,h2,h3,h4{font-family:'Baloo 2','Poppins',system-ui,sans-serif;margin:0;letter-spacing:-0.01em;text-wrap:balance;}
+p{margin:0;}
+a{color:inherit;}
+
+#deck-app{width:100%;max-width:1200px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+/* ============ toolbar ============ */
+.toolbar{
+  width:100%;
+  max-width:1160px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-family:'Inter',sans-serif;
+}
+.toolbar-group{display:flex;align-items:center;gap:8px;}
+.toolbar-title{
+  font-family:'Baloo 2',sans-serif;
+  font-weight:700;
+  font-size:16px;
+  color:var(--ink-soft);
+}
+.tb-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;
+  padding:8px 14px;border-radius:999px;cursor:pointer;line-height:1;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.tb-btn:hover{transform:translateY(-2px);}
+.tb-btn.active{background:var(--ink);color:var(--paper);}
+.tb-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.lang-group{display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;}
+.lang-group .tb-btn{border:none;border-radius:0;padding:8px 16px;}
+.lang-group .tb-btn+.tb-btn{border-left:2px solid var(--ink);}
+
+/* ============ stage ============ */
+.stage-wrap{
+  width:100%;
+  max-width:1160px;
+  aspect-ratio:16/9;
+  position:relative;
+}
+.stage{
+  position:absolute;inset:0;
+  background:var(--paper);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.stage:fullscreen{border-radius:0;max-width:none;}
+.stage:fullscreen .slide{padding:5vw 6vw;}
+
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  padding:56px 64px;
+  overflow:hidden;
+}
+.slide.is-active{display:block;}
+.slide-inner{
+  position:relative;z-index:2;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+  max-width:980px;
+}
+.eyebrow{
+  font-family:'Baloo 2',sans-serif;font-weight:700;
+  font-size:clamp(14px,1.6vw,18px);
+  color:var(--blue-deep);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.slide h2{font-size:clamp(26px,3.6vw,44px);line-height:1.08;font-weight:800;max-width:16ch;}
+.slide .mega{font-size:clamp(34px,6vw,72px);line-height:1.02;font-weight:800;}
+.lede-lg{font-size:clamp(16px,1.9vw,22px);color:var(--ink-soft);max-width:62ch;line-height:1.5;}
+.note{font-size:clamp(15px,1.6vw,18px);color:var(--ink-soft);max-width:66ch;line-height:1.55;}
+.byline{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(16px,1.8vw,20px);color:var(--ink-soft);}
+
+/* ============ deco shapes ============ */
+.deco-corner{position:absolute;z-index:1;pointer-events:none;}
+.deco-a{width:230px;height:230px;top:-70px;right:-70px;border-radius:50%;background:var(--blue);}
+.deco-b{width:160px;height:160px;bottom:-50px;left:-50px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+
+.slide[data-deco="2"] .deco-a{background:var(--yellow);top:-90px;left:-90px;right:auto;border-radius:50%;}
+.slide[data-deco="2"] .deco-b{display:none;}
+
+.slide[data-deco="3"] .deco-a{width:210px;height:210px;top:-60px;right:-60px;border-radius:50%;border:38px solid var(--blue);background:transparent;}
+.slide[data-deco="3"] .deco-b{width:130px;height:130px;bottom:-40px;left:-40px;background:var(--mint);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="4"] .deco-a{width:200px;height:200px;bottom:-70px;right:-70px;top:auto;border-radius:50%;background:var(--orange);}
+.slide[data-deco="4"] .deco-b{width:150px;height:150px;top:-50px;left:-50px;bottom:auto;background:var(--lilac);clip-path:polygon(100% 0,0 0,100% 100%);}
+
+.slide[data-deco="5"] .deco-a{width:220px;height:220px;top:-80px;left:-80px;right:auto;border-radius:50%;background:var(--mint);}
+.slide[data-deco="5"] .deco-b{width:120px;height:120px;bottom:-40px;right:-40px;left:auto;background:var(--yellow);clip-path:polygon(0 0,100% 0,100% 100%);}
+
+.slide[data-deco="6"] .deco-a{width:200px;height:200px;top:-70px;right:-70px;border-radius:50%;background:var(--lilac);}
+.slide[data-deco="6"] .deco-b{width:170px;height:170px;bottom:-60px;left:-60px;background:var(--blue);clip-path:polygon(0 0,100% 100%,0 100%);}
+
+.slide[data-deco="title"] .deco-a{width:340px;height:340px;top:-110px;right:-110px;border-radius:50%;background:var(--blue);}
+.slide[data-deco="title"] .deco-b{width:230px;height:230px;bottom:-70px;left:-70px;background:var(--lilac);clip-path:polygon(0 100%,0 0,100% 100%);}
+.slide.slide-title .slide-inner{gap:22px;}
+
+.slide[data-deco="activity"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--orange);opacity:.16;}
+.activity-inner{align-items:flex-start;gap:12px;}
+.activity-inner .lede-lg{max-width:70ch;}
+.slide[data-deco="activity"],.slide[data-deco="solucion"]{overflow-y:auto;}
+.activity-badge.team{background:var(--blue);box-shadow:0 14px 30px -10px rgba(27,57,230,.55);}
+.quiz-cards .card{display:flex;flex-direction:column;gap:8px;}
+.quiz-cards .card p{font-size:14.5px;font-weight:600;line-height:1.4;}
+.scenario-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:18px 22px;margin-top:4px;}
+.scenario-card p{font-size:16px;font-weight:600;line-height:1.5;}
+.activity-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--orange);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(255,90,46,.55);
+  flex:none;
+}
+
+.activity-prompts{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;}
+.activity-prompt{
+  display:flex;align-items:center;gap:10px;border:2px solid var(--ink);border-radius:999px;
+  padding:9px 18px 9px 9px;background:var(--paper);font-size:14.5px;font-weight:600;
+}
+.activity-prompt .num{
+  width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:13px;
+}
+.activity-prompt.p-campo .num{background:var(--blue);}
+.activity-prompt.p-registro .num{background:var(--mint-deep);}
+.activity-prompt.p-clave .num{background:var(--orange);}
+
+.solution-badge{
+  width:64px;height:64px;border-radius:50%;background:var(--mint-deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:30px;
+  box-shadow:0 14px 30px -10px rgba(63,148,104,.55);
+  flex:none;
+}
+.slide[data-deco="solucion"] .deco-a{width:260px;height:260px;top:-90px;left:-90px;right:auto;border-radius:50%;background:var(--mint);opacity:.22;}
+
+/* ============ content components ============ */
+.index-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 34px;}
+.index-list li{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);}
+.ix-num{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--blue);}
+.ix-txt{font-size:16px;color:var(--ink-soft);}
+
+.chain{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
+.chain-step{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 14px;min-width:135px;flex:1;}
+.chain-tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--blue-deep);margin-bottom:6px;}
+.chain-step p{font-size:14.5px;font-weight:600;}
+.chain-arrow{align-self:center;font-size:22px;color:var(--ink-dim);}
+
+.pillbox{display:flex;flex-wrap:wrap;gap:10px;}
+.pill,.pill-lg{
+  display:inline-flex;align-items:center;
+  border:2px solid var(--ink);border-radius:999px;
+  font-family:'Baloo 2',sans-serif;font-weight:600;
+  background:var(--paper);
+}
+.pill{padding:8px 16px;font-size:14px;}
+.pill-lg{padding:12px 20px;font-size:16px;}
+.pill.ghost{border-style:dashed;color:var(--ink-dim);border-color:var(--ink-dim);font-weight:500;}
+
+.tl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tl-row-4{grid-template-columns:repeat(4,1fr);}
+.tl-card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.tl-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--tint-blue);margin-bottom:12px;}
+.tl-icon svg{display:block;}
+.tl-year{display:inline-block;font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:13px;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.tl-card h4{font-size:17px;margin-bottom:6px;line-height:1.2;}
+.tl-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.4;}
+
+.cards{display:grid;gap:14px;}
+.cards-2{grid-template-columns:repeat(2,1fr);}
+.cards-3{grid-template-columns:repeat(3,1fr);}
+.cards-4{grid-template-columns:repeat(4,1fr);}
+.cards-5{grid-template-columns:repeat(5,1fr);}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.card.small{padding:14px 16px;}
+.card .tag{display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--blue-deep);background:var(--tint-blue);border-radius:999px;padding:3px 10px;margin-bottom:10px;}
+.card h4{font-size:16px;margin-bottom:6px;line-height:1.2;}
+.card p{font-size:13.5px;color:var(--ink-soft);line-height:1.42;}
+
+.gloss-grid .card, .gloss-grid .gloss-item{background:var(--paper);}
+.gloss-item{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:16px 18px;}
+.gloss-item h4{font-size:15.5px;margin-bottom:6px;}
+.gloss-item p{font-size:13px;color:var(--ink-soft);line-height:1.4;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:34px;}
+.col-h{display:block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);margin-bottom:10px;}
+.col-h-good{color:var(--mint-deep);}
+.col-h-bad{color:var(--orange);}
+.check-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.check-list li{display:flex;align-items:flex-start;gap:8px;font-size:14.5px;color:var(--ink-soft);}
+.check-icon{color:var(--mint-deep);font-weight:800;}
+.x-icon{color:var(--orange);font-weight:800;}
+.col-badge{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;flex:none;vertical-align:middle;}
+.col-badge.good{background:var(--mint-deep);}
+.col-badge.bad{background:var(--orange);}
+.problem-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;}
+.problem-list li{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;}
+
+.diagram-box{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 16px;}
+.diagram-box svg{display:block;width:100%;height:auto;}
+
+.gloss-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px;flex:none;}
+
+.chart-grid{border:2px solid var(--ink);border-radius:14px;overflow:hidden;}
+.chart-row{display:grid;grid-template-columns:1.1fr repeat(4,1fr);}
+.chart-row+.chart-row{border-top:2px solid var(--ink);}
+.chart-cell{padding:4px 10px;display:flex;align-items:center;justify-content:center;font-size:12.5px;line-height:1.05;border-left:2px solid var(--ink);}
+.chart-cell:first-child{border-left:none;justify-content:flex-start;font-family:'Spline Sans Mono',monospace;font-weight:600;background:var(--stage-bg);}
+.chart-row.head{background:#15171c;color:#e9ecf7;}
+.chart-row.head .chart-cell{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;border-left-color:#3a3d48;padding:4px 10px;}
+.chart-row.head .chart-cell:first-child{background:#15171c;}
+.chart-row.winner{background:var(--tint-mint);}
+.ok{color:var(--mint-deep);font-weight:800;font-size:14px;}
+.no{color:var(--orange);font-weight:800;font-size:14px;}
+
+.arch{display:flex;flex-direction:column;gap:10px;}
+.arch-layer{border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;color:#fff;}
+.arch-layer .lbl{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;}
+.arch-layer span:last-child{font-size:14px;opacity:.92;}
+.arch-layer.ext{background:var(--blue);}
+.arch-layer.con{background:var(--blue-deep);}
+.arch-layer.int{background:var(--ink);color:var(--paper);}
+
+.code{
+  font-family:'Spline Sans Mono',monospace;font-size:13.5px;line-height:1.7;
+  background:#15171c;color:#e9ecf7;border-radius:14px;padding:16px 20px;
+  white-space:pre-wrap;margin-top:10px;
+}
+.code .kw{color:#8fd0aa;font-weight:600;}
+.code .cm{color:#9aa1b8;}
+
+.final-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;counter-reset:fin;}
+.final-list li{counter-increment:fin;position:relative;padding-left:30px;font-size:15.5px;color:var(--ink-soft);line-height:1.4;}
+.final-list li::before{content:counter(fin);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.credits{margin-top:8px;font-size:11.5px;color:var(--ink-dim);max-width:70ch;line-height:1.5;}
+
+/* ============ bilingual toggle (self-contained wrapper, not <html>) ============ */
+[data-i18n]{display:none;}
+#deck-app[data-lang="es"] [data-i18n="es"]{display:revert;}
+#deck-app[data-lang="en"] [data-i18n="en"]{display:revert;}
+#deck-app[data-lang="es"] span[data-i18n="es"],
+#deck-app[data-lang="en"] span[data-i18n="en"]{display:inline;}
+
+/* ============ nav row ============ */
+.nav-row{
+  width:100%;max-width:1160px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.nav-btn{
+  appearance:none;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s ease, background .12s ease, color .12s ease;
+}
+.nav-btn:hover{background:var(--ink);color:#fff;transform:translateY(-2px);}
+.nav-btn:disabled{opacity:.3;cursor:default;transform:none;background:var(--paper);color:var(--ink);}
+.nav-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+.progress-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.progress-track{width:100%;height:6px;border-radius:999px;background:var(--line);overflow:hidden;}
+.progress-fill{height:100%;background:var(--blue);border-radius:999px;transition:width .25s ease;}
+.slide-counter{font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--ink-dim);}
+.hint{font-size:12px;color:var(--ink-dim);text-align:center;}
+
+@media (max-width:760px){
+  .slide{padding:34px 26px;}
+  .cards-3,.cards-4,.cards-5{grid-template-columns:repeat(2,1fr);}
+  .tl-row,.tl-row-4{grid-template-columns:1fr;}
+  .index-list{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .problem-list{grid-template-columns:1fr;}
+  .chart-cell{padding:7px 5px;font-size:10.5px;}
+}
+</style>
+
+
+<style>
+  /* Hardcoded colors on purpose (no var(--...) lookups): some pages, like the
+     bright résumé deck, redefine --ink/--line/--bg-alt for their own theme,
+     and the sidebar must stay visually identical everywhere. */
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:252px;
+    background:#1f2020; border-right:1px solid #3d3d3d;
+    overflow-y:auto; padding:26px 18px 30px; z-index:100000;
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#3d3d3d; border-radius:4px;}
+  .sidebar .brand{
+    font-family:'Fraunces',serif; font-weight:700; color:#ece9e0;
+    font-size:1.15rem; display:block; margin:2px 6px 2px;
+  }
+  .sidebar .brand-sub{
+    font-family:'Spline Sans Mono',monospace; font-size:12px; color:#767c98;
+    letter-spacing:.04em; display:block; margin:0 6px 26px;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:1px;}
+  .sidebar a{
+    display:block; padding:8px 10px; border-radius:4px; font-size:14.5px;
+    color:#a6acc4; text-decoration:none; line-height:1.35;
+  }
+  .sidebar a:hover{background:rgba(255,255,255,.07); color:#a9ecdf;}
+  .sidebar a.active{background:rgba(58,207,186,.16); color:#3acfba; font-weight:600;}
+  .sidebar .group-label{
+    font-family:'Spline Sans Mono',monospace; font-size:11.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:#767c98; margin:22px 0 6px; padding:0 10px;
+  }
+  .sidebar .group-label:first-of-type{margin-top:4px;}
+  .sidebar .ut-group{margin-bottom:1px;}
+  .sidebar .ut-group > a{font-weight:600;}
+  .sidebar .ut-children{
+    display:flex; flex-direction:column; padding-left:14px; margin:2px 0 6px 20px;
+    border-left:1px solid #3d3d3d;
+  }
+  .sidebar .ut-children a{font-size:13.5px; padding:6px 10px; font-weight:400;}
+  .sidebar a.pending{color:#767c98; cursor:default; opacity:.55;}
+  .sidebar a.pending:hover{background:none; color:#767c98;}
+
+  .sidebar{transition:transform .22s ease;}
+  .sidebar-toggle{
+    display:flex; position:fixed; top:12px; left:12px; z-index:100001;
+    width:42px; height:42px; border-radius:8px;
+    background:#292929; border:1px solid #3d3d3d;
+    color:#ece9e0; font-size:18px; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .sidebar-toggle:hover{background:#333;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999;}
+  body{margin-left:252px !important; transition:margin-left .22s ease;}
+
+  body.sidebar-collapsed{margin-left:0 !important;}
+  body.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+
+  @media(max-width:880px){
+    body{margin-left:0 !important;}
+    .sidebar{
+      transform:translateX(-100%);
+      box-shadow:0 0 40px rgba(0,0,0,.55);
+    }
+    body:not(.sidebar-collapsed) .sidebar{transform:translateX(0);}
+    body:not(.sidebar-collapsed) .sidebar-backdrop{display:block;}
+  }
+</style>
+
+<style>
+#deck-app{--panel:var(--paper);--clay:var(--ink);--teal:var(--blue);--accent-text:var(--blue-deep);}
+.slide h2{max-width:24ch;}
+.slide-inner{gap:14px;}
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;align-items:center;}
+.split-l,.split-r{min-width:0;}
+.split .diagram-box{padding:8px 10px;}
+.schema-box{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:6px;}
+.sl{font-family:'Spline Sans Mono',monospace;font-size:13.5px;line-height:1.55;color:var(--ink);overflow-wrap:anywhere;}
+.sl u{text-underline-offset:3px;text-decoration-thickness:1.5px;}
+.sl i.fk{font-style:italic;color:var(--blue-deep);}
+.sl .ak{text-decoration:underline dashed;text-underline-offset:3px;}
+.sleg{font-size:11.5px;color:var(--ink-dim);margin-top:4px;}
+.sleg .ak{text-decoration:underline dashed;}
+.sleg i.fk{color:var(--blue-deep);}
+.tables-row{display:none;gap:14px;flex-wrap:wrap;}
+#deck-app[data-lang="es"] .tables-row[data-i18n="es"],#deck-app[data-lang="en"] .tables-row[data-i18n="en"]{display:flex;}
+.reltab{background:var(--paper);border:2px solid var(--ink);border-radius:12px;padding:8px 10px;}
+.reltab .tname{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px;}
+table.rel{border-collapse:collapse;font-family:'Spline Sans Mono',monospace;font-size:12px;}
+table.rel th,table.rel td{border:1px solid var(--line);padding:2px 9px;text-align:left;white-space:nowrap;}
+table.rel th{background:var(--tint-blue);font-weight:600;}
+table.rel th u{text-underline-offset:3px;}
+table.rel th i.fk{font-style:italic;color:var(--blue-deep);}
+table.rel th .ak{text-decoration:underline dashed;}
+.null{color:var(--ink-dim);font-style:italic;}
+.prompts{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:3px;font-size:15px;font-weight:600;color:var(--ink-soft);}
+.prompts li[data-i18n]{display:none;}
+#deck-app[data-lang="es"] .prompts li[data-i18n="es"],#deck-app[data-lang="en"] .prompts li[data-i18n="en"]{display:list-item;}
+ul.bul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:15px;color:var(--ink-soft);line-height:1.42;}
+ul.bul li[data-i18n]{display:none;}
+#deck-app[data-lang="es"] ul.bul li[data-i18n="es"],#deck-app[data-lang="en"] ul.bul li[data-i18n="en"]{display:list-item;}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px;}
+.kv-row{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);}
+.kv-k{font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:12.5px;color:var(--blue-deep);flex:0 0 150px;}
+.kv-v{font-size:13.5px;color:var(--ink-soft);line-height:1.35;}
+pre.code{font-family:'Spline Sans Mono',monospace;font-size:13px;line-height:1.55;background:#15171c;color:#e9ecf7;border-radius:14px;padding:14px 18px;white-space:pre;margin:0;overflow-x:auto;}
+.quiz-cards .tag{font-size:11.5px;}
+.slide-title .lede-lg{margin-top:-4px;}
+.chain-step.on{background:var(--tint-blue);}
+.slide[data-deco="activity"] .slide-inner,.slide[data-deco="solucion"] .slide-inner{justify-content:flex-start;padding-top:2px;}
+.activity-badge,.solution-badge{width:48px;height:48px;font-size:22px;}
+.activity-inner h2{max-width:none;}
+code{font-family:'Spline Sans Mono',monospace;font-size:.92em;background:var(--tint-ink);border-radius:4px;padding:0 4px;}
+.note code,.card code,.kv-v code{background:var(--tint-ink);}
+@media(max-width:760px){.split{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}}
+
+.card p{font-size:15.5px;}.card h4{font-size:18px;}.card .tag{font-size:13px;}
+.tl-card p{font-size:15px;}
+.gloss-item h4{font-size:17px;}.gloss-item p{font-size:14.5px;}
+.sl{font-size:16.5px;line-height:1.6;}
+.sleg{font-size:12.5px;}
+table.rel{font-size:14.5px;}table.rel th,table.rel td{padding:4px 13px;}
+.reltab .tname{font-size:15px;}
+.kv-k{font-size:14px;flex-basis:170px;}.kv-v{font-size:15.5px;}
+ul.bul{font-size:17px;gap:9px;}
+.prompts{font-size:18px;gap:5px;}
+.scenario-card p{font-size:17px;}
+pre.code{font-size:15px;}
+.final-list li{font-size:18px;padding-left:34px;}.final-list li::before{width:25px;height:25px;font-size:13px;}
+.final-list{gap:12px;}
+.chain-step p{font-size:16.5px;}
+.slide-final .credits{font-size:12.5px;}
+.quiz-cards .card p{font-size:16px;}
+</style>
+
+<style>
+pre.code{line-height:1.5;padding:12px 16px;}
+pre.code.sm{line-height:1.42;padding:10px 14px;}
+pre.code .sk{color:#7cc4ff;font-weight:600;} pre.code .st{color:#c9a0ff;} pre.code .ss{color:#f2b872;}
+pre.code .sn{color:#8fe3a2;} pre.code .sc{color:#7f8aa6;font-style:italic;}
+.grid-sql{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+.grid-sql > div{min-width:0;}
+.split-l pre.code,.split-r pre.code{max-width:100%;}
+.split{grid-template-columns:1.15fr 1fr;}
+.slide .kv{gap:2px 22px;}
+.slide .kv-row{padding:4px 0;}
+.slide .kv-k{font-size:15px;flex-basis:165px;} .slide .kv-v{font-size:16.5px;line-height:1.3;}
+.slide .kv-row{padding:6px 0;}
+.cards-4 .card p{font-size:16px;} .cards-4 .card h4{font-size:18px;}
+.tables-row .reltab{margin-bottom:8px;}
+table.rel{font-size:15px;} table.rel th,table.rel td{padding:4px 12px;} .reltab .tname{font-size:16px;}
+.sl{font-size:15.5px;line-height:1.55;}
+pre.code{font-size:16px;} pre.code.sm{font-size:15px;}
+.note{font-size:17px;}
+
+.split.splitc{grid-template-columns:1.7fr 1fr;}
+.stack{display:flex;flex-direction:column;gap:10px;}
+.stack pre.code.sm{font-size:14px;line-height:1.33;padding:8px 14px;}
+.stack ul.bul{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;padding:0;gap:14px;font-size:16px;}
+.stack ul.bul li[data-i18n]{background:var(--tint-blue);border-radius:10px;padding:8px 12px;}
+.grid-sql pre.code.sm{font-size:13.2px;padding:10px 10px;}
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" aria-label="Abrir menú">☰</button>
+<div class="sidebar-backdrop"></div>
+<aside class="sidebar">
+  <span class="brand"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CFGS DAM </span>
+  <span class="brand">Bases de datos</span>
+  <span class="brand-sub"> 1º DAM bilingüe</span>
+  <nav>
+
+    <a href="../index.html">Portal</a>
+    <a href="../modulo.html">Módulo</a>
+
+    <span class="group-label">Unidades de trabajo</span>
+    <div class="ut-group"><a href="../ut1/teoria.html">UT1</a>
+      <div class="ut-children">
+        <a href="../ut1/teoria.html">📖 Teoría</a>
+        <a href="../ut1/actividades.html">📝 Actividades</a>
+        <a href="../ut1/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut2/teoria.html">UT2</a>
+      <div class="ut-children">
+        <a href="../ut2/teoria.html">📖 Teoría</a>
+        <a href="../ut2/actividades.html">📝 Actividades</a>
+        <a href="../ut2/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut3/teoria.html">UT3</a>
+      <div class="ut-children">
+        <a href="../ut3/teoria.html">📖 Teoría</a>
+        <a href="../ut3/actividades.html">📝 Actividades</a>
+        <a href="../ut3/resumen.html">🎛️ Resumen</a>
+      </div></div><div class="ut-group"><a href="../ut4/teoria.html">UT4</a>
+      <div class="ut-children">
+        <a href="../ut4/teoria.html">📖 Teoría</a>
+        <a href="../ut4/resumen.html" class="active">🎛️ Resumen</a>
+      </div></div><a class="pending" title="Próximamente">UT5 · próximamente</a><a class="pending" title="Próximamente">UT6 · próximamente</a><a class="pending" title="Próximamente">UT7 · próximamente</a><a class="pending" title="Próximamente">UT8 · próximamente</a>
+  </nav>
+  <button type="button" class="theme-toggle" id="theme-toggle"><span id="theme-toggle-icon">☀️</span> <span id="theme-toggle-label">Modo claro</span></button>
+</aside>
+
+<div id="deck-app" data-lang="es">
+
+  <div class="toolbar">
+    <span class="toolbar-title">UT4 · <span data-i18n="es">Resumen de apoyo</span><span data-i18n="en">Teaching support summary</span></span>
+    <div class="toolbar-group">
+      <div class="lang-group" role="group" aria-label="Idioma / Language">
+        <button type="button" class="tb-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button type="button" class="tb-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <button type="button" class="tb-btn" id="btn-theme" onclick="toggleTheme()"><span id="theme-icon">🌙</span> <span id="theme-label"><span data-i18n="es">Modo oscuro</span><span data-i18n="en">Dark mode</span></span></button>
+      <button type="button" class="tb-btn" id="btn-fs" onclick="toggleFullscreen()">⛶ <span data-i18n="es">Pantalla completa</span><span data-i18n="en">Fullscreen</span></button>
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+
+<section class="slide slide-title" data-deco="title">
+  <div class="deco-corner deco-a"></div>
+  <div class="deco-corner deco-b"></div>
+  <div class="slide-inner title-slide">
+    <span class="eyebrow"><span data-i18n="es">UT4 · Base de datos · 1º DAM bilingüe</span><span data-i18n="en">Unit 4 · Databases · 1st year DAM bilingual programme</span></span>
+    <h1 class="mega"><span data-i18n="es">El diseño<br>físico</span><span data-i18n="en">Physical<br>design</span></h1>
+    <p class="lede-lg"><span data-i18n="es">DDL y DCL en MySQL: crear, modificar y proteger una base de datos</span><span data-i18n="en">DDL and DCL in MySQL: creating, modifying and protecting a database</span></p>
+    <p class="byline">Marina Preciados Agapito</p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">Índice</span><span data-i18n="en">Contents</span></span>
+    <h2><span data-i18n="es">Lo que vamos a ver</span><span data-i18n="en">What we'll cover</span></h2>
+    <ol class="index-list"><li><span class="ix-num">01</span><span class="ix-txt"><span data-i18n="es">SQL y sus sublenguajes</span><span data-i18n="en">SQL and its sublanguages</span></span></li><li><span class="ix-num">02</span><span class="ix-txt"><span data-i18n="es">MySQL, bases de datos y tablas</span><span data-i18n="en">MySQL, databases and tables</span></span></li><li><span class="ix-num">03</span><span class="ix-txt"><span data-i18n="es">Tipos de datos</span><span data-i18n="en">Data types</span></span></li><li><span class="ix-num">04</span><span class="ix-txt"><span data-i18n="es">Restricciones de columna</span><span data-i18n="en">Column constraints</span></span></li><li><span class="ix-num">05</span><span class="ix-txt"><span data-i18n="es">Claves ajenas e integridad referencial</span><span data-i18n="en">Foreign keys and referential integrity</span></span></li><li><span class="ix-num">06</span><span class="ix-txt"><span data-i18n="es">Del esquema relacional al script</span><span data-i18n="en">From the relational schema to the script</span></span></li><li><span class="ix-num">07</span><span class="ix-txt"><span data-i18n="es">ALTER, DROP y TRUNCATE</span><span data-i18n="en">ALTER, DROP and TRUNCATE</span></span></li><li><span class="ix-num">08</span><span class="ix-txt"><span data-i18n="es">Usuarios, permisos y roles</span><span data-i18n="en">Users, permissions and roles</span></span></li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — SQL y sus sublenguajes</span><span data-i18n="en">01 — SQL and its sublanguages</span></span>
+    <h2><span data-i18n="es">Del papel al servidor</span><span data-i18n="en">From paper to server</span></h2>
+    <div class="chain"><div class="chain-step"><span class="chain-tag"><span data-i18n="es">1 · conceptual</span><span data-i18n="en">1 · conceptual</span></span><p><span data-i18n="es">Modelo E/R</span><span data-i18n="en">E/R model</span></p></div><div class="chain-arrow">→</div><div class="chain-step"><span class="chain-tag"><span data-i18n="es">2 · lógico</span><span data-i18n="en">2 · logical</span></span><p><span data-i18n="es">Modelo relacional normalizado</span><span data-i18n="en">Normalised relational model</span></p></div><div class="chain-arrow">→</div><div class="chain-step on"><span class="chain-tag"><span data-i18n="es">3 · físico</span><span data-i18n="en">3 · physical</span></span><p><span data-i18n="es">Script SQL</span><span data-i18n="en">SQL script</span></p></div><div class="chain-arrow">→</div><div class="chain-step on"><span class="chain-tag"><span data-i18n="es">4</span><span data-i18n="en">4</span></span><p><span data-i18n="es">Base de datos en marcha</span><span data-i18n="en">A running database</span></p></div></div>
+    <p class="note"><span data-i18n="es">Ya sabemos qué tablas necesitamos. Ahora las escribimos en SQL, elegimos el tipo de cada columna y decidimos quién puede tocar qué.</span><span data-i18n="en">We know which tables we need. Now we write them in SQL, choose each column's type and decide who may touch what.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — SQL y sus sublenguajes</span><span data-i18n="en">01 — SQL and its sublanguages</span></span>
+    <h2><span data-i18n="es">SQL tiene cuatro sublenguajes</span><span data-i18n="en">SQL has four sublanguages</span></h2>
+    <div class="cards cards-4"><div class="card"><span class="tag">DDL</span><h4><span data-i18n="es">Definición</span><span data-i18n="en">Definition</span></h4><p><span data-i18n="es">Crea y modifica la <strong>estructura</strong>: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code>.</span><span data-i18n="en">Creates and changes the <strong>structure</strong>: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code>.</span></p></div><div class="card"><span class="tag">DML</span><h4><span data-i18n="es">Manipulación</span><span data-i18n="en">Manipulation</span></h4><p><span data-i18n="es">Trabaja con los <strong>datos</strong>: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>SELECT</code>.</span><span data-i18n="en">Works with the <strong>data</strong>: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>SELECT</code>.</span></p></div><div class="card"><span class="tag">DCL</span><h4><span data-i18n="es">Control</span><span data-i18n="en">Control</span></h4><p><span data-i18n="es">Gestiona <strong>quién puede qué</strong>: <code>GRANT</code>, <code>REVOKE</code>.</span><span data-i18n="en">Manages <strong>who can do what</strong>: <code>GRANT</code>, <code>REVOKE</code>.</span></p></div><div class="card"><span class="tag">TCL</span><h4><span data-i18n="es">Transacciones</span><span data-i18n="en">Transactions</span></h4><p><span data-i18n="es">Agrupa operaciones: <code>COMMIT</code>, <code>ROLLBACK</code>.</span><span data-i18n="en">Groups operations: <code>COMMIT</code>, <code>ROLLBACK</code>.</span></p></div></div>
+    <p class="note"><span data-i18n="es">En esta unidad: DDL y DCL. El DML y las consultas vienen después.</span><span data-i18n="en">In this unit: DDL and DCL. DML and queries come next.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">01 — SQL y sus sublenguajes</span><span data-i18n="en">01 — SQL and its sublanguages</span></span>
+    <h2><span data-i18n="es">Reglas de escritura y de nombres</span><span data-i18n="en">Writing and naming rules</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">;</span><span class="kv-v"><span data-i18n="es">Cada instrucción termina en punto y coma.</span><span data-i18n="en">Every statement ends with a semicolon.</span></span></div><div class="kv-row"><span class="kv-k">MAYÚS / minús</span><span class="kv-v"><span data-i18n="es">Las palabras reservadas no distinguen mayúsculas; las escribimos en <strong>MAYÚSCULAS</strong>.</span><span data-i18n="en">Keywords are case-insensitive; we write them in <strong>UPPER CASE</strong>.</span></span></div><div class="kv-row"><span class="kv-k">Linux</span><span class="kv-v"><span data-i18n="es">Ojo: los nombres de tablas <strong>sí</strong> distinguen mayúsculas en Linux.</span><span data-i18n="en">Careful: table names <strong>are</strong> case-sensitive on Linux.</span></span></div><div class="kv-row"><span class="kv-k">--  /* */</span><span class="kv-v"><span data-i18n="es">Comentarios de línea y de bloque.</span><span data-i18n="en">Line and block comments.</span></span></div><div class="kv-row"><span class="kv-k">tablas</span><span class="kv-v"><span data-i18n="es">Minúsculas, en <strong>plural</strong>, con guion bajo: <code>usuarios</code>, <code>order_lines</code>.</span><span data-i18n="en">Lower-case, <strong>plural</strong>, with underscores: <code>users</code>, <code>order_lines</code>.</span></span></div><div class="kv-row"><span class="kv-k">columnas</span><span class="kv-v"><span data-i18n="es">Minúsculas y en <strong>singular</strong>: <code>nombre</code>, <code>birth_date</code>.</span><span data-i18n="en">Lower-case and <strong>singular</strong>: <code>name</code>, <code>birth_date</code>.</span></span></div><div class="kv-row"><span class="kv-k">id</span><span class="kv-v"><span data-i18n="es">Clave primaria: <code>id BIGINT UNSIGNED AUTO_INCREMENT</code>.</span><span data-i18n="en">Primary key: <code>id BIGINT UNSIGNED AUTO_INCREMENT</code>.</span></span></div><div class="kv-row"><span class="kv-k">tabla_id</span><span class="kv-v"><span data-i18n="es">Clave ajena: tabla de origen en singular + <code>_id</code>.</span><span data-i18n="en">Foreign key: source table in the singular + <code>_id</code>.</span></span></div></div>
+    <p class="note"><span data-i18n="es">Sin tildes, sin espacios y como máximo 64 caracteres en cualquier nombre.</span><span data-i18n="en">No accents, no spaces and at most 64 characters in any name.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">02 — MySQL, bases de datos y tablas</span><span data-i18n="en">02 — MySQL, databases and tables</span></span>
+    <h2><span data-i18n="es">MySQL: servidor y cliente</span><span data-i18n="en">MySQL: server and client</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag"><span data-i18n="es">SERVIDOR</span><span data-i18n="en">SERVER</span></span><h4><span data-i18n="es">MySQL Server</span><span data-i18n="en">MySQL Server</span></h4><p><span data-i18n="es">Es el programa que guarda los datos y ejecuta el SQL. Versión de referencia: <strong>8.0</strong>.</span><span data-i18n="en">The program that stores the data and runs the SQL. Reference version: <strong>8.0</strong>.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">CLIENTE</span><span data-i18n="en">CLIENT</span></span><h4><span data-i18n="es">MySQL Workbench</span><span data-i18n="en">MySQL Workbench</span></h4><p><span data-i18n="es">Interfaz gráfica para escribir scripts, ver tablas y administrar usuarios. También vale la consola <code>mysql</code>.</span><span data-i18n="en">Graphical interface to write scripts, browse tables and manage users. The <code>mysql</code> console works too.</span></p></div><div class="card"><span class="tag"><span data-i18n="es">MOTOR</span><span data-i18n="en">ENGINE</span></span><h4><span data-i18n="es">InnoDB</span><span data-i18n="en">InnoDB</span></h4><p><span data-i18n="es">El motor por defecto: admite claves ajenas, transacciones y restricciones <code>CHECK</code>.</span><span data-i18n="en">The default engine: supports foreign keys, transactions and <code>CHECK</code> constraints.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Gratuito, muy extendido y compatible con casi todos los lenguajes: por eso trabajamos con él.</span><span data-i18n="en">Free, widely used and compatible with almost every language: that's why we work with it.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">02 — MySQL, bases de datos y tablas</span><span data-i18n="en">02 — MySQL, databases and tables</span></span>
+    <h2><span data-i18n="es">Crear y usar una base de datos</span><span data-i18n="en">Creating and using a database</span></h2>
+    <div class="split "><div class="split-l"><div data-i18n="es"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">DATABASE</span> <span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span> academia;
+<span class="sk">USE</span> academia;
+
+<span class="sk">SHOW</span> <span class="sk">DATABASES</span>;
+<span class="sk">DROP</span> <span class="sk">DATABASE</span> <span class="sk">IF</span> <span class="sk">EXISTS</span> academia;</pre></div><div data-i18n="en"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">DATABASE</span> <span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span> academy;
+<span class="sk">USE</span> academy;
+
+<span class="sk">SHOW</span> <span class="sk">DATABASES</span>;
+<span class="sk">DROP</span> <span class="sk">DATABASE</span> <span class="sk">IF</span> <span class="sk">EXISTS</span> academy;</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es"><code>IF NOT EXISTS</code> evita el error si ya existe.</li><li data-i18n="en"><code>IF NOT EXISTS</code> avoids the error if it already exists.</li><li data-i18n="es"><code>USE</code> elige la base con la que vas a trabajar.</li><li data-i18n="en"><code>USE</code> picks the database you'll work with.</li><li data-i18n="es"><code>DROP DATABASE</code> borra la base entera, con todo lo que contiene. Sin vuelta atrás.</li><li data-i18n="en"><code>DROP DATABASE</code> deletes the whole database and everything in it. No way back.</li></ul></div></div>
+    <p class="note"><span data-i18n="es">Es el paso 1 de los siete: crear la base de datos. El paso 2 son las tablas.</span><span data-i18n="en">It's step 1 of seven: create the database. Step 2 is the tables.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">02 — MySQL, bases de datos y tablas</span><span data-i18n="en">02 — MySQL, databases and tables</span></span>
+    <h2><span data-i18n="es">CREATE TABLE: el molde</span><span data-i18n="en">CREATE TABLE: the mould</span></h2>
+    <div class="split "><div class="split-l"><div data-i18n="es"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">TABLE</span> [<span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span>] nombre_tabla (
+    columna1  tipo  [restricciones],
+    columna2  tipo  [restricciones],
+    …,
+    [restricciones de tabla]
+);</pre></div><div data-i18n="en"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">TABLE</span> [<span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span>] table_name (
+    column1  tipo  [restricciones],
+    column2  tipo  [restricciones],
+    …,
+    [restricciones de tabla]
+);</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es">Cada columna lleva <strong>nombre</strong>, <strong>tipo</strong> y, si hace falta, <strong>restricciones</strong>.</li><li data-i18n="en">Each column takes a <strong>name</strong>, a <strong>type</strong> and, if needed, <strong>constraints</strong>.</li><li data-i18n="es">Las columnas se separan con comas; la última, sin coma.</li><li data-i18n="en">Columns are separated by commas; the last one has none.</li><li data-i18n="es">Las restricciones que afectan a varias columnas (clave compuesta, clave ajena) van al final.</li><li data-i18n="en">Constraints involving several columns (composite key, foreign key) go at the end.</li></ul></div></div>
+    <p class="note"><span data-i18n="es">Primero se crean las tablas que no dependen de ninguna; después, las que apuntan a ellas.</span><span data-i18n="en">First create the tables that depend on none; then the ones that point to them.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">03 — Tipos de datos</span><span data-i18n="en">03 — Data types</span></span>
+    <h2><span data-i18n="es">Elegir el tipo de cada columna</span><span data-i18n="en">Choosing each column's type</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">INT, BIGINT</span><span class="kv-v"><span data-i18n="es">Enteros. <code>TINYINT</code> (±127) para valores pequeños; <code>UNSIGNED</code> para quitar los negativos.</span><span data-i18n="en">Integers. <code>TINYINT</code> (±127) for small values; <code>UNSIGNED</code> drops the negatives.</span></span></div><div class="kv-row"><span class="kv-k">DECIMAL(p,s)</span><span class="kv-v"><span data-i18n="es">Número <strong>exacto</strong> con decimales. <code>DECIMAL(8,2)</code>: 8 cifras, 2 decimales. Para dinero.</span><span data-i18n="en"><strong>Exact</strong> number with decimals. <code>DECIMAL(8,2)</code>: 8 digits, 2 decimals. For money.</span></span></div><div class="kv-row"><span class="kv-k">FLOAT, DOUBLE</span><span class="kv-v"><span data-i18n="es">Aproximados. <strong>Nunca para dinero</strong>: acumulan errores de redondeo.</span><span data-i18n="en">Approximate. <strong>Never for money</strong>: they accumulate rounding errors.</span></span></div><div class="kv-row"><span class="kv-k">CHAR(n)</span><span class="kv-v"><span data-i18n="es">Longitud <strong>fija</strong>: DNI, códigos, matrículas.</span><span data-i18n="en"><strong>Fixed</strong> length: ID numbers, codes, plates.</span></span></div><div class="kv-row"><span class="kv-k">VARCHAR(n)</span><span class="kv-v"><span data-i18n="es">Longitud variable hasta <code>n</code>: nombres, correos.</span><span data-i18n="en">Variable length up to <code>n</code>: names, e-mails.</span></span></div><div class="kv-row"><span class="kv-k">TEXT</span><span class="kv-v"><span data-i18n="es">Textos largos sin límite práctico: comentarios, descripciones.</span><span data-i18n="en">Long texts with no practical limit: comments, descriptions.</span></span></div><div class="kv-row"><span class="kv-k">DATE, DATETIME</span><span class="kv-v"><span data-i18n="es">Fecha, o fecha y hora: <code>'2026-10-06'</code>.</span><span data-i18n="en">Date, or date and time: <code>'2026-10-06'</code>.</span></span></div><div class="kv-row"><span class="kv-k">ENUM, BOOL</span><span class="kv-v"><span data-i18n="es"><code>ENUM('fácil','difícil')</code> lista cerrada; <code>BOOL</code> es un <code>TINYINT(1)</code>.</span><span data-i18n="en"><code>ENUM('easy','hard')</code> closed list; <code>BOOL</code> is a <code>TINYINT(1)</code>.</span></span></div></div>
+    <p class="note"><span data-i18n="es">Regla práctica: el tipo más pequeño que no te obligue a cambiarlo el año que viene.</span><span data-i18n="en">Rule of thumb: the smallest type you won't have to change next year.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Qué tipo elegirías?</span><span data-i18n="en">Which type would you pick?</span></h2>
+    
+    <div class="kv"><div class="kv-row"><span class="kv-k">precio</span><span class="kv-v"><span data-i18n="es">Precio de un producto: 1299,99 €.</span><span data-i18n="en">Price of a product: 1299.99.</span></span></div><div class="kv-row"><span class="kv-k">dni</span><span class="kv-v"><span data-i18n="es">DNI español: <code>12345678A</code>.</span><span data-i18n="en">Spanish ID number: <code>12345678A</code>.</span></span></div><div class="kv-row"><span class="kv-k">fecha_nacimiento</span><span class="kv-v"><span data-i18n="es">Día, mes y año de nacimiento.</span><span data-i18n="en">Day, month and year of birth.</span></span></div><div class="kv-row"><span class="kv-k">nota</span><span class="kv-v"><span data-i18n="es">Nota de 0 a 10 con dos decimales.</span><span data-i18n="en">Grade from 0 to 10 with two decimals.</span></span></div><div class="kv-row"><span class="kv-k">descripcion</span><span class="kv-v"><span data-i18n="es">Texto libre de hasta 5000 caracteres.</span><span data-i18n="en">Free text of up to 5000 characters.</span></span></div><div class="kv-row"><span class="kv-k">dificultad</span><span class="kv-v"><span data-i18n="es">Solo puede ser «fácil», «media» o «difícil».</span><span data-i18n="en">Can only be “easy”, “medium” or “hard”.</span></span></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Nueve de cada diez veces es esto</span><span data-i18n="en">Nine times out of ten it's this</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">precio</span><span class="kv-v"><span data-i18n="es"><code>DECIMAL(8,2)</code> — exacto, nunca <code>FLOAT</code>.</span><span data-i18n="en"><code>DECIMAL(8,2)</code> — exact, never <code>FLOAT</code>.</span></span></div><div class="kv-row"><span class="kv-k">dni</span><span class="kv-v"><span data-i18n="es"><code>CHAR(9)</code> — siempre mide lo mismo.</span><span data-i18n="en"><code>CHAR(9)</code> — it's always the same length.</span></span></div><div class="kv-row"><span class="kv-k">fecha_nacimiento</span><span class="kv-v"><span data-i18n="es"><code>DATE</code> — sin hora.</span><span data-i18n="en"><code>DATE</code> — no time part.</span></span></div><div class="kv-row"><span class="kv-k">nota</span><span class="kv-v"><span data-i18n="es"><code>DECIMAL(4,2)</code> con un <code>CHECK</code> entre 0 y 10.</span><span data-i18n="en"><code>DECIMAL(4,2)</code> with a <code>CHECK</code> between 0 and 10.</span></span></div><div class="kv-row"><span class="kv-k">descripcion</span><span class="kv-v"><span data-i18n="es"><code>TEXT</code> (o <code>VARCHAR(5000)</code> si quieres fijar el límite).</span><span data-i18n="en"><code>TEXT</code> (or <code>VARCHAR(5000)</code> if you want a fixed limit).</span></span></div><div class="kv-row"><span class="kv-k">dificultad</span><span class="kv-v"><span data-i18n="es"><code>ENUM('fácil','media','difícil')</code>.</span><span data-i18n="en"><code>ENUM('easy','medium','hard')</code>.</span></span></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Restricciones de columna</span><span data-i18n="en">04 — Column constraints</span></span>
+    <h2><span data-i18n="es">Seis restricciones de columna</span><span data-i18n="en">Six column constraints</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">NOT NULL</span><span class="kv-v"><span data-i18n="es">La columna no puede quedar vacía.</span><span data-i18n="en">The column can't be left empty.</span></span></div><div class="kv-row"><span class="kv-k">DEFAULT</span><span class="kv-v"><span data-i18n="es">Valor que se usa si el <code>INSERT</code> no da ninguno. Hay que nombrar las columnas en el <code>INSERT</code>.</span><span data-i18n="en">Value used when the <code>INSERT</code> gives none. The <code>INSERT</code> must name its columns.</span></span></div><div class="kv-row"><span class="kv-k">AUTO_INCREMENT</span><span class="kv-v"><span data-i18n="es">MySQL numera solo. Solo sobre una <strong>clave</strong> y de tipo entero.</span><span data-i18n="en">MySQL numbers by itself. Only on a <strong>key</strong> of integer type.</span></span></div><div class="kv-row"><span class="kv-k">UNIQUE</span><span class="kv-v"><span data-i18n="es">No se repite entre filas; admite <code>NULL</code> (varias veces).</span><span data-i18n="en">Doesn't repeat across rows; allows <code>NULL</code> (several times).</span></span></div><div class="kv-row"><span class="kv-k">PRIMARY KEY</span><span class="kv-v"><span data-i18n="es">Único y nunca nulo. Una sola por tabla; puede ser compuesta, y entonces va a nivel de tabla.</span><span data-i18n="en">Unique and never null. One per table; can be composite, and then goes at table level.</span></span></div><div class="kv-row"><span class="kv-k">CHECK</span><span class="kv-v"><span data-i18n="es">Condición que cada fila debe cumplir. Desde MySQL 8.0.16 se aplica de verdad.</span><span data-i18n="en">Condition each row must meet. Since MySQL 8.0.16 it is really enforced.</span></span></div></div>
+    <p class="note"><span data-i18n="es">Una restricción de columna se escribe a continuación del tipo; la que afecta a varias columnas, al final de la tabla.</span><span data-i18n="en">A column constraint follows the type; one involving several columns goes at the end of the table.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">04 — Restricciones de columna</span><span data-i18n="en">04 — Column constraints</span></span>
+    <h2><span data-i18n="es">Todas juntas en una tabla</span><span data-i18n="en">All together in one table</span></h2>
+    <div class="split "><div class="split-l"><div data-i18n="es"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">TABLE</span> usuarios (
+    id     <span class="st">BIGINT</span> <span class="sk">UNSIGNED</span> <span class="sk">AUTO_INCREMENT</span>,
+    email  <span class="st">VARCHAR</span>(<span class="sn">100</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">UNIQUE</span>,
+    edad   <span class="st">TINYINT</span> <span class="sk">UNSIGNED</span> <span class="sk">CHECK</span> (edad &gt;= <span class="sn">18</span>),
+    rol    <span class="st">VARCHAR</span>(<span class="sn">10</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">DEFAULT</span> <span class="ss">&#x27;socio&#x27;</span>,
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (id)
+);</pre></div><div data-i18n="en"><pre class="code sql"><span class="sk">CREATE</span> <span class="sk">TABLE</span> users (
+    id     <span class="st">BIGINT</span> <span class="sk">UNSIGNED</span> <span class="sk">AUTO_INCREMENT</span>,
+    email  <span class="st">VARCHAR</span>(<span class="sn">100</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">UNIQUE</span>,
+    age    <span class="st">TINYINT</span> <span class="sk">UNSIGNED</span> <span class="sk">CHECK</span> (age &gt;= <span class="sn">18</span>),
+    role   <span class="st">VARCHAR</span>(<span class="sn">10</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">DEFAULT</span> <span class="ss">&#x27;member&#x27;</span>,
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (id)
+);</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es"><code>id</code> se numera solo: no hace falta darlo en el <code>INSERT</code>.</li><li data-i18n="en"><code>id</code> numbers itself: the <code>INSERT</code> doesn't need to give it.</li><li data-i18n="es">Sin <code>rol</code> en el <code>INSERT</code>, vale <code>'socio'</code>.</li><li data-i18n="en">With no <code>role</code> in the <code>INSERT</code>, it's <code>'member'</code>.</li><li data-i18n="es">Un <code>email</code> repetido da el error 1062; una edad de 15, el 3819.</li><li data-i18n="en">A repeated <code>email</code> gives error 1062; an age of 15, error 3819.</li></ul></div></div>
+    <p class="note"><span data-i18n="es">Aquí la clave primaria va a nivel de tabla: cuando es compuesta, es la única forma.</span><span data-i18n="en">Here the primary key sits at table level: when it's composite, it's the only way.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Qué <code>INSERT</code> acepta MySQL?</span><span data-i18n="en">Which <code>INSERT</code> does MySQL accept?</span></h2>
+    
+    <div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> vehiculos (
+    id             <span class="st">BIGINT</span> <span class="sk">UNSIGNED</span> <span class="sk">AUTO_INCREMENT</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    matricula      <span class="st">CHAR</span>(<span class="sn">7</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">UNIQUE</span>,
+    precio_compra  <span class="st">DECIMAL</span>(<span class="sn">8</span>,<span class="sn">2</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    precio_venta   <span class="st">DECIMAL</span>(<span class="sn">8</span>,<span class="sn">2</span>),
+    <span class="sk">CHECK</span> (precio_venta &gt; precio_compra)
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> vehicles (
+    id          <span class="st">BIGINT</span> <span class="sk">UNSIGNED</span> <span class="sk">AUTO_INCREMENT</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    plate       <span class="st">CHAR</span>(<span class="sn">7</span>) <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">UNIQUE</span>,
+    cost_price  <span class="st">DECIMAL</span>(<span class="sn">8</span>,<span class="sn">2</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    sale_price  <span class="st">DECIMAL</span>(<span class="sn">8</span>,<span class="sn">2</span>),
+    <span class="sk">CHECK</span> (sale_price &gt; cost_price)
+);</pre></div><ol class="prompts"><li data-i18n="es">Compra 7000, venta 8000, matrícula nueva.</li><li data-i18n="en">Cost 7000, sale 8000, new plate.</li><li data-i18n="es">Compra 7000, venta 6500, matrícula nueva.</li><li data-i18n="en">Cost 7000, sale 6500, new plate.</li><li data-i18n="es">Compra 7000, venta <code>NULL</code>, matrícula nueva.</li><li data-i18n="en">Cost 7000, sale <code>NULL</code>, new plate.</li><li data-i18n="es">Compra 8000, venta 8000, matrícula nueva.</li><li data-i18n="en">Cost 8000, sale 8000, new plate.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Sí, no, sí (¡sorpresa!), no</span><span data-i18n="en">Yes, no, yes (surprise!), no</span></h2>
+    <div class="cards cards-2 quiz-cards"><div class="card" style="border-color:var(--mint-deep)"><span class="tag" style="color:var(--mint-deep)">1 · <span data-i18n="es">ACEPTADA</span><span data-i18n="en">ACCEPTED</span></span><p><span data-i18n="es">8000 > 7000: cumple el <code>CHECK</code>.</span><span data-i18n="en">8000 > 7000: meets the <code>CHECK</code>.</span></p></div><div class="card" style="border-color:var(--orange)"><span class="tag" style="color:var(--orange)">2 · <span data-i18n="es">RECHAZADA</span><span data-i18n="en">REJECTED</span></span><p><span data-i18n="es">6500 > 7000 es falso: error 3819.</span><span data-i18n="en">6500 > 7000 is false: error 3819.</span></p></div><div class="card" style="border-color:var(--mint-deep)"><span class="tag" style="color:var(--mint-deep)">3 · <span data-i18n="es">ACEPTADA</span><span data-i18n="en">ACCEPTED</span></span><p><span data-i18n="es"><code>NULL</code> hace que la condición sea <em>desconocida</em>, y el <code>CHECK</code> solo rechaza lo falso.</span><span data-i18n="en"><code>NULL</code> makes the condition <em>unknown</em>, and <code>CHECK</code> only rejects what is false.</span></p></div><div class="card" style="border-color:var(--orange)"><span class="tag" style="color:var(--orange)">4 · <span data-i18n="es">RECHAZADA</span><span data-i18n="en">REJECTED</span></span><p><span data-i18n="es">8000 > 8000 es falso: el operador es «mayor que», no «mayor o igual».</span><span data-i18n="en">8000 > 8000 is false: the operator is “greater than”, not “greater or equal”.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Para exigir también que haya precio de venta hace falta <code>NOT NULL</code>.</span><span data-i18n="en">To also require a sale price you need <code>NOT NULL</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Claves ajenas</span><span data-i18n="en">05 — Foreign keys</span></span>
+    <h2><span data-i18n="es">Una clave ajena vigila los dos sentidos</span><span data-i18n="en">A foreign key watches both directions</span></h2>
+    <div class="split "><div class="split-l"><div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">personas</div><table class="rel"><thead><tr><th><u>id</u></th><th>apellidos</th></tr></thead><tbody><tr><td>1</td><td>Pérez</td></tr><tr><td>2</td><td>Fernández</td></tr></tbody></table></div><div class="reltab"><div class="tname">pedidos</div><table class="rel"><thead><tr><th><u>id</u></th><th>numero</th><th><i class="fk">persona_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>1</td></tr><tr><td>2</td><td>3344</td><td>1</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">persons</div><table class="rel"><thead><tr><th><u>id</u></th><th>last_name</th></tr></thead><tbody><tr><td>1</td><td>Smith</td></tr><tr><td>2</td><td>Jones</td></tr></tbody></table></div><div class="reltab"><div class="tname">orders</div><table class="rel"><thead><tr><th><u>id</u></th><th>number</th><th><i class="fk">person_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>1</td></tr><tr><td>2</td><td>3344</td><td>1</td></tr></tbody></table></div></div></div><div class="split-r"><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> pedidos (
+    id          <span class="st">INT</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    numero      <span class="st">INT</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    persona_id  <span class="st">INT</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (persona_id)
+        <span class="sk">REFERENCES</span> personas(id)
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> orders (
+    id         <span class="st">INT</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    number     <span class="st">INT</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    person_id  <span class="st">INT</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (person_id)
+        <span class="sk">REFERENCES</span> persons(id)
+);</pre></div></div></div>
+    <p class="note"><span data-i18n="es">No deja <strong>insertar</strong> un pedido de una persona que no existe (error 1452), ni <strong>borrar o cambiar</strong> una persona con pedidos (error 1451). Con padre e hijo: el padre se crea primero.</span><span data-i18n="en">It won't let you <strong>insert</strong> an order for a person who doesn't exist (error 1452), nor <strong>delete or change</strong> a person who has orders (error 1451). Parent and child: the parent is created first.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">05 — Claves ajenas</span><span data-i18n="en">05 — Foreign keys</span></span>
+    <h2><span data-i18n="es">Políticas: qué hacer con los hijos</span><span data-i18n="en">Policies: what to do with the children</span></h2>
+    <div class="cards cards-4"><div class="card"><span class="tag">NO ACTION / RESTRICT</span><p><span data-i18n="es">La operación se prohíbe si hay hijos. Es lo que pasa si no escribes nada.</span><span data-i18n="en">The operation is forbidden if there are children. It's what happens if you write nothing.</span></p></div><div class="card"><span class="tag">CASCADE</span><p><span data-i18n="es">Se transmite: cambia la clave del padre y cambia en los hijos; se borra el padre y se borran los hijos.</span><span data-i18n="en">It's passed on: the parent's key changes and so does the children's; the parent is deleted and so are the children.</span></p></div><div class="card"><span class="tag">SET NULL</span><p><span data-i18n="es">Los hijos quedan vivos con la clave ajena a <code>NULL</code>. La columna no puede ser <code>NOT NULL</code>.</span><span data-i18n="en">The children survive with the foreign key set to <code>NULL</code>. The column can't be <code>NOT NULL</code>.</span></p></div><div class="card"><span class="tag">SET DEFAULT</span><p><span data-i18n="es"><strong>MySQL no lo implementa.</strong> Acepta la sintaxis pero se comporta como <code>NO ACTION</code>: no lo uses.</span><span data-i18n="en"><strong>MySQL doesn't implement it.</strong> It accepts the syntax but behaves like <code>NO ACTION</code>: don't use it.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Cada operación tiene su política: <code>ON UPDATE CASCADE ON DELETE SET NULL</code>. Si los hijos no tienen sentido sin el padre, <code>CASCADE</code>; si pueden vivir sin él, <code>SET NULL</code>; si borrarlo sería un error, <code>NO ACTION</code>.</span><span data-i18n="en">Each operation has its own policy: <code>ON UPDATE CASCADE ON DELETE SET NULL</code>. If the children make no sense without the parent, <code>CASCADE</code>; if they can live without it, <code>SET NULL</code>; if deleting it would be a mistake, <code>NO ACTION</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Cómo quedan los pedidos?</span><span data-i18n="en">What do the orders look like afterwards?</span></h2>
+    
+    <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">personas</div><table class="rel"><thead><tr><th><u>id</u></th><th>apellidos</th></tr></thead><tbody><tr><td>1</td><td>Pérez</td></tr><tr><td>2</td><td>Fernández</td></tr></tbody></table></div><div class="reltab"><div class="tname">pedidos</div><table class="rel"><thead><tr><th><u>id</u></th><th>numero</th><th><i class="fk">persona_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>1</td></tr><tr><td>2</td><td>3344</td><td>1</td></tr><tr><td>3</td><td>5120</td><td>2</td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">persons</div><table class="rel"><thead><tr><th><u>id</u></th><th>last_name</th></tr></thead><tbody><tr><td>1</td><td>Smith</td></tr><tr><td>2</td><td>Jones</td></tr></tbody></table></div><div class="reltab"><div class="tname">orders</div><table class="rel"><thead><tr><th><u>id</u></th><th>number</th><th><i class="fk">person_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>1</td></tr><tr><td>2</td><td>3344</td><td>1</td></tr><tr><td>3</td><td>5120</td><td>2</td></tr></tbody></table></div></div><div data-i18n="es"><pre class="code sql sm"><span class="sk">FOREIGN</span> <span class="sk">KEY</span> (persona_id) <span class="sk">REFERENCES</span> personas(id)
+    <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="st">SET</span> <span class="sk">NULL</span>
+
+<span class="sk">UPDATE</span> personas <span class="st">SET</span> id = <span class="sn">20</span> <span class="sk">WHERE</span> id = <span class="sn">1</span>;
+<span class="sk">DELETE</span> <span class="sk">FROM</span> personas <span class="sk">WHERE</span> id = <span class="sn">2</span>;</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">FOREIGN</span> <span class="sk">KEY</span> (person_id) <span class="sk">REFERENCES</span> persons(id)
+    <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="st">SET</span> <span class="sk">NULL</span>
+
+<span class="sk">UPDATE</span> persons <span class="st">SET</span> id = <span class="sn">20</span> <span class="sk">WHERE</span> id = <span class="sn">1</span>;
+<span class="sk">DELETE</span> <span class="sk">FROM</span> persons <span class="sk">WHERE</span> id = <span class="sn">2</span>;</pre></div>
+    <p class="note"><span data-i18n="es">Pista: hazlo en el orden en que se ejecutan las dos sentencias.</span><span data-i18n="en">Hint: follow the order in which the two statements run.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">La 1 pasa a 20; la 2 se queda huérfana</span><span data-i18n="en">Person 1 becomes 20; person 2 is left orphaned</span></h2>
+    <div class="tables-row" data-i18n="es"><div class="reltab"><div class="tname">personas</div><table class="rel"><thead><tr><th><u>id</u></th><th>apellidos</th></tr></thead><tbody><tr><td>20</td><td>Pérez</td></tr></tbody></table></div><div class="reltab"><div class="tname">pedidos</div><table class="rel"><thead><tr><th><u>id</u></th><th>numero</th><th><i class="fk">persona_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>20</td></tr><tr><td>2</td><td>3344</td><td>20</td></tr><tr><td>3</td><td>5120</td><td><span class=null>NULL</span></td></tr></tbody></table></div></div><div class="tables-row" data-i18n="en"><div class="reltab"><div class="tname">persons</div><table class="rel"><thead><tr><th><u>id</u></th><th>last_name</th></tr></thead><tbody><tr><td>20</td><td>Smith</td></tr></tbody></table></div><div class="reltab"><div class="tname">orders</div><table class="rel"><thead><tr><th><u>id</u></th><th>number</th><th><i class="fk">person_id</i></th></tr></thead><tbody><tr><td>1</td><td>7632</td><td>20</td></tr><tr><td>2</td><td>3344</td><td>20</td></tr><tr><td>3</td><td>5120</td><td><span class=null>NULL</span></td></tr></tbody></table></div></div>
+    <p class="note"><span data-i18n="es">El <code>UPDATE</code> se propaga con <code>CASCADE</code>; el <code>DELETE</code> deja el pedido 3 con <code>persona_id = NULL</code>.</span><span data-i18n="en">The <code>UPDATE</code> propagates with <code>CASCADE</code>; the <code>DELETE</code> leaves order 3 with <code>person_id = NULL</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge team">👥</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad en equipo</span><span data-i18n="en">Team activity</span></span>
+    <h2><span data-i18n="es">De este esquema, al script</span><span data-i18n="en">From this schema to the script</span></h2>
+    
+    <div data-i18n="es"><div class="schema-box"><div class="sl">EXÁMENES(<u>numero_examen</u>, numero_preguntas, fecha)</div><div class="sl">HACEN(<u><i class="fk">numero_examen</i></u>, <u><i class="fk">numero_matricula</i></u>, nota)</div><div class="sl">ALUMNOS(<u>numero_matricula</u>, nombre, grupo)</div><div class="sl">REALIZAN(<u><i class="fk">numero_matricula_alumno</i></u>, <u><i class="fk">codigo_practica</i></u>, fecha, nota)</div><div class="sl">PRÁCTICAS(<u>codigo</u>, titulo, dificultad)</div><div class="sl">DISEÑAN(<u><i class="fk">codigo_practica</i></u>, <u><i class="fk">dni_profesor</i></u>, fecha)</div><div class="sl">PROFESORES(<u>dni</u>, nombre)</div></div></div><div data-i18n="en"><div class="schema-box"><div class="sl">EXAMS(<u>exam_number</u>, question_count, exam_date)</div><div class="sl">SITS(<u><i class="fk">exam_number</i></u>, <u><i class="fk">student_number</i></u>, grade)</div><div class="sl">STUDENTS(<u>student_number</u>, name, class_group)</div><div class="sl">COMPLETES(<u><i class="fk">student_number</i></u>, <u><i class="fk">practical_code</i></u>, completed_on, grade)</div><div class="sl">PRACTICALS(<u>code</u>, title, difficulty)</div><div class="sl">DESIGNS(<u><i class="fk">practical_code</i></u>, <u><i class="fk">teacher_id</i></u>, designed_on)</div><div class="sl">TEACHERS(<u>national_id</u>, name)</div></div></div><ol class="prompts"><li data-i18n="es">¿En qué orden crearías las tablas?</li><li data-i18n="en">In which order would you create the tables?</li><li data-i18n="es">¿Qué tipo y qué restricciones para cada columna?</li><li data-i18n="en">Which type and constraints for each column?</li><li data-i18n="es">¿Qué política para cada clave ajena? Justifícala.</li><li data-i18n="en">Which policy for each foreign key? Justify it.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Primero las independientes</span><span data-i18n="en">Independent tables first</span></h2>
+    <div class="grid-sql"><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> examenes (
+    numero_examen     <span class="st">INT</span> <span class="sk">UNSIGNED</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    numero_preguntas  <span class="st">TINYINT</span> <span class="sk">UNSIGNED</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    fecha             <span class="st">DATE</span> <span class="sk">NOT</span> <span class="sk">NULL</span>
+);
+
+<span class="sk">CREATE</span> <span class="sk">TABLE</span> alumnos (
+    numero_matricula  <span class="st">INT</span> <span class="sk">UNSIGNED</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    nombre            <span class="st">VARCHAR</span>(<span class="sn">50</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    grupo             <span class="st">VARCHAR</span>(<span class="sn">10</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> exams (
+    exam_number     <span class="st">INT</span> <span class="sk">UNSIGNED</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    question_count  <span class="st">TINYINT</span> <span class="sk">UNSIGNED</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    exam_date       <span class="st">DATE</span> <span class="sk">NOT</span> <span class="sk">NULL</span>
+);
+
+<span class="sk">CREATE</span> <span class="sk">TABLE</span> students (
+    student_number  <span class="st">INT</span> <span class="sk">UNSIGNED</span> <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    name            <span class="st">VARCHAR</span>(<span class="sn">50</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    class_group     <span class="st">VARCHAR</span>(<span class="sn">10</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);</pre></div><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> practicas (
+    codigo      <span class="st">CHAR</span>(<span class="sn">6</span>) <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    titulo      <span class="st">VARCHAR</span>(<span class="sn">100</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    dificultad  <span class="st">ENUM</span>(<span class="ss">&#x27;baja&#x27;</span>, <span class="ss">&#x27;media&#x27;</span>, <span class="ss">&#x27;alta&#x27;</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);
+
+<span class="sk">CREATE</span> <span class="sk">TABLE</span> profesores (
+    dni     <span class="st">CHAR</span>(<span class="sn">9</span>) <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    nombre  <span class="st">VARCHAR</span>(<span class="sn">50</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> practicals (
+    code        <span class="st">CHAR</span>(<span class="sn">6</span>) <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    title       <span class="st">VARCHAR</span>(<span class="sn">100</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    difficulty  <span class="st">ENUM</span>(<span class="ss">&#x27;easy&#x27;</span>, <span class="ss">&#x27;medium&#x27;</span>, <span class="ss">&#x27;hard&#x27;</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);
+
+<span class="sk">CREATE</span> <span class="sk">TABLE</span> teachers (
+    national_id  <span class="st">CHAR</span>(<span class="sn">9</span>) <span class="sk">PRIMARY</span> <span class="sk">KEY</span>,
+    name         <span class="st">VARCHAR</span>(<span class="sn">50</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>
+);</pre></div></div>
+    <p class="note"><span data-i18n="es">Las claves naturales (matrícula, código, DNI) se respetan: no hace falta añadir un <code>id</code> artificial.</span><span data-i18n="en">The natural keys (enrolment number, code, ID) are kept: no need to add an artificial <code>id</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Después las tablas de unión</span><span data-i18n="en">Then the junction tables</span></h2>
+    <div class="stack"><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> hacen (
+    numero_examen     <span class="st">INT</span> <span class="sk">UNSIGNED</span>,
+    numero_matricula  <span class="st">INT</span> <span class="sk">UNSIGNED</span>,
+    nota              <span class="st">DECIMAL</span>(<span class="sn">4</span>,<span class="sn">2</span>) <span class="sk">CHECK</span> (nota <span class="sk">BETWEEN</span> <span class="sn">0</span> <span class="sk">AND</span> <span class="sn">10</span>),
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (numero_examen, numero_matricula),
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (numero_examen) <span class="sk">REFERENCES</span> examenes(numero_examen)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (numero_matricula) <span class="sk">REFERENCES</span> alumnos(numero_matricula)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> sits (
+    exam_number     <span class="st">INT</span> <span class="sk">UNSIGNED</span>,
+    student_number  <span class="st">INT</span> <span class="sk">UNSIGNED</span>,
+    grade           <span class="st">DECIMAL</span>(<span class="sn">4</span>,<span class="sn">2</span>) <span class="sk">CHECK</span> (grade <span class="sk">BETWEEN</span> <span class="sn">0</span> <span class="sk">AND</span> <span class="sn">10</span>),
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (exam_number, student_number),
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (exam_number) <span class="sk">REFERENCES</span> exams(exam_number)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (student_number) <span class="sk">REFERENCES</span> students(student_number)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>
+);</pre></div><ul class="bul"><li data-i18n="es">Clave primaria <strong>compuesta</strong>: las dos ajenas juntas.</li><li data-i18n="en"><strong>Composite</strong> primary key: the two foreign keys together.</li><li data-i18n="es"><code>CASCADE</code>: si desaparece el examen o el alumno, su fila de unión ya no tiene sentido.</li><li data-i18n="en"><code>CASCADE</code>: if the exam or the student disappears, their junction row no longer makes sense.</li><li data-i18n="es"><code>realizan</code> sigue el mismo patrón.</li><li data-i18n="en"><code>completes</code> follows the same pattern.</li></ul></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Y una excepción: RESTRICT</span><span data-i18n="en">And one exception: RESTRICT</span></h2>
+    <div class="stack"><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> disenan (
+    codigo_practica  <span class="st">CHAR</span>(<span class="sn">6</span>),
+    dni_profesor     <span class="st">CHAR</span>(<span class="sn">9</span>),
+    fecha            <span class="st">DATE</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (codigo_practica, dni_profesor),
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (codigo_practica) <span class="sk">REFERENCES</span> practicas(codigo)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (dni_profesor) <span class="sk">REFERENCES</span> profesores(dni)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">RESTRICT</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>
+);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">TABLE</span> designs (
+    practical_code  <span class="st">CHAR</span>(<span class="sn">6</span>),
+    teacher_id      <span class="st">CHAR</span>(<span class="sn">9</span>),
+    designed_on     <span class="st">DATE</span> <span class="sk">NOT</span> <span class="sk">NULL</span>,
+    <span class="sk">PRIMARY</span> <span class="sk">KEY</span> (practical_code, teacher_id),
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (practical_code) <span class="sk">REFERENCES</span> practicals(code)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">CASCADE</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>,
+    <span class="sk">FOREIGN</span> <span class="sk">KEY</span> (teacher_id) <span class="sk">REFERENCES</span> teachers(national_id)
+        <span class="sk">ON</span> <span class="sk">DELETE</span> <span class="sk">RESTRICT</span> <span class="sk">ON</span> <span class="sk">UPDATE</span> <span class="sk">CASCADE</span>
+);</pre></div><ul class="bul"><li data-i18n="es">Borrar una práctica borra quién la diseñó: <code>CASCADE</code>.</li><li data-i18n="en">Deleting a practical deletes who designed it: <code>CASCADE</code>.</li><li data-i18n="es">Borrar un profesor <strong>no</strong> debe llevarse por delante las prácticas que diseñó: <code>RESTRICT</code>.</li><li data-i18n="en">Deleting a teacher must <strong>not</strong> wipe out the practicals they designed: <code>RESTRICT</code>.</li><li data-i18n="es">Cambiar una clave se propaga siempre: <code>UPDATE CASCADE</code>.</li><li data-i18n="en">Changing a key always propagates: <code>UPDATE CASCADE</code>.</li></ul></div>
+    <p class="note"><span data-i18n="es">En la versión inglesa, <code>group</code> es palabra reservada: de ahí <code>class_group</code>.</span><span data-i18n="en"><code>group</code> is a reserved word, hence <code>class_group</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">07 — Modificar y borrar</span><span data-i18n="en">07 — Modify and drop</span></span>
+    <h2><span data-i18n="es">ALTER TABLE: cambiar una tabla ya creada</span><span data-i18n="en">ALTER TABLE: changing an existing table</span></h2>
+    <div class="split "><div class="split-l"><div data-i18n="es"><pre class="code sql sm"><span class="sk">ALTER</span> <span class="sk">TABLE</span> personas
+    <span class="sk">ADD</span> <span class="sk">COLUMN</span> telefono <span class="st">VARCHAR</span>(<span class="sn">15</span>);
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas
+    <span class="sk">DROP</span> <span class="sk">COLUMN</span> telefono;
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas
+    <span class="sk">MODIFY</span> <span class="sk">COLUMN</span> apellidos <span class="st">VARCHAR</span>(<span class="sn">80</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>;
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas
+    <span class="sk">RENAME</span> <span class="sk">COLUMN</span> edad <span class="sk">TO</span> anios;</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">ALTER</span> <span class="sk">TABLE</span> persons
+    <span class="sk">ADD</span> <span class="sk">COLUMN</span> phone <span class="st">VARCHAR</span>(<span class="sn">15</span>);
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons
+    <span class="sk">DROP</span> <span class="sk">COLUMN</span> phone;
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons
+    <span class="sk">MODIFY</span> <span class="sk">COLUMN</span> last_name <span class="st">VARCHAR</span>(<span class="sn">80</span>) <span class="sk">NOT</span> <span class="sk">NULL</span>;
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons
+    <span class="sk">RENAME</span> <span class="sk">COLUMN</span> age <span class="sk">TO</span> years;</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es"><code>ADD</code> y <code>DROP</code> añaden y quitan columnas.</li><li data-i18n="en"><code>ADD</code> and <code>DROP</code> add and remove columns.</li><li data-i18n="es"><code>MODIFY</code> <strong>redefine toda la columna</strong>: si omites un <code>NOT NULL</code> o un <code>DEFAULT</code>, desaparece.</li><li data-i18n="en"><code>MODIFY</code> <strong>redefines the whole column</strong>: if you leave out a <code>NOT NULL</code> or a <code>DEFAULT</code>, it's gone.</li><li data-i18n="es"><code>CHANGE</code> renombra y redefine; <code>RENAME COLUMN</code> solo renombra.</li><li data-i18n="en"><code>CHANGE</code> renames and redefines; <code>RENAME COLUMN</code> only renames.</li><li data-i18n="es">También: <code>ADD CONSTRAINT</code> y <code>DROP CONSTRAINT</code>.</li><li data-i18n="en">Also: <code>ADD CONSTRAINT</code> and <code>DROP CONSTRAINT</code>.</li></ul></div></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">¿Funciona?</span><span data-i18n="en">Does it work?</span></h2>
+    
+    <div data-i18n="es"><pre class="code sql sm"><span class="sc">-- a) la tabla personas ya tiene filas</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas <span class="sk">ADD</span> <span class="sk">COLUMN</span> estado_civil <span class="st">VARCHAR</span>(<span class="sn">1</span>)
+    <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">CHECK</span> (estado_civil <span class="sk">IN</span> (<span class="ss">&#x27;C&#x27;</span>,<span class="ss">&#x27;S&#x27;</span>,<span class="ss">&#x27;D&#x27;</span>));
+
+<span class="sc">-- b) pedidos.persona_id apunta a personas.id</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas <span class="sk">DROP</span> <span class="sk">COLUMN</span> id;
+
+<span class="sc">-- c) hay apellidos de más de 5 letras</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> personas <span class="sk">MODIFY</span> apellidos <span class="st">VARCHAR</span>(<span class="sn">5</span>);</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sc">-- a) the table persons already has rows</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons <span class="sk">ADD</span> <span class="sk">COLUMN</span> marital_status <span class="st">VARCHAR</span>(<span class="sn">1</span>)
+    <span class="sk">NOT</span> <span class="sk">NULL</span> <span class="sk">CHECK</span> (marital_status <span class="sk">IN</span> (<span class="ss">&#x27;C&#x27;</span>,<span class="ss">&#x27;S&#x27;</span>,<span class="ss">&#x27;D&#x27;</span>));
+
+<span class="sc">-- b) orders.person_id points to persons.id</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons <span class="sk">DROP</span> <span class="sk">COLUMN</span> id;
+
+<span class="sc">-- c) some last names are longer than 5 letters</span>
+<span class="sk">ALTER</span> <span class="sk">TABLE</span> persons <span class="sk">MODIFY</span> last_name <span class="st">VARCHAR</span>(<span class="sn">5</span>);</pre></div>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Las tres fallan, y por motivos distintos</span><span data-i18n="en">All three fail, for different reasons</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">a) 3819</span><span class="kv-v"><span data-i18n="es">Las filas existentes se quedan con <code>''</code>, que incumple el <code>CHECK</code>. Solución: <code>DEFAULT 'C'</code>.</span><span data-i18n="en">Existing rows get <code>''</code>, which breaks the <code>CHECK</code>. Fix: <code>DEFAULT 'C'</code>.</span></span></div><div class="kv-row"><span class="kv-k">b) 1829</span><span class="kv-v"><span data-i18n="es">La columna la usa una clave ajena: antes hay que eliminar la restricción de la tabla hija.</span><span data-i18n="en">A foreign key uses the column: drop the child table's constraint first.</span></span></div><div class="kv-row"><span class="kv-k">c) 1406</span><span class="kv-v"><span data-i18n="es">«Data too long»: los datos no caben en el tamaño nuevo. No se hace nada.</span><span data-i18n="en">“Data too long”: the data don't fit the new size. Nothing happens.</span></span></div></div>
+    <p class="note"><span data-i18n="es">Y, como siempre, no se puede borrar una columna con datos sin perder esos datos.</span><span data-i18n="en">And, as always, you can't drop a column with data without losing that data.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="6">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">07 — Modificar y borrar</span><span data-i18n="en">07 — Modify and drop</span></span>
+    <h2><span data-i18n="es">DROP, TRUNCATE y DELETE no son lo mismo</span><span data-i18n="en">DROP, TRUNCATE and DELETE are not the same</span></h2>
+    <div class="cards cards-3"><div class="card"><span class="tag">DROP TABLE</span><h4><span data-i18n="es">Quita la tabla</span><span data-i18n="en">Removes the table</span></h4><p><span data-i18n="es">Estructura <strong>y</strong> datos. La tabla deja de existir. No funciona si una clave ajena apunta a ella.</span><span data-i18n="en">Structure <strong>and</strong> data. The table ceases to exist. Fails if a foreign key points to it.</span></p></div><div class="card"><span class="tag">TRUNCATE TABLE</span><h4><span data-i18n="es">Vacía la tabla</span><span data-i18n="en">Empties the table</span></h4><p><span data-i18n="es">Conserva la estructura, borra todas las filas y reinicia el <code>AUTO_INCREMENT</code>. Es DDL: sin vuelta atrás.</span><span data-i18n="en">Keeps the structure, deletes every row and resets <code>AUTO_INCREMENT</code>. It's DDL: no way back.</span></p></div><div class="card"><span class="tag">DELETE FROM</span><h4><span data-i18n="es">Borra filas</span><span data-i18n="en">Deletes rows</span></h4><p><span data-i18n="es">Es DML: con <code>WHERE</code> borra las filas que elijas y puede deshacerse dentro de una transacción.</span><span data-i18n="en">It's DML: with <code>WHERE</code> it deletes the rows you pick and can be undone within a transaction.</span></p></div></div>
+    <p class="note"><span data-i18n="es">Antes de un <code>DROP</code> o un <code>TRUNCATE</code>: ¿estás en la base de datos correcta?</span><span data-i18n="en">Before a <code>DROP</code> or a <code>TRUNCATE</code>: are you in the right database?</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="2">
+  <div class="deco-corner deco-a"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">08 — Usuarios y permisos (DCL)</span><span data-i18n="en">08 — Users and permissions (DCL)</span></span>
+    <h2><span data-i18n="es">Usuarios: nombre y desde dónde</span><span data-i18n="en">Users: a name and where from</span></h2>
+    <div class="split splitc"><div class="split-l"><div><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">USER</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span> <span class="sk">IDENTIFIED</span> <span class="sk">BY</span> <span class="ss">&#x27;password&#x27;</span>;
+<span class="sk">CREATE</span> <span class="sk">USER</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;10.20.%&#x27;</span>   <span class="sk">IDENTIFIED</span> <span class="sk">BY</span> <span class="ss">&#x27;password&#x27;</span>;
+
+<span class="sk">ALTER</span> <span class="sk">USER</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>
+    <span class="sk">IDENTIFIED</span> <span class="sk">BY</span> <span class="ss">&#x27;otra_password&#x27;</span>;
+<span class="sk">DROP</span> <span class="sk">USER</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es">Un usuario es <strong>nombre + equipo</strong>: <code>'alicia'@'localhost'</code> y <code>'alicia'@'10.20.%'</code> son dos cuentas distintas.</li><li data-i18n="en">A user is <strong>name + host</strong>: <code>'alicia'@'localhost'</code> and <code>'alicia'@'10.20.%'</code> are two different accounts.</li><li data-i18n="es"><code>%</code> vale por «cualquiera»: <code>10.20.%</code> son todas las IP que empiezan por 10.20.</li><li data-i18n="en"><code>%</code> means “any”: <code>10.20.%</code> covers every IP starting with 10.20.</li><li data-i18n="es">Un usuario recién creado <strong>no puede hacer nada</strong> salvo conectarse.</li><li data-i18n="en">A newly created user <strong>can do nothing</strong> but connect.</li></ul></div></div>
+    <p class="note"><span data-i18n="es">Crear usuarios es una operación de administrador: normalmente, de <code>root</code>.</span><span data-i18n="en">Creating users is an administrator operation: normally, <code>root</code>.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="3">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">08 — Usuarios y permisos (DCL)</span><span data-i18n="en">08 — Users and permissions (DCL)</span></span>
+    <h2><span data-i18n="es">GRANT, REVOKE y SHOW GRANTS</span><span data-i18n="en">GRANT, REVOKE and SHOW GRANTS</span></h2>
+    <div class="split splitc"><div class="split-l"><div data-i18n="es"><pre class="code sql sm"><span class="sk">GRANT</span> <span class="sk">SELECT</span>, <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="sk">GRANT</span> <span class="sk">UPDATE</span> <span class="sk">ON</span> ikea.cliente <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+
+<span class="sk">SHOW</span> <span class="sk">GRANTS</span> <span class="sk">FOR</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+
+<span class="sk">REVOKE</span> <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">FROM</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">GRANT</span> <span class="sk">SELECT</span>, <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="sk">GRANT</span> <span class="sk">UPDATE</span> <span class="sk">ON</span> ikea.customer <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+
+<span class="sk">SHOW</span> <span class="sk">GRANTS</span> <span class="sk">FOR</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+
+<span class="sk">REVOKE</span> <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">FROM</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es"><code>GRANT privilegio ON nivel TO cuenta</code>.</li><li data-i18n="en"><code>GRANT privilege ON level TO account</code>.</li><li data-i18n="es">Nivel: <code>*.*</code> todo el servidor; <code>ikea.*</code> una base; <code>ikea.cliente</code> una tabla.</li><li data-i18n="en">Level: <code>*.*</code> the whole server; <code>ikea.*</code> one database; <code>ikea.customer</code> one table.</li><li data-i18n="es"><code>REVOKE … FROM</code> quita exactamente lo que se indique, al nivel que se indique.</li><li data-i18n="en"><code>REVOKE … FROM</code> removes exactly what you say, at the level you say.</li><li data-i18n="es"><code>USAGE</code> significa «ningún privilegio».</li><li data-i18n="en"><code>USAGE</code> means “no privilege”.</li></ul></div></div>
+    <p class="note"><span data-i18n="es"><strong>Mínimo privilegio</strong>: a cada usuario, lo que necesita para su trabajo y nada más.</span><span data-i18n="en"><strong>Least privilege</strong>: give each user what they need for their job and nothing more.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="activity">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="activity-badge">?</span>
+    <span class="eyebrow"><span data-i18n="es">Actividad individual</span><span data-i18n="en">Individual activity</span></span>
+    <h2><span data-i18n="es">Escribe los permisos</span><span data-i18n="en">Write the permissions</span></h2>
+    
+    <ol class="prompts"><li data-i18n="es"><code>alicia</code> solo puede consultar la base <code>ikea</code>.</li><li data-i18n="en"><code>alicia</code> can only query the <code>ikea</code> database.</li><li data-i18n="es"><code>pepito</code> puede consultar e insertar en <code>ikea</code>, pero no borrar.</li><li data-i18n="en"><code>pepito</code> can query and insert in <code>ikea</code>, but not delete.</li><li data-i18n="es"><code>admin</code> puede todo en todo… y dar permisos a otros.</li><li data-i18n="en"><code>admin</code> can do everything on everything… and give permissions to others.</li><li data-i18n="es">Más tarde, <code>pepito</code> deja de poder insertar.</li><li data-i18n="en">Later, <code>pepito</code> loses the right to insert.</li></ol>
+    
+  </div>
+</section>
+
+<section class="slide" data-deco="solucion">
+  <div class="deco-corner deco-a deco-activity"></div>
+  <div class="slide-inner activity-inner">
+    <span class="solution-badge">✓</span>
+    <span class="eyebrow"><span data-i18n="es">Solución</span><span data-i18n="en">Solution</span></span>
+    <h2><span data-i18n="es">Cuatro líneas y un REVOKE</span><span data-i18n="en">Four lines and a REVOKE</span></h2>
+    <div><pre class="code sql"><span class="sk">GRANT</span> <span class="sk">SELECT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="sk">GRANT</span> <span class="sk">SELECT</span>, <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="sk">GRANT</span> <span class="sk">ALL</span> <span class="sk">PRIVILEGES</span> <span class="sk">ON</span> *.* <span class="sk">TO</span> <span class="ss">&#x27;admin&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span> <span class="sk">WITH</span> <span class="sk">GRANT</span> <span class="sk">OPTION</span>;
+<span class="sk">REVOKE</span> <span class="sk">INSERT</span> <span class="sk">ON</span> ikea.* <span class="sk">FROM</span> <span class="ss">&#x27;pepito&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div>
+    <p class="note"><span data-i18n="es"><code>ALL PRIVILEGES</code> no incluye <code>GRANT OPTION</code>: sin el <code>WITH GRANT OPTION</code>, <code>admin</code> no podría dar permisos a nadie.</span><span data-i18n="en"><code>ALL PRIVILEGES</code> doesn't include <code>GRANT OPTION</code>: without <code>WITH GRANT OPTION</code>, <code>admin</code> couldn't give permissions to anyone.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="4">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">08 — Usuarios y permisos (DCL)</span><span data-i18n="en">08 — Users and permissions (DCL)</span></span>
+    <h2><span data-i18n="es">Roles: un paquete de permisos con nombre</span><span data-i18n="en">Roles: a named bundle of permissions</span></h2>
+    <div class="split splitc"><div class="split-l"><div data-i18n="es"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">ROLE</span> <span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span> ikea_admin, ikea_consulta;
+
+<span class="sk">GRANT</span> <span class="sk">ALL</span> <span class="sk">PRIVILEGES</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> ikea_admin;
+<span class="sk">GRANT</span> <span class="sk">SELECT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> ikea_consulta;
+
+<span class="sk">GRANT</span> ikea_consulta <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="st">SET</span> <span class="sk">DEFAULT</span> <span class="sk">ROLE</span> ikea_consulta <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div><div data-i18n="en"><pre class="code sql sm"><span class="sk">CREATE</span> <span class="sk">ROLE</span> <span class="sk">IF</span> <span class="sk">NOT</span> <span class="sk">EXISTS</span> ikea_admin, ikea_read_only;
+
+<span class="sk">GRANT</span> <span class="sk">ALL</span> <span class="sk">PRIVILEGES</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> ikea_admin;
+<span class="sk">GRANT</span> <span class="sk">SELECT</span> <span class="sk">ON</span> ikea.* <span class="sk">TO</span> ikea_read_only;
+
+<span class="sk">GRANT</span> ikea_read_only <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;
+<span class="st">SET</span> <span class="sk">DEFAULT</span> <span class="sk">ROLE</span> ikea_read_only <span class="sk">TO</span> <span class="ss">&#x27;alicia&#x27;</span>@<span class="ss">&#x27;localhost&#x27;</span>;</pre></div></div><div class="split-r"><ul class="bul"><li data-i18n="es">Dar los mismos permisos a veinte usuarios: se crea <strong>un rol</strong> y se asigna a los veinte.</li><li data-i18n="en">Giving the same permissions to twenty users: create <strong>one role</strong> and assign it to all twenty.</li><li data-i18n="es">Si mañana cambian los permisos, se cambia el rol y listo.</li><li data-i18n="en">If the permissions change tomorrow, change the role and you're done.</li><li data-i18n="es"><strong>La trampa:</strong> tener el rol no es usarlo. Hay que activarlo con <code>SET ROLE</code> o, para siempre, con <code>SET DEFAULT ROLE</code>.</li><li data-i18n="en"><strong>The trap:</strong> having the role isn't using it. Activate it with <code>SET ROLE</code> or, permanently, with <code>SET DEFAULT ROLE</code>.</li></ul></div></div>
+    <p class="note"><span data-i18n="es">Sin activar el rol, <code>SELECT CURRENT_ROLE();</code> devuelve <code>NONE</code> y las consultas fallan con «command denied».</span><span data-i18n="en">Without activating the role, <code>SELECT CURRENT_ROLE();</code> returns <code>NONE</code> and queries fail with “command denied”.</span></p>
+  </div>
+</section>
+
+<section class="slide" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">09 — Cuando algo falla</span><span data-i18n="en">09 — When something fails</span></span>
+    <h2><span data-i18n="es">Los errores que vas a ver</span><span data-i18n="en">The errors you'll meet</span></h2>
+    <div class="kv"><div class="kv-row"><span class="kv-k">1064</span><span class="kv-v"><span data-i18n="es">Error de sintaxis: falta una coma, un paréntesis o un <code>;</code>.</span><span data-i18n="en">Syntax error: a missing comma, parenthesis or <code>;</code>.</span></span></div><div class="kv-row"><span class="kv-k">1046</span><span class="kv-v"><span data-i18n="es">No hay base de datos seleccionada: falta el <code>USE</code>.</span><span data-i18n="en">No database selected: the <code>USE</code> is missing.</span></span></div><div class="kv-row"><span class="kv-k">1050</span><span class="kv-v"><span data-i18n="es">La tabla ya existe: <code>IF NOT EXISTS</code>.</span><span data-i18n="en">The table already exists: <code>IF NOT EXISTS</code>.</span></span></div><div class="kv-row"><span class="kv-k">1146</span><span class="kv-v"><span data-i18n="es">La tabla no existe (o la escribiste con otras mayúsculas).</span><span data-i18n="en">The table doesn't exist (or you wrote it with different capitals).</span></span></div><div class="kv-row"><span class="kv-k">1048 / 1364</span><span class="kv-v"><span data-i18n="es">Columna <code>NOT NULL</code> sin valor ni <code>DEFAULT</code>.</span><span data-i18n="en"><code>NOT NULL</code> column with no value and no <code>DEFAULT</code>.</span></span></div><div class="kv-row"><span class="kv-k">1062</span><span class="kv-v"><span data-i18n="es">Valor duplicado en una columna <code>UNIQUE</code> o clave primaria.</span><span data-i18n="en">Duplicate value in a <code>UNIQUE</code> or primary-key column.</span></span></div><div class="kv-row"><span class="kv-k">3819</span><span class="kv-v"><span data-i18n="es">Una fila incumple un <code>CHECK</code>.</span><span data-i18n="en">A row breaks a <code>CHECK</code>.</span></span></div><div class="kv-row"><span class="kv-k">1452 / 1451</span><span class="kv-v"><span data-i18n="es">Clave ajena: el padre no existe / el padre tiene hijos.</span><span data-i18n="en">Foreign key: the parent doesn't exist / the parent has children.</span></span></div><div class="kv-row"><span class="kv-k">1142 / 1044</span><span class="kv-v"><span data-i18n="es">Falta un permiso: es un asunto de <code>GRANT</code>.</span><span data-i18n="en">A permission is missing: it's a <code>GRANT</code> matter.</span></span></div></div>
+    <p class="note"><span data-i18n="es">Lee siempre el número y el texto del error: casi siempre te dice qué columna o qué restricción es la culpable.</span><span data-i18n="en">Always read the error number and text: it almost always tells you which column or constraint is to blame.</span></p>
+  </div>
+</section>
+
+<section class="slide slide-final" data-deco="5">
+  <div class="deco-corner deco-a"></div><div class="deco-corner deco-b"></div>
+  <div class="slide-inner">
+    <span class="eyebrow"><span data-i18n="es">En resumen</span><span data-i18n="en">In summary</span></span>
+    <h2><span data-i18n="es">Cinco ideas para llevarse</span><span data-i18n="en">Five ideas to take away</span></h2>
+    <ol class="final-list"><li><strong><span data-i18n="es">SQL se divide</span><span data-i18n="en">SQL is split</span></strong> <span data-i18n="es">en DDL (estructura), DML (datos), DCL (permisos) y TCL (transacciones). Aquí, DDL y DCL.</span><span data-i18n="en">into DDL (structure), DML (data), DCL (permissions) and TCL (transactions). Here, DDL and DCL.</span></li><li><strong><span data-i18n="es">Cada columna</span><span data-i18n="en">Every column</span></strong> <span data-i18n="es">lleva un tipo (<code>DECIMAL</code> para dinero, nunca <code>FLOAT</code>) y las restricciones que protegen los datos: <code>NOT NULL</code>, <code>UNIQUE</code>, <code>PRIMARY KEY</code>, <code>CHECK</code>.</span><span data-i18n="en">takes a type (<code>DECIMAL</code> for money, never <code>FLOAT</code>) and the constraints that protect the data: <code>NOT NULL</code>, <code>UNIQUE</code>, <code>PRIMARY KEY</code>, <code>CHECK</code>.</span></li><li><strong><span data-i18n="es">Una clave ajena</span><span data-i18n="en">A foreign key</span></strong> <span data-i18n="es">solo vigila si la declaras, y su política (<code>RESTRICT</code>, <code>CASCADE</code>, <code>SET NULL</code>) decide qué pasa con los hijos.</span><span data-i18n="en">only watches if you declare it, and its policy (<code>RESTRICT</code>, <code>CASCADE</code>, <code>SET NULL</code>) decides what happens to the children.</span></li><li><strong><span data-i18n="es">Del esquema al script</span><span data-i18n="en">From schema to script</span></strong> <span data-i18n="es">se crean primero las tablas independientes y después las que apuntan a ellas.</span><span data-i18n="en">create the independent tables first and then those that point to them.</span></li><li><strong><span data-i18n="es">Los permisos</span><span data-i18n="en">Permissions</span></strong> <span data-i18n="es">se dan con <code>GRANT</code>, se quitan con <code>REVOKE</code> y siguen el mínimo privilegio; los roles evitan repetirlos (¡y hay que activarlos!).</span><span data-i18n="en">are given with <code>GRANT</code>, removed with <code>REVOKE</code> and follow least privilege; roles avoid repeating them (and must be activated!).</span></li></ol><p class="credits"><span data-i18n="es">Resumen elaborado a partir de UT4 · Diseño físico — Base de datos, 1º DAM — Marina Preciados Agapito.</span><span data-i18n="en">Summary built from Unit 4 · Physical design — Databases, 1st year DAM — Marina Preciados Agapito.</span></p>
+    
+  </div>
+</section>
+
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button type="button" class="nav-btn" id="btn-prev" onclick="go(-1)" aria-label="Previous slide">‹</button>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="slide-counter" id="slide-counter">1 / 34</span>
+    </div>
+    <button type="button" class="nav-btn" id="btn-next" onclick="go(1)" aria-label="Next slide">›</button>
+  </div>
+  <p class="hint"><span data-i18n="es">Usa las flechas del teclado, haz clic en ‹ › o pulsa pantalla completa para proyectar en clase.</span><span data-i18n="en">Use the arrow keys, click ‹ ›, or hit fullscreen to project in class.</span></p>
+
+</div><!-- /#deck-app -->
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var idx = 0;
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('is-active', i===idx); });
+    document.getElementById('slide-counter').textContent = (idx+1) + ' / ' + total;
+    document.getElementById('progress-fill').style.width = ((idx+1)/total*100) + '%';
+    document.getElementById('btn-prev').disabled = idx===0;
+    document.getElementById('btn-next').disabled = idx===total-1;
+  }
+
+  window.go = function(delta){
+    idx = Math.max(0, Math.min(total-1, idx+delta));
+    render();
+  };
+
+  document.addEventListener('keydown', function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); go(1); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); go(-1); }
+    else if(e.key==='Home'){ idx=0; render(); }
+    else if(e.key==='End'){ idx=total-1; render(); }
+  });
+
+  window.setLang = function(lang){
+    var app = document.getElementById('deck-app');
+    if(app) app.setAttribute('data-lang', lang);
+    document.getElementById('btn-es').classList.toggle('active', lang==='es');
+    document.getElementById('btn-en').classList.toggle('active', lang==='en');
+    try{ localStorage.setItem('ut4-resumen-lang', lang); }catch(e){}
+  };
+
+  window.toggleFullscreen = function(){
+    var stage = document.getElementById('stage');
+    if(!document.fullscreenElement){
+      if(stage.requestFullscreen) stage.requestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+    }
+  };
+
+  window.setTheme = function(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    var icon = document.getElementById('theme-icon');
+    var labelEs = document.querySelector('#theme-label [data-i18n="es"]');
+    var labelEn = document.querySelector('#theme-label [data-i18n="en"]');
+    if(theme === 'dark'){
+      if(icon) icon.textContent = '☀️';
+      if(labelEs) labelEs.textContent = 'Modo claro';
+      if(labelEn) labelEn.textContent = 'Light mode';
+    } else {
+      if(icon) icon.textContent = '🌙';
+      if(labelEs) labelEs.textContent = 'Modo oscuro';
+      if(labelEn) labelEn.textContent = 'Dark mode';
+    }
+    try{ localStorage.setItem('ut4-resumen-theme', theme); }catch(e){}
+  };
+  window.toggleTheme = function(){
+    var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  try{
+    var savedTheme = localStorage.getItem('ut4-resumen-theme');
+    if(savedTheme) setTheme(savedTheme);
+  }catch(e){}
+
+  try{
+    var saved = localStorage.getItem('ut4-resumen-lang');
+    if(saved) setLang(saved);
+  }catch(e){}
+
+  render();
+})();
+</script>
+
+
+<script>
+(function(){
+  var body = document.body;
+  var tg = document.querySelector('.sidebar-toggle');
+  var bd = document.querySelector('.sidebar-backdrop');
+  var sb = document.querySelector('.sidebar');
+  if(!tg || !bd || !sb) return;
+  var KEY = 'bbdd-sidebar';
+  function isNarrow(){ return window.matchMedia('(max-width:880px)').matches; }
+  function setCollapsed(collapsed, remember){
+    body.classList.toggle('sidebar-collapsed', collapsed);
+    if(remember){
+      try{ localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); }catch(e){}
+    }
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem(KEY); }catch(e){}
+  if(saved === 'collapsed' || saved === 'open'){
+    setCollapsed(saved === 'collapsed', false);
+  } else {
+    setCollapsed(isNarrow(), false);
+  }
+  tg.addEventListener('click', function(){
+    setCollapsed(!body.classList.contains('sidebar-collapsed'), true);
+  });
+  bd.addEventListener('click', function(){ setCollapsed(true, true); });
+  sb.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      if(isNarrow()){ setCollapsed(true, true); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
